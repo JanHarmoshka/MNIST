@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -69,6 +70,7 @@ namespace MNIST
 
         private List<float> inter_Data = new List<float>();
         List<float> assessment = new List<float>();
+        System.Diagnostics.Stopwatch sw = new Stopwatch();
 
 
         public Counter Assessment(List<float> InputData, int IndexData = -1)
@@ -83,7 +85,17 @@ namespace MNIST
             int fulEror100 = (int)(fulEror / 100f);
             Counter counter = new Counter();
 
+            float assessment_;
+            float appeal_;
+            float inter_Data_;
+
+            if (nn == 0)
+            {
+                sw.Start();
+            }
             nn++;
+
+
 
             // Чистка
             if (nn % V6 == 0)
@@ -93,6 +105,7 @@ namespace MNIST
                 {
                     if (ListMatte[j].appeal == 0.3f & ListMatte[j].Control_value <= 0)
                     {
+                        //message += "-";
                         Empty.Add(j);
                     }
                 }
@@ -141,19 +154,26 @@ namespace MNIST
             inter_Data.Clear();
             inter_Data = InputData.GetRange(0, InputData.Count);
 
-            //Коррекция сигнала от сенсоров
+            //Коррекция сигнала от сенсоров (новый вариант)
             if (inter_Data.Count > 0 & ListReverseMatte.Count > 0 & assessment.Count > 0)
             {
                 for (int j = 0; j < ListReverseMatte.Count; j++)
                 {
-                    if (assessment[j] > 0.0f & ListReverseMatte[j].appeal_ > 0)
+                    if (ListReverseMatte[j].Control_value > 0f & assessment[j] > 0.0f)
                     {
+                        assessment_ = assessment[j];
+                        appeal_ = ListReverseMatte[j].appeal_;
+
                         for (int i = 0; i < inter_Data.Count; i++)
                         {
-                            inter_Data[i] = (float)(InputData[i] + ListReverseMatte[j].matte[i] * assessment[j] * ListReverseMatte[j].appeal_ * 10f);
+                            inter_Data_ = InputData[i] + ListReverseMatte[j].matte[i] * assessment_ * appeal_ * 10f;
+                            if (inter_Data[i] < inter_Data_)
+                            {
+                                inter_Data[i] = inter_Data_;
+                            }
+
                         }
                     }
-
                 }
             }//Конец коррекции
 
@@ -189,10 +209,14 @@ namespace MNIST
             for (int i = 0; i < ListMatte.Count; i++)
             {
                 Activ = 0;
-                for (int j = 0; j < ContractionInputData.Count; j++)
+                if (ListMatte[i].appeal == 0.3f & ListMatte[i].Control_value <= 0) { }
+                else
                 {
-                    n = ContractionInputData[j];
-                    Activ += ListMatte[i].matte[n] * inter_Data[n];
+                    for (int j = 0; j < ContractionInputData.Count; j++)
+                    {
+                        n = ContractionInputData[j];
+                        Activ += ListMatte[i].matte[n] * inter_Data[n];
+                    }
                 }
                 if (Activ > Activ_)
                 {
@@ -212,24 +236,23 @@ namespace MNIST
 
 
             //Обучение масок
-            if (Activ_ > ListMatte[Index].appeal)
+            if (Activ_ > ListMatte[Index].appeal + 0.1f)//
             {
                 ListMatte[Index].Lesson(InputData);
-                if (Activ_ > ListMatte[Index].appeal)
+                if (Activ_ > ListMatte[Index].appeal & ListMatte[Index].appeal < 0.9f)
                 {
-                    if (ListMatte[Index].appeal < 0.9f)
-                    {
-                        ListMatte[Index].appeal = ListMatte[Index].appeal + 0.001f;
-                    }
+                    ListMatte[Index].appeal = ListMatte[Index].appeal + 0.001f;
                 }
-            }//Конец обучения масок
-
-
-            if (Activ_ <= satiety)
+            }
+            //else
+            //{
+            if (Activ_ <= satiety + 0.1f)//
             {
                 Matte matte = new Matte(InputData, (ushort)(ListMatte.Count), satiety);
                 ListMatte.Add(matte);
             }
+            //}
+            //Конец обучения масок
 
             //Расчёт активности результирующих масок 
             var Ind = -1;
@@ -240,20 +263,29 @@ namespace MNIST
                 {
                     assessment.Add(0);
                 }
-                for (int j = 0; j < ContractionInterResult.Count; j++)
+                if (ListReverseMatte[i].appeal_ <= 0.0f & ListReverseMatte[i].Control_value <= 0f) { }
+                else
                 {
-                    n = ContractionInterResult[j];
-                    if (ListReverseMatte[i].Correct.Count > n)
+                    for (int j = 0; j < ContractionInterResult.Count; j++)
                     {
-                        assessment[i] = assessment[i] + inter_result[n] * ListReverseMatte[i].Correct[n];
+                        n = ContractionInterResult[j];
+                        if (ListReverseMatte[i].Correct.Count > n)
+                        {
+                            if (ListReverseMatte[i].Correct[n] > 0)
+                            {
+                                assessment[i] = assessment[i] + inter_result[n] * ListReverseMatte[i].Correct[n];
+                            }
+                        }
                     }
                 }
+
                 if (Activ < assessment[i] & assessment[i] > 0)
                 {
                     Activ = assessment[i];
                     Ind = i;
                 }
             }//Конец расчёт активности результирующих масок 
+            counter.assessment_.Clear();
 
             //Подсчет ошибки
             if (ListReverseMatte.Count < Ind | Ind == -1)
@@ -264,7 +296,7 @@ namespace MNIST
             }
             else
             {
-                if (ListReverseMatte[Ind].room != IndexData)
+                if (ListReverseMatte[Ind].room != IndexData | IndexData == -1)
                 {
                     all.Add(1);
                     allEror++;
@@ -279,25 +311,29 @@ namespace MNIST
 
             if (all.Count > fulEror)
             {
-                allEror = allEror - all[0];
+                allEror -= all[0];
                 all.RemoveAt(0);
             }
 
 
-            if (nn % (fulEror100 * 10) == 0)//Вывод ошибки
+            if (nn % (fulEror100 * 1) == 0)//Вывод ошибки
             {
                 message = "\r\n";
-                message += String.Format(" {0:0000}", (double)nn / fulEror100); // Сколько элементов просмотрено, %
-                message += String.Format(" {0:00.00}", (double)allEror / fulEror100); // Какой процент ошибки среди просмотренных, %				
+                message += String.Format("{0:0000}", (double)nn / fulEror100) + "%"; // Сколько элементов просмотрено, %
+
                 if (nn < fulEror)
                 {
-                    message += String.Format(" {0:00.00}", (double)(nn - allEror) / fulEror100); // Какой процент без ошибки среди просмотренных, %
+                    // message += String.Format(" {0:00.00}", (double)(nn - allEror) / fulEror100); // Какой процент без ошибки среди просмотренных, %
                     if (nn != 0)
                     {
-                        message += String.Format(" {0:00.00}", (100f - (((nn - allEror) / (float)fulEror100) / (float)(nn / (float)fulEror100)) * 100f)); // Предполагаемая ошибка
+                        message += " ошибка:" + String.Format("{0:00.00}", (100f - (((nn - allEror) / (float)fulEror100) / (float)(nn / (float)fulEror100)) * 100f)) + "%"; // Предполагаемая ошибка
                     }
                 }
-                message += " " + ListMatte.Count.ToString() + "/" + ListReverseMatte.Count.ToString();
+                else
+                {
+                    message += " ошибка:" + String.Format("{0:00.00}", (double)allEror / fulEror100) + "%"; // Какой процент ошибки среди просмотренных, %		
+                }
+                message += " нейронов:" + ListMatte.Count.ToString() + " групп:" + ListReverseMatte.Count.ToString();
             }
             //Конец подсчёта ошибок	
 
@@ -327,7 +363,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (ListReverseMatte[Ind].appeal_ > V2 & Activ < 1f - ListReverseMatte[Ind].appeal_)
+                    if (ListReverseMatte[Ind].appeal_ > V2 & Activ < 1f - ListReverseMatte[Ind].appeal_ & ListReverseMatte.Count < 1000)//
                     {
                         for (int i = 0; i < assessment.Count; i++)
                         {
@@ -357,16 +393,10 @@ namespace MNIST
                 {
                     for (int i = 0; i < assessment.Count; i++)
                     {
-                        if (i != Ind)
+                        if (i != Ind & ListReverseMatte[i].room == IndexData & assessment[i] > RoomValue)
                         {
-                            if (ListReverseMatte[i].room == IndexData)
-                            {
-                                if (assessment[i] > RoomValue)
-                                {
-                                    RoomValue = assessment[i];
-                                    RoomIndex = i;
-                                }
-                            }
+                            RoomValue = assessment[i];
+                            RoomIndex = i;
                         }
                     }
                     if (RoomIndex > -1 & RoomValue > -1000)
@@ -381,7 +411,10 @@ namespace MNIST
             {
                 for (int i = 0; i < ListReverseMatte.Count; i++)
                 {
-                    assessment[i] = (float)assessment[i] / Activ;
+                    if (assessment[i] > 0)
+                    {
+                        assessment[i] = (float)assessment[i] / Activ;
+                    }
                 }
             }
             if (Ind > -1 & Pass)
@@ -396,12 +429,9 @@ namespace MNIST
                     if (assessment[Ind] > ListReverseMatte[Ind].appeal_ | Lesson_trigger)
                     {
                         ListReverseMatte[Ind].Lesson(InputData, inter_result, 1, Correct_trigger);
-                        if (assessment[Ind] > ListReverseMatte[Ind].appeal_)
+                        if (assessment[Ind] > ListReverseMatte[Ind].appeal_ & ListReverseMatte[Ind].appeal_ < 0.95f)
                         {
-                            if (ListReverseMatte[Ind].appeal_ < 0.95f)
-                            {
-                                ListReverseMatte[Ind].appeal_ = ListReverseMatte[Ind].appeal_ + 0.01f;
-                            }
+                            ListReverseMatte[Ind].appeal_ += 0.01f;
                         }
                     }
                 }//Конец основного цикла обучения
@@ -416,7 +446,7 @@ namespace MNIST
                             ListReverseMatte[i].Control_value++;
                             if (ListReverseMatte[i].appeal_ < 0.90f)
                             {
-                                ListReverseMatte[i].appeal_ = ListReverseMatte[Ind].appeal_ + 0.001f;
+                                ListReverseMatte[i].appeal_ += 0.001f;
                             }
                         }
                     }
@@ -456,6 +486,13 @@ namespace MNIST
                     }
 
                 }
+                if (nn % (fulEror100 * 1) == 0)
+                {
+                    message += String.Format(" {00:00.00}", sw.ElapsedMilliseconds / 1000.0) + "c.";
+                    sw.Restart();
+                }
+
+
             }
             //Конец фиксации обучения	
             counter.str1 = allEror;
@@ -528,7 +565,7 @@ namespace MNIST
                 matte.Add(0);
             }
             appeal = satiety;
-            Control_value = 100;
+            Control_value = 500;
             this.Sleep();
             Contraction = true;
         }
@@ -571,9 +608,9 @@ namespace MNIST
                 }
                 summ_0 = summ_0 + matte[j];
             }
-            if (max_0 == 1)
+            if (max_0 < 2.0f)
             {
-                if (summ_0 == 0)
+                if (summ_0 < 0.1f)
                 {
                     if (Control_value > 0)
                     {
@@ -583,7 +620,7 @@ namespace MNIST
                 }
                 else
                 {
-                    Control_value = 100;
+                    Control_value = 1000;
                 }
 
             }
@@ -598,7 +635,7 @@ namespace MNIST
             {
                 if (InputData[j] >= 1)
                 {
-                    mask[j] = (float)(mask[j] + (InputData[j] * res * 10));
+                    mask[j] = (mask[j] + (InputData[j] * res * 10f));
                 }
             }
         }
@@ -775,7 +812,7 @@ namespace MNIST
             }
             summ_0 = summ_0 / Correct.Count;
 
-            if (Math.Abs(summ_0) < 0.01f)
+            if (Math.Abs(summ_0) < 1.1f)
             {
                 if (Control_value > 0)
                 {
@@ -802,5 +839,6 @@ namespace MNIST
     {
         public float str1;
         public bool str2;
+        public List<float> assessment_ = new List<float>();
     }
 }
