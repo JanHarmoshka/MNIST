@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MNIST
 {
@@ -15,6 +12,7 @@ namespace MNIST
         public bool Contraction;
         public bool Contraction_;
         public int Control_value;
+        public int SleepStep;
         private List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
 
@@ -30,6 +28,7 @@ namespace MNIST
             Control_value = 250;
             this.Sleep();
             Contraction = true;
+            SleepStep = 10;
         }
 
         /// Сон маски. 
@@ -40,7 +39,7 @@ namespace MNIST
             Contraction = false;
             Contraction_ = false;
             Single max = 0;
-            Single max_0 = 0;
+            Single max_0;
             for (int j = 0; j < mask.Count; j++)
             {
                 if (max < mask[j])
@@ -48,7 +47,7 @@ namespace MNIST
             }
             max_0 = max;
 
-            max = (float)max / 2;
+            max = (float)max / 2.2f;//2
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
@@ -70,7 +69,7 @@ namespace MNIST
                 }
                 summ_0 = summ_0 + matte[j];
             }
-            if (max_0 < 100.0f)//10
+            if (max_0 < SleepStep)//10 50.0f
             {
                 if (summ_0 < 0.3f)//0.1
                 {
@@ -86,6 +85,11 @@ namespace MNIST
                 }
 
             }
+            //if (SleepStep < 300)
+            //{
+            //    SleepStep++;
+            //}
+
         }
 
         /// Обучение маски.
@@ -122,6 +126,7 @@ namespace MNIST
     public class ReverseMatte
     {
         public int room;
+        public int Live;
         public float Control_value;
         public bool Contraction;
         public bool Contraction_;
@@ -129,24 +134,27 @@ namespace MNIST
         public float appeal_;
         private List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
-        public List<Single> Refined = new List<Single>();
-        public List<Single> Correct = new List<Single>();
-        public List<Single> Appeal = new List<Single>();
+        public List<float> Refined = new List<float>();
+        public List<float> Correct = new List<float>();
+        public List<float> Appeal = new List<float>();
 
-        public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, float satiety = 0.3f)
+        public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, int nn, float satiety = 0.3f)
         {
             appeal = satiety;
             appeal_ = 0.0f;
             room = IndexData;
-            mask = InputData.GetRange(0, InputData.Count);
-            Refined = inter_result.GetRange(0, inter_result.Count);
-            for (int i = 0; i < mask.Count; i++)
+            //mask = InputData.GetRange(0, InputData.Count);
+            //Refined = inter_result.GetRange(0, inter_result.Count);
+            Live = nn;
+            for (int i = 0; i < InputData.Count; i++)
             {
-                matte.Add(0);
+                mask.Add(InputData[i] * 0.1f);
+                matte.Add(-0f);
             }
-            for (int i = 0; i < Refined.Count; i++)
+            for (int i = 0; i < inter_result.Count; i++)
             {
-                Correct.Add(0);
+                Refined.Add(inter_result[i] * 0.1f);
+                Correct.Add(-0.5f);
                 Appeal.Add(appeal);
             }
             Control_value = 100;
@@ -181,21 +189,24 @@ namespace MNIST
                     Appeal.Add(appeal);
                 }
             }
-
-            for (int j = 1; j < inter_result.Count; j++)
+            if (inter_result.Count > 0)
             {
-                if (inter_result[j] > 0.0f)
+                for (int j = 1; j < inter_result.Count; j++)
                 {
-                    if (Correct[j] * 10f >= Appeal[j] | Correct[j] < 0.00001f)
+                    if (inter_result[j] > 0.0f)
                     {
-                        Refined[j] = (float)(Refined[j] + inter_result[j] * res);
-                        if (Appeal[j] < 0.3f)
+                        if (Correct[j] * 10f >= Appeal[j] | Correct[j] < 0.00001f)
                         {
-                            Appeal[j] = Appeal[j] + 0.0001f;
+                            Refined[j] = (float)(Refined[j] + inter_result[j] * res);
+                            if (Appeal[j] < 0.3f)
+                            {
+                                Appeal[j] = Appeal[j] + 0.0001f;
+                            }
                         }
                     }
                 }
             }
+
 
             if (leader)
             {
@@ -224,7 +235,7 @@ namespace MNIST
                     max = mask[j];
             }
 
-            max = (float)max / 2;
+            max = (float)max / 3f;
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
@@ -262,7 +273,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0)
+                if (Control_value > 0 & appeal_ < 0.9f)//
                 {
                     Control_value--;
                     Contraction_ = true;
@@ -270,7 +281,7 @@ namespace MNIST
             }
             else
             {
-                Control_value = 100;
+                Control_value = 101;
             }
         }
     }
@@ -282,7 +293,10 @@ namespace MNIST
         public bool str2;
         public List<byte> inter_Data_ = new List<byte>();
         public List<byte> inter_Data_Full = new List<byte>();
+        public List<float> Assessment = new List<float>();
+        public List<int> room = new List<int>();
         public int summ;
         public int summ2;
+        public int Index;
     }
 }
