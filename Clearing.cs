@@ -263,6 +263,21 @@ namespace MNIST
                     Activ = Activ4;
                     Ind = Ind4;
                 }
+
+                SecondActiv = SecondActiv1;
+                if (SecondActiv < SecondActiv2)
+                {
+                    SecondActiv = SecondActiv2;
+                }
+                if (SecondActiv < SecondActiv3)
+                {
+                    SecondActiv = SecondActiv3;
+                }
+                if (SecondActiv < SecondActiv4)
+                {
+                    SecondActiv = SecondActiv4;                    
+                }
+
             }
             if (Activ > 1)
             {

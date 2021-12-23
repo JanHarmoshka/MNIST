@@ -102,7 +102,7 @@ namespace MNIST
 
             for (int i = InputDataCount - Dispenser; i < InputDataCount; i++)
             {
-                if (inter_Data[i] >= 1.0f)
+                if (inter_Data[i] > 1.0f)
                 {
                     counter.inter_Data_.Add(1);
                 }
@@ -117,7 +117,7 @@ namespace MNIST
             int l = 0;
             for (int i = InputDataCount - Dispenser + 1; i < InputDataCount; i++)
             {
-                if (inter_Data[i] >= 1.0f)
+                if (inter_Data[i] > 1.0f)
                 {
                     if (l < Dispenser)
                     {
@@ -249,7 +249,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.7f)//
+                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.5f)//
                     {
                         IndVar = true;
                     }
@@ -259,7 +259,7 @@ namespace MNIST
                 {
                     for (int i = 0; i < AssessmentFirst.Count; i++)
                     {
-                        AssessmentFirst[i] = 0;
+                        AssessmentFirst[i] = 0.001f;
                     }
                     ReverseMatte reverseMatte = new ReverseMatte(InputData, IndexData, inter_result, nnn, ReverseSatiety);
                     ListReverseMatte.Add(reverseMatte);

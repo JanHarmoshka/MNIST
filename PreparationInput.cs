@@ -59,11 +59,10 @@ namespace MNIST
                     X = (int)Math.Ceiling(SumX / num);
                     Y = (int)Math.Ceiling(SumY / num);
                 }
-                else
-                {
-
-                }
             }
+
+            X += X;//координаты зрачка
+            Y += Y;
 
             if (prevX2 > 0 & prevY2 > 0)
             {
@@ -87,12 +86,12 @@ namespace MNIST
 
             prevX1 = prevX2;
             prevY1 = prevY2;
-            if (counter.summ < 10 & counter.summ2 > 0)
+            if (counter.summ < 1 & counter.summ2 > 0)
             {
                 X = prevX2;
                 counter.summ = 1;
             }
-            if (counter.summ2 < 10 & counter.summ > 0)
+            if (counter.summ2 < 1 & counter.summ > 0)
             {
                 Y = prevY2;
                 counter.summ2 = 1;
@@ -100,7 +99,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if (counter.summ < 1 & counter.summ2 < 1 | counter.inter_Data_.Count < 1 | X > 13 | Y > 13 | X < 1 | Y < 1 | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
+            if (counter.summ < 1 & counter.summ2 < 1 | counter.inter_Data_.Count < 1 | X > 21 | Y > 21 | X < 4 | Y < 4 | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
             {
 
                 InputData.Clear();
@@ -109,7 +108,7 @@ namespace MNIST
                 n_green--;
                 Random rnd = new Random();
 
-                if (X == Xb & Y == Yb)
+                if (X == Xb & Y == Yb & counter.summ > 0 & counter.summ2 > 0)
                 {
                     col = true;//green
                     n_blekc--;
@@ -123,14 +122,14 @@ namespace MNIST
                         {
                             if (rnd.Next(0, 9) > 4)
                             {
-                                if (XYBuf[i] >= 0 & XYBuf[i] < 14)
+                                if (XYBuf[i] >= 0 & XYBuf[i] < 23)
                                 {
                                     XYBuf[i]++;
                                 }
                             }
                             else
                             {
-                                if (XYBuf[i] > 0 & XYBuf[i] <= 14)
+                                if (XYBuf[i] > 0 & XYBuf[i] <= 23)
                                 {
                                     XYBuf[i]--;
                                 }
@@ -145,20 +144,19 @@ namespace MNIST
                 byte[,] Coordinate = new byte[14, 14];
                 //byte[,] Coordinate_ = new byte[28, 28];
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j < 4; j++)
                     {
-                        if (i % 2 == 0 & j % 2 == 0)
+                        // if (i % 2 == 0 & j % 2 == 0)
                         {
-                            if (i + X / 2 > 0 & i + X / 2 < 14 & j + Y / 2 > 0 & j + Y / 2 < 14)
+                            if (i + X > 0 & i + X < 28 & j + Y > 0 & j + Y < 28)
                             {
-                                Coordinate[i + X / 2, j + Y / 2] = 1;
-                                //Coordinate_[i + X / 2, j + Y / 2] = 1;
+                                Coordinate[i + Y / 2, j + X / 2] = 1;
+                                //Coordinate_[i + Y, j + X] = 1;
                             }
                         }
                     }
-
                 }
                 //bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, 7, 7, col, 20);
 
@@ -215,7 +213,7 @@ namespace MNIST
                 //    }
                 //}
 
-                bitMap = MakeBitmap.Make_Bitmap(pixels, 6, 6, col, 10);
+                bitMap = MakeBitmap.Make_Bitmap(pixels, 6, 6, col, 10, false);
             }// Конец прорисовки фокуса внимания
 
             InputData.Clear();
@@ -248,16 +246,16 @@ namespace MNIST
             X += X;//координаты зрачка
             Y += Y;
 
-            if (X < 6 | X > 20)
+            if (X < 4 | X > 21)
             {
                 X = 14;
-                XYBuf[0] = 7;
+                XYBuf[0] = 14;
             }
 
-            if (Y < 6 | Y > 20)
+            if (Y < 4 | Y > 21)
             {
                 Y = 14;
-                XYBuf[1] = 7;
+                XYBuf[1] = 14;
             }
 
             if (bufX != 0 & bufX != X)
@@ -287,26 +285,29 @@ namespace MNIST
             }
             bufY = Y;
 
+            //X = 21;
+            //Y = X;
+
             {//Пустые скобки
                 InputData.Clear();
                 byte[,] Coordinate = new byte[14, 14];
                 byte[,] Coordinate_ = new byte[28, 28];
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j < 4; j++)
                     {
-                        if (i % 2 == 0 & j % 2 == 0)
+                        //if (i % 2 == 0 & j % 2 == 0)
                         {
-                            if (i + X / 2 > 0 & i + X / 2 < 14 & j + Y / 2 > 0 & j + Y / 2 < 14)
+                            if (i + X > 0 & i + X < 28 & j + Y > 0 & j + Y < 28)
                             {
-                                Coordinate[i + X / 2, j + Y / 2] = 1;
-                                Coordinate_[i + X / 2, j + Y / 2] = 1;
+                                Coordinate[i + Y / 2, j + X / 2] = 1;
+                                Coordinate_[i + Y - 2, j + X - 2] = 1;
                             }
                         }
                     }
                 }
-                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, 7, 7, col, 20);
+                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, true);
 
                 for (int i = 0; i < 14; i++)
                 {
@@ -378,7 +379,7 @@ namespace MNIST
                 {
                     blackPen = new Pen(Color.FromArgb(255, 0, 200, 50), 5);
                 }
-                gr.DrawRectangle(blackPen, (X - 6) * mag, (Y - 6) * mag, 12 * mag, 12 * mag);
+                gr.DrawRectangle(blackPen, (X - 3) * mag, (Y - 3) * mag, 6 * mag, 6 * mag);
             }
             return result;
         }

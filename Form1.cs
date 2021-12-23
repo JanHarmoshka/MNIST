@@ -314,10 +314,10 @@ namespace MNIST
                         {
                             for (int j = 0; j < focus_scale; ++j)
                             {
-                                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения
+                                InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
                                 if (TabPagesBool)
                                 {
-                                    pixels_[i + 8, j + 8] = pixels[i + Y, j + X];
+                                    pixels_[i + 6, j + 6] = pixels[i + Y - 3, j + X - 3];
                                 }
                             }
                         }
@@ -344,7 +344,7 @@ namespace MNIST
 
                         if (TabPagesBool)
                         {
-                            bitMap_ = MakeBitmap.Make_Bitmap(pixels_, 14, 14, col, 15, false);//прорисовка фокуса зрения
+                            bitMap_ = MakeBitmap.Make_Bitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
                             pictureBox2.Invoke((MethodInvoker)delegate
                             {
                                 pictureBox2.Image = bitMap_;
