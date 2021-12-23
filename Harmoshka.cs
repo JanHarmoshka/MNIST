@@ -259,7 +259,7 @@ namespace MNIST
                 {
                     for (int i = 0; i < AssessmentFirst.Count; i++)
                     {
-                        AssessmentFirst[i] = 0.001f;
+                        AssessmentFirst[i] = 0.0f;
                     }
                     ReverseMatte reverseMatte = new ReverseMatte(InputData, IndexData, inter_result, nnn, ReverseSatiety);
                     ListReverseMatte.Add(reverseMatte);

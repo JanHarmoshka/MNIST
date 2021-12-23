@@ -273,7 +273,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 & appeal_ < 0.85f)//
+                if (Control_value > 0 )//& appeal_ < 0.95f
                 {
                     Control_value--;
                     Contraction_ = true;
