@@ -34,6 +34,7 @@ namespace MNIST
             int num = 0;
             n_green = 0;
             n_blekc = 0;
+            Random rnd = new Random();
 
             InputData.Clear();
 
@@ -106,7 +107,7 @@ namespace MNIST
                 col = false;//bleck
                 n_blekc++;
                 n_green--;
-                Random rnd = new Random();
+
 
                 if (X == Xb & Y == Yb & counter.summ > 0 & counter.summ2 > 0)
                 {
@@ -120,7 +121,7 @@ namespace MNIST
                     {
                         for (int j = 0; j < 1; ++j)
                         {
-                            if (rnd.Next(0, 9) > 4)
+                            if (rnd.Next(0, 100) > 50)
                             {
                                 if (XYBuf[i] >= 0 & XYBuf[i] < 23)
                                 {
@@ -307,6 +308,24 @@ namespace MNIST
                         }
                     }
                 }
+
+                for (int i = 0; i < 28; i++)
+                {
+                    for (int j = 0; j < 28; j++)
+                    {
+                        //if (rnd.Next(0, 9) > 5)
+                        //{
+                        //    Coordinate[i / 2, j / 2] = 0;
+                        //    Coordinate_[i, j] = 0;
+                        //}
+                        if (rnd.Next(0, 100) < 10)
+                        {
+                            Coordinate[i / 2, j / 2] = 1;
+                            Coordinate_[i, j] = 1;
+                        }
+                    }
+                }
+
                 bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, true);
 
                 for (int i = 0; i < 14; i++)
