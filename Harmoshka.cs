@@ -166,7 +166,7 @@ namespace MNIST
                 if (Activ_ > ListMatte[Index].appeal)
                 {
                     ListMatte[Index].Lesson(InputData);
-                    if (Activ_ > ListMatte[Index].appeal & ListMatte[Index].appeal < 0.9f)
+                    if (Activ_ > ListMatte[Index].appeal & ListMatte[Index].appeal < 0.7f)
                     {
                         ListMatte[Index].appeal = ListMatte[Index].appeal + 0.001f;
                     }
@@ -195,7 +195,7 @@ namespace MNIST
             for (int i = 0; i < AssessmentFirst.Count; i++)
             {
                 counter.Assessment.Add(AssessmentFirst[i] + AssessmentSecond[i]);
-                counter.room.Add(ListReverseMatte[counter.room.Count].room);
+                counter.room.Add(ListReverseMatte[i].room);
             }
             Activ = activityReverseMasks.Activ;
             Ind = activityReverseMasks.Ind;
@@ -249,7 +249,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.9f)//
+                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.7f)//
                     {
                         IndVar = true;
                     }
@@ -259,13 +259,13 @@ namespace MNIST
                 {
                     for (int i = 0; i < AssessmentFirst.Count; i++)
                     {
-                        AssessmentFirst[i] = 0.0f;
+                        AssessmentFirst[i] = 0;//.001f
                     }
                     ReverseMatte reverseMatte = new ReverseMatte(InputData, IndexData, inter_result, nnn, ReverseSatiety);
                     ListReverseMatte.Add(reverseMatte);
                     Ind = ListReverseMatte.Count - 1;
                     AssessmentFirst.Add(1);
-                    ListReverseMatte[Ind].Sleep();
+                    //ListReverseMatte[Ind].Sleep();
                     Pass = false;
                     nnn++;
                 }
@@ -307,10 +307,10 @@ namespace MNIST
                 for (int i = 0; i < ListReverseMatte.Count; i++)
                 {
                     AssessmentFirst[i] = (float)AssessmentFirst[i] / Activ;
-                    if (AssessmentFirst[i] > 1 & ListReverseMatte[i].room != IndexData)
-                    {
-                        AssessmentFirst[i] = 0.1f;
-                    }
+                    //if (AssessmentFirst[i] > 1 & ListReverseMatte[i].room != IndexData)
+                    //{
+                    //    AssessmentFirst[i] = 0.1f;
+                    //}
                 }
             }
 

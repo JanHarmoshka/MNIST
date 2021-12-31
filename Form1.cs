@@ -110,11 +110,6 @@ namespace MNIST
             bool col;
             float semblance = 20;
 
-            List<Point> pixels_way_List = new List<Point>();
-            byte[,] pixels_way = new byte[28, 28];
-            Point XY;
-            Bitmap bitMap_way;
-
             sw.Start();
             // проход по файлам данных
             for (int l = 0; l < 100; l++)
@@ -281,8 +276,17 @@ namespace MNIST
                     {
                         col = true;
                         n_green++;
-                        ;
-                        preparation_input.PreparationInput_1(counter, col, semblance, Xb, Yb, reproduction, TabPagesBool);
+
+                        try
+                        {
+                            preparation_input.PreparationInput_1(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
+                        }
+                        catch (Exception ex)
+                        {
+                            //Выводим ошибку
+                            MessageBox.Show(ex.ToString());
+                        }
+
                         col = preparation_input.col;
                         n_blekc += preparation_input.n_blekc;
                         n_green += preparation_input.n_green;
@@ -294,7 +298,6 @@ namespace MNIST
                         {
                             pictureBox3.Image = preparation_input.bitMap;
                         });
-
 
                         if (TabPagesBool)
                         {
@@ -310,16 +313,25 @@ namespace MNIST
 
                         byte[,] pixels_ = new byte[28, 28];
 
-                        for (int i = 0; i < focus_scale; ++i)
+                        try
                         {
-                            for (int j = 0; j < focus_scale; ++j)
+                            for (int i = 0; i < focus_scale; ++i)
                             {
-                                InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
-                                if (TabPagesBool)
+                                for (int j = 0; j < focus_scale; ++j)
                                 {
-                                    pixels_[i + 6, j + 6] = pixels[i + Y - 3, j + X - 3];
+                                    InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
+                                    InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
+                                    if (TabPagesBool)
+                                    {
+                                        pixels_[i + 6, j + 6] = pixels[i + Y - 3, j + X - 3];
+                                    }
                                 }
                             }
+                        }
+                        catch (Exception ex)
+                        {
+                            //Выводим ошибку
+                            MessageBox.Show(ex.ToString());
                         }
 
                         { //Дабавление перефирийное зрение к входящиму вектору
@@ -361,6 +373,11 @@ namespace MNIST
                                 pictureBox6.Image = preparation_input.bitMap_Draw;
                             });
 
+                            pictureBox4.Invoke((MethodInvoker)delegate
+                            {
+                                pictureBox4.Image = preparation_input.way_Draw;
+                            });
+
                             label16.Invoke((MethodInvoker)delegate
                             {
                                 label16.Text = "Повторение символа: " + ll.ToString();
@@ -371,6 +388,20 @@ namespace MNIST
 
                         Xb = X;
                         Yb = Y;
+
+                        //for (int i = 0; i < InputData.Count; i++)
+                        //{
+                        //    if (rnd.Next(0, 9) > 5)
+                        //    {
+                        //        InputData[i] = 0;
+                        //    }
+                        //    if (rnd.Next(0, 9) > 8)
+                        //    {
+                        //        InputData[i] = 1;
+                        //    }
+
+                        //}
+
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
                             if (preparation_input.InputData[i] > 0)
@@ -383,24 +414,9 @@ namespace MNIST
                             }
                         }
 
-
-                        for (int i = 0; i < InputData.Count; i++)
-                        {
-                            if (rnd.Next(0, 9) > 5)
-                            {
-                                InputData[i] = 0;
-                            }
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 1;
-                            }
-
-                        }
-
-
                         try
                         {
-                            counter = Harmoshka.Assessment(14 * 14, InputData, semblance, Index);
+                            counter = Harmoshka.Assessment(28 * 28, InputData, semblance, Index);
                         }
                         catch (Exception ex)
                         {
@@ -559,9 +575,13 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (n_col > 0)
+                    if (y1 <= 30)
                     {
                         chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
+                    }
+
+                    if (n_col > 0)
+                    {
                         chart2.Series["N"].Points.AddXY(series.Count - 2, n_col);
                     }
                 }

@@ -47,7 +47,7 @@ namespace MNIST
             }
             max_0 = max;
 
-            max = (float)max / 2.2f;//2
+            max = (float)max / 2f;//2
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
@@ -273,7 +273,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 & appeal_ < 0.90f)//
+                if (Control_value > 0 & appeal_ < 0.9f)//
                 {
                     Control_value--;
                     Contraction_ = true;

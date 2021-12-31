@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,10 +58,7 @@
             this.pictureBox6 = new System.Windows.Forms.PictureBox();
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.label16 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
@@ -267,8 +264,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart2.BackColor = System.Drawing.Color.Gray;
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea5.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea5);
+            chartArea7.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea7);
             this.chart2.Location = new System.Drawing.Point(9, 658);
             this.chart2.Name = "chart2";
             this.chart2.Size = new System.Drawing.Size(1291, 186);
@@ -283,8 +280,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart1.BackColor = System.Drawing.Color.Gray;
             this.chart1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea6.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea6);
+            chartArea8.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea8);
             this.chart1.Location = new System.Drawing.Point(9, 39);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(1291, 613);
@@ -311,10 +308,7 @@
             this.tabPage2.Controls.Add(this.pictureBox6);
             this.tabPage2.Controls.Add(this.pictureBox5);
             this.tabPage2.Controls.Add(this.label16);
-            this.tabPage2.Controls.Add(this.label14);
-            this.tabPage2.Controls.Add(this.label13);
             this.tabPage2.Controls.Add(this.pictureBox4);
-            this.tabPage2.Controls.Add(this.label11);
             this.tabPage2.Controls.Add(this.label10);
             this.tabPage2.Controls.Add(this.label2);
             this.tabPage2.Controls.Add(this.pictureBox3);
@@ -354,7 +348,7 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label17.Location = new System.Drawing.Point(761, 15);
+            this.label17.Location = new System.Drawing.Point(989, 31);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(64, 18);
             this.label17.TabIndex = 50;
@@ -384,49 +378,21 @@
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label16.Location = new System.Drawing.Point(853, 509);
+            this.label16.Location = new System.Drawing.Point(960, 508);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(64, 18);
             this.label16.TabIndex = 47;
             this.label16.Text = "label16";
             // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(611, 418);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(61, 13);
-            this.label14.TabIndex = 46;
-            this.label14.Text = "Возможное";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(617, 371);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(55, 13);
-            this.label13.TabIndex = 45;
-            this.label13.Text = "Желаемое";
-            // 
             // pictureBox4
             // 
             this.pictureBox4.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox4.Location = new System.Drawing.Point(678, 371);
+            this.pictureBox4.Location = new System.Drawing.Point(605, 15);
             this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(560, 60);
+            this.pictureBox4.Size = new System.Drawing.Size(280, 280);
             this.pictureBox4.TabIndex = 44;
             this.pictureBox4.TabStop = false;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Consolas", 10F);
-            this.label11.Location = new System.Drawing.Point(853, 351);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(144, 17);
-            this.label11.TabIndex = 43;
-            this.label11.Text = "Желаемое движение";
             // 
             // label10
             // 
@@ -442,7 +408,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Consolas", 10F);
-            this.label2.Location = new System.Drawing.Point(705, 38);
+            this.label2.Location = new System.Drawing.Point(788, 360);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(480, 17);
             this.label2.TabIndex = 41;
@@ -451,7 +417,7 @@
             // pictureBox3
             // 
             this.pictureBox3.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pictureBox3.Location = new System.Drawing.Point(795, 68);
+            this.pictureBox3.Location = new System.Drawing.Point(904, 67);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(280, 280);
             this.pictureBox3.TabIndex = 40;
@@ -786,15 +752,12 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.PictureBox pictureBox6;
         private System.Windows.Forms.Label label18;

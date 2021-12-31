@@ -20,15 +20,24 @@ namespace MNIST
         public float n_green;
         public Bitmap bitMap;
         public Bitmap bitMap_Draw;
+        public Bitmap way_Draw;
 
         public int X;
         public int Y;
+        int way_max = 256;
 
         public List<byte> InputData = new List<byte>();
+        int[,] way = new int[28, 28];
+        byte[,] way_byte = new byte[28, 28];
 
-        public void PreparationInput_1(Counter counter, bool col, float semblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
+        int lower_limit = 3;
+        int Upper_limit = 24;
+        int proportions = 6;
+
+
+        public void PreparationInput_1(Counter counter, float semblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
         {
-
+            col = true;
             double SumX = 0;
             double SumY = 0;
             int num = 0;
@@ -38,13 +47,13 @@ namespace MNIST
 
             InputData.Clear();
 
-            if (counter.inter_Data_.Count >= 14 * 14)
+            if (counter.inter_Data_.Count >= 28 * 28)
             {
                 InputData.AddRange(counter.inter_Data_);
                 int n = 0;
-                for (int j = 0; j < 14; ++j)
+                for (int j = 0; j < 28; ++j)
                 {
-                    for (int i = 0; i < 14; ++i)
+                    for (int i = 0; i < 28; ++i)
                     {
                         if (InputData[n] > 0)
                         {
@@ -62,8 +71,8 @@ namespace MNIST
                 }
             }
 
-            X += X;//координаты зрачка
-            Y += Y;
+            //X += X;//координаты зрачка
+            //Y += Y;
 
             if (prevX2 > 0 & prevY2 > 0)
             {
@@ -100,7 +109,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if (counter.summ < 1 & counter.summ2 < 1 | counter.inter_Data_.Count < 1 | X > 21 | Y > 21 | X < 4 | Y < 4 | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
+            if ((counter.summ < 1 & counter.summ2 < 1) | counter.inter_Data_.Count < 1 | X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
             {
 
                 InputData.Clear();
@@ -109,51 +118,52 @@ namespace MNIST
                 n_green--;
 
 
-                if (X == Xb & Y == Yb & counter.summ > 0 & counter.summ2 > 0)
-                {
-                    col = true;//green
-                    n_blekc--;
-                    n_green++;
-                }
+                //if (X == Xb & Y == Yb & counter.summ > 0 & counter.summ2 > 0)
+                //{
+                //    col = true;//green
+                //    n_blekc--;
+                //    n_green++;
+                //}
                 do
                 {
                     for (int i = 0; i < 2; i++)
                     {
                         for (int j = 0; j < 1; ++j)
                         {
-                            if (rnd.Next(0, 100) > 50)
+                            if (rnd.Next(0, 100) > 49)
                             {
-                                if (XYBuf[i] >= 0 & XYBuf[i] < 23)
+                                if (XYBuf[i] >= 0 & XYBuf[i] < 24)
                                 {
                                     XYBuf[i]++;
                                 }
                             }
                             else
                             {
-                                if (XYBuf[i] > 0 & XYBuf[i] <= 23)
+                                if (XYBuf[i] > 0 & XYBuf[i] <= 24)
                                 {
                                     XYBuf[i]--;
                                 }
                             }
                         }
                     }
+                    //XYBuf[0] = (byte)rnd.Next(lower_limit + 1, Upper_limit - 1);
+                    //XYBuf[1] = (byte)rnd.Next(lower_limit + 1, Upper_limit - 1);
                 }
                 while ((X == XYBuf[0] | Y == XYBuf[1]));
                 X = XYBuf[0];
                 Y = XYBuf[1];
 
-                byte[,] Coordinate = new byte[14, 14];
-                //byte[,] Coordinate_ = new byte[28, 28];
+                byte[,] Coordinate = new byte[28, 28];
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < proportions; i++)
                 {
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < proportions; j++)
                     {
                         // if (i % 2 == 0 & j % 2 == 0)
                         {
-                            if (i + X > 0 & i + X < 28 & j + Y > 0 & j + Y < 28)
+                            if (i + Y > 0 & i + Y < 28 & j + X > 0 & j + X < 28)
                             {
-                                Coordinate[i + Y / 2, j + X / 2] = 1;
+                                Coordinate[i + Y, j + X] = 1;//
                                 //Coordinate_[i + Y, j + X] = 1;
                             }
                         }
@@ -161,9 +171,9 @@ namespace MNIST
                 }
                 //bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, 7, 7, col, 20);
 
-                for (int i = 0; i < 14; i++)
+                for (int i = 0; i < 28; i++)
                 {
-                    for (int j = 0; j < 14; j++)
+                    for (int j = 0; j < 28; j++)
                     {
                         if (Coordinate[i, j] == 1)
                         {
@@ -219,16 +229,16 @@ namespace MNIST
 
             InputData.Clear();
 
-            if (counter.inter_Data_.Count >= 100)//14*14
+            if (counter.inter_Data_.Count >= 28 * 28)//14*14
             {
                 SumX = 0;
                 SumY = 0;
                 num = 0;
                 InputData.AddRange(counter.inter_Data_);
                 int n = 0;
-                for (int j = 0; j < 14; ++j)
+                for (int j = 0; j < 28; ++j)
                 {
-                    for (int i = 0; i < 14; ++i)
+                    for (int i = 0; i < 28; ++i)
                     {
                         if (InputData[n] > 0)
                         {
@@ -244,22 +254,22 @@ namespace MNIST
                 Y = (int)Math.Ceiling(SumY / num);
             }
 
-            X += X;//координаты зрачка
-            Y += Y;
+            //X += X;//координаты зрачка
+            //Y += Y;
 
-            if (X < 4 | X > 21)
+            if (X < lower_limit | X > Upper_limit)//
             {
-                X = 14;
-                XYBuf[0] = 14;
+                X = 14;//rnd.Next(lower_limit, Upper_limit)
+                XYBuf[0] = (byte)X;
             }
 
-            if (Y < 4 | Y > 21)
+            if (Y < lower_limit | Y > Upper_limit)//
             {
-                Y = 14;
-                XYBuf[1] = 14;
+                Y = 14;//rnd.Next(lower_limit, Upper_limit)
+                XYBuf[1] = (byte)Y;
             }
 
-            if (bufX != 0 & bufX != X)
+            if (bufX != 0 & bufX != X)//& col
             {
                 if (bufX > X)
                 {
@@ -272,7 +282,7 @@ namespace MNIST
             }
             bufX = X;
 
-            if (bufY != 0 & bufY != Y)
+            if (bufY != 0 & bufY != Y)//& col
             {
 
                 if (bufY > Y)
@@ -286,51 +296,89 @@ namespace MNIST
             }
             bufY = Y;
 
-            //X = 21;
+            //X = 3;
             //Y = X;
 
-            {//Пустые скобки
-                InputData.Clear();
-                byte[,] Coordinate = new byte[14, 14];
-                byte[,] Coordinate_ = new byte[28, 28];
-
-                for (int i = 0; i < 4; i++)
+            // if (X != 4 & Y != 4)
+            {
+                way[X, Y] += 1;
+                if (way_max < way[X, Y])
                 {
-                    for (int j = 0; j < 4; j++)
-                    {
-                        //if (i % 2 == 0 & j % 2 == 0)
-                        {
-                            if (i + X > 0 & i + X < 28 & j + Y > 0 & j + Y < 28)
-                            {
-                                Coordinate[i + Y / 2, j + X / 2] = 1;
-                                Coordinate_[i + Y - 2, j + X - 2] = 1;
-                            }
-                        }
-                    }
+                    way_max = way[X, Y];
                 }
+            }
 
+            if (TabPagesBool)
+            {
                 for (int i = 0; i < 28; i++)
                 {
                     for (int j = 0; j < 28; j++)
                     {
-                        //if (rnd.Next(0, 9) > 5)
-                        //{
-                        //    Coordinate[i / 2, j / 2] = 0;
-                        //    Coordinate_[i, j] = 0;
-                        //}
-                        if (rnd.Next(0, 100) < 10)
+                        way_byte[i, j] = (byte)(256 - (255f * way[i, j] / way_max)); //чем темнее тем сильнее
+                        if (way[i, j] > 0)
                         {
-                            Coordinate[i / 2, j / 2] = 1;
-                            Coordinate_[i, j] = 1;
+                            way[i, j] = 256 - way_byte[i, j];
                         }
+
+                    }
+                }
+                way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X, Y, true);
+                way_max = 256;
+            }
+
+            {//Пустые скобки
+                InputData.Clear();
+                byte[,] Coordinate = new byte[28, 28];
+                byte[,] Coordinate_ = new byte[28, 28];
+
+                for (int i = 0; i < proportions; i++)
+                {
+                    for (int j = 0; j < proportions; j++)
+                    {
+                        if (i + Y > 0 & i + Y < 28 & j + X > 0 & j + X < 28)
+                        {
+                            Coordinate[i + Y, j + X] = 1;
+                            Coordinate_[i + Y - 3, j + X - 3] = 1;
+                        }
+
                     }
                 }
 
+
+                //for (int i = 0; i < 28; i++)
+                //{
+                //    Coordinate[i, X] = 1;
+                //    Coordinate_[i, X] = 1;
+                //}
+
+                //for (int j = 0; j < 28; j++)
+                //{
+                //    Coordinate[Y, j] = 1;
+                //    Coordinate_[Y, j] = 1;
+                //}
+
+                //for (int i = 0; i < 28; i++)
+                //{
+                //    for (int j = 0; j < 28; j++)
+                //    {
+                //        //if (rnd.Next(0, 9) > 5)
+                //        //{
+                //        //    Coordinate[i / 2, j / 2] = 0;
+                //        //    Coordinate_[i, j] = 0;
+                //        //}
+                //        if (rnd.Next(0, 100) < 1)
+                //        {
+                //            Coordinate[i, j] = 1;
+                //            Coordinate_[i, j] = 1;
+                //        }
+                //    }
+                //}
+
                 bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, true);
 
-                for (int i = 0; i < 14; i++)
+                for (int i = 0; i < 28; i++)
                 {
-                    for (int j = 0; j < 14; j++)
+                    for (int j = 0; j < 28; j++)
                     {
                         if (Coordinate[i, j] == 1)
                         {
@@ -349,27 +397,32 @@ namespace MNIST
     }
     class MakeBitmap
     {
-        public static Bitmap MakeBitmapLine(List<byte> InputData1, List<byte> InputData2, List<byte> InputData3, int mag = 20)
+        public static Bitmap Make_Bitmap_grey(byte[,] pixels, int X, int Y, bool DrawR = true)
         {
+            int mag = 10;
             int width = 28 * mag;
-            int height = 3 * mag;
+            int height = 28 * mag;
+            byte Color_grey;
             Bitmap result = new Bitmap(width, height);
             Graphics gr = Graphics.FromImage(result);
+            gr.Clear(Color.FromArgb(255, 255, 255));
             SolidBrush sb = new SolidBrush(Color.FromArgb(0, 0, 0));
             for (int i = 0; i < 28; ++i)
             {
-                if (InputData1[i] > 0)
+                for (int j = 0; j < 28; ++j)
                 {
-                    gr.FillRectangle(sb, i * mag, 0 * mag, mag - 1, mag - 1);
+                    if (pixels[i, j] > 0)
+                    {
+                        Color_grey = pixels[i, j];
+                        sb.Color = Color.FromArgb(Color_grey, Color_grey, Color_grey);
+                        gr.FillRectangle(sb, j * mag, i * mag, mag, mag);
+                    }
                 }
-                if (InputData2[i] > 0)
-                {
-                    gr.FillRectangle(sb, i * mag, 1 * mag, mag - 1, mag - 1);
-                }
-                if (InputData3[i] > 0)
-                {
-                    gr.FillRectangle(sb, i * mag, 2 * mag, mag - 1, mag - 1);
-                }
+            }
+            if (DrawR)
+            {
+                Pen blackPen = new Pen(Color.FromArgb(255, 0, 0, 0), 5);
+                gr.DrawRectangle(blackPen, (X - 3) * mag, (Y - 3) * mag, 6 * mag, 6 * mag);
             }
             return result;
         }

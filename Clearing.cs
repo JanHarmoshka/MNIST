@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MNIST
 {
@@ -13,7 +11,7 @@ namespace MNIST
             List<int> Empty = new List<int>();
             for (int j = 0; j < ListMatte.Count; j++)
             {
-                message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
+                //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
                 if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))//* 2f
                 {
                     Empty.Add(j);
@@ -41,7 +39,9 @@ namespace MNIST
 
             for (int j = 0; j < ListReverseMatte.Count; j++)
             {
-                if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value < 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f) | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f) //)
+                //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";//
+                if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 96.0f)
+                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f) //)| (ListReverseMatte[j].appeal_ > 0.70f & ListReverseMatte[j].Control_value < 15.0f)
                 {
                     Empty.Add(j);
                 }
@@ -115,16 +115,7 @@ namespace MNIST
                         }
                         else
                         {
-                            try
-                            {
-                                ActivSecond += ListMatte[i].matte[n] * inter_Data[n];
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(i.ToString() + "  " + n.ToString() + "  " + n.ToString(inter_Data.Length.ToString()));
-                                MessageBox.Show(ex.ToString());
-                            }
-
+                            ActivSecond += ListMatte[i].matte[n] * inter_Data[n];
                         }
                     }
                 }
@@ -133,10 +124,15 @@ namespace MNIST
                     Activ_ = Activ;
                     Index = i;
                 }
+
                 if (Activ > -0.0f)
                 {
                     inter_result.Add(Activ);
                     ContractionInterResultFirst.Add(inter_result.Count - 1);
+                    if (ActivSecond > -0.0f)
+                    {
+                        ContractionInterResultSecond.Add(inter_result.Count - 1);
+                    }
                 }
                 else if (ActivSecond > -0.0f)
                 {
@@ -167,7 +163,7 @@ namespace MNIST
 
         public ActivityReverseMasks(List<ReverseMatte> vListReverseMatte, List<int> vContractionInterResultFirst, List<int> vContractionInterResultSecond, List<float> vinter_result)
         {
-            DefenseLearning = 20;
+            DefenseLearning = 20;//20
 
             Activ = 0;
             SecondActiv = -1;
@@ -275,7 +271,7 @@ namespace MNIST
                 }
                 if (SecondActiv < SecondActiv4)
                 {
-                    SecondActiv = SecondActiv4;                    
+                    SecondActiv = SecondActiv4;
                 }
 
             }
