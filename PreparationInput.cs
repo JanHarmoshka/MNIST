@@ -71,8 +71,8 @@ namespace MNIST
                 }
             }
 
-            //X += X;//координаты зрачка
-            //Y += Y;
+            X -= 3;//координаты зрачка
+            Y -= 3;
 
             if (prevX2 > 0 & prevY2 > 0)
             {
@@ -96,16 +96,16 @@ namespace MNIST
 
             prevX1 = prevX2;
             prevY1 = prevY2;
-            if (counter.summ < 1 & counter.summ2 > 0)
-            {
-                X = prevX2;
-                counter.summ = 1;
-            }
-            if (counter.summ2 < 1 & counter.summ > 0)
-            {
-                Y = prevY2;
-                counter.summ2 = 1;
-            }
+            //if (counter.summ < 1 & counter.summ2 > 0)
+            //{
+            //    X = prevX2;
+            //    counter.summ = 1;
+            //}
+            //if (counter.summ2 < 1 & counter.summ > 0)
+            //{
+            //    Y = prevY2;
+            //    counter.summ2 = 1;
+            //}
             prevX2 = X;
             prevY2 = Y;
 
@@ -124,13 +124,14 @@ namespace MNIST
                 //    n_blekc--;
                 //    n_green++;
                 //}
+
                 do
                 {
                     for (int i = 0; i < 2; i++)
                     {
                         for (int j = 0; j < 1; ++j)
                         {
-                            if (rnd.Next(0, 100) > 49)
+                            if (rnd.Next(0, 99) > 49)
                             {
                                 if (XYBuf[i] >= 0 & XYBuf[i] < 24)
                                 {
@@ -171,22 +172,21 @@ namespace MNIST
                 }
                 //bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, 7, 7, col, 20);
 
+                counter.inter_Data_.Clear();
                 for (int i = 0; i < 28; i++)
                 {
                     for (int j = 0; j < 28; j++)
                     {
                         if (Coordinate[i, j] == 1)
                         {
-                            InputData.Add(1);
+                            counter.inter_Data_.Add(1);
                         }
                         else
                         {
-                            InputData.Add(0);
+                            counter.inter_Data_.Add(0);
                         }
                     }
                 }
-                counter.inter_Data_.Clear();
-                counter.inter_Data_.AddRange(InputData);
             }
 
             if ((counter.inter_Data_Full.Count > 0 & !reproduction) | (counter.inter_Data_Full.Count > 0) & TabPagesBool)//Рисовать фокус внимания 
@@ -195,36 +195,17 @@ namespace MNIST
                 int n = 0;
                 for (int i = 0; i < 28; i++)
                 {
-                    for (int j = 0; j < 12; j++)
+                    for (int j = 0; j < 28; j++)
                     {
                         pixels[i, j] = 0;
-                        if (counter.inter_Data_Full[n] > 0)
+                        if (counter.inter_Data_[n] > 0)//counter.inter_Data_Full[n + counter.inter_Data_Full.Count - 28 * 28] > 0
                         {
                             pixels[i, j] = 1;
                         }
                         n++;
                     }
                 }
-                //for (int i = 0; i < 28; i++)
-                //{
-                //    for (int j = 12; j < 26; j++)
-                //    {
-                //        pixels[i, j] = 0;
-
-                //        if (counter.inter_Data_Full[n] > 0)
-                //        {
-                //            pixels[i, j] = 1;
-
-                //        }
-                //        n++;
-                //        if (counter.inter_Data_Full.Count - 28 < n)
-                //        {
-                //            break;
-                //        }
-                //    }
-                //}
-
-                bitMap = MakeBitmap.Make_Bitmap(pixels, 6, 6, col, 10, false);
+                bitMap = MakeBitmap.Make_Bitmap(pixels, X + 3, Y + 3, col, 10, true);
             }// Конец прорисовки фокуса внимания
 
             InputData.Clear();
@@ -254,6 +235,7 @@ namespace MNIST
                 Y = (int)Math.Ceiling(SumY / num);
             }
 
+            //X -= 3;
             //X += X;//координаты зрачка
             //Y += Y;
 
@@ -322,7 +304,7 @@ namespace MNIST
 
                     }
                 }
-                way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X, Y, true);
+                way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, true);
                 way_max = 256;
             }
 
@@ -338,7 +320,7 @@ namespace MNIST
                         if (i + Y > 0 & i + Y < 28 & j + X > 0 & j + X < 28)
                         {
                             Coordinate[i + Y, j + X] = 1;
-                            Coordinate_[i + Y - 3, j + X - 3] = 1;
+                            Coordinate_[i + Y, j + X] = 1;
                         }
 
                     }
@@ -374,7 +356,7 @@ namespace MNIST
                 //    }
                 //}
 
-                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, true);
+                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, false);
 
                 for (int i = 0; i < 28; i++)
                 {

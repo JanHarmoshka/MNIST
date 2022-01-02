@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,6 +65,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -87,7 +88,6 @@
             this.Consol = new System.Windows.Forms.RichTextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.label4 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -117,7 +117,7 @@
             this.toolStripMenuItem2});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1533, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1666, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -137,40 +137,40 @@
             // открытьToolStripMenuItem
             // 
             this.открытьToolStripMenuItem.Name = "открытьToolStripMenuItem";
-            this.открытьToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.открытьToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.открытьToolStripMenuItem.Text = "Открыть";
             this.открытьToolStripMenuItem.Click += new System.EventHandler(this.открытьToolStripMenuItem_Click);
             // 
             // сохранитьToolStripMenuItem
             // 
             this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.сохранитьToolStripMenuItem.Text = "Сохранить";
             this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
             // 
             // экспортБазыToolStripMenuItem
             // 
             this.экспортБазыToolStripMenuItem.Name = "экспортБазыToolStripMenuItem";
-            this.экспортБазыToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.экспортБазыToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.экспортБазыToolStripMenuItem.Text = "Экспорт базы";
             this.экспортБазыToolStripMenuItem.Click += new System.EventHandler(this.экспортБазыToolStripMenuItem_Click);
             // 
             // импортБазыToolStripMenuItem
             // 
             this.импортБазыToolStripMenuItem.Name = "импортБазыToolStripMenuItem";
-            this.импортБазыToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.импортБазыToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.импортБазыToolStripMenuItem.Text = "Импорт базы";
             this.импортБазыToolStripMenuItem.Click += new System.EventHandler(this.импортБазыToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(146, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
             // 
             // выходToolStripMenuItem
             // 
             this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.выходToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.выходToolStripMenuItem.Text = "Выход";
             this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
             // 
@@ -218,7 +218,7 @@
             this.panel1.Controls.Add(this.Consol);
             this.panel1.Location = new System.Drawing.Point(12, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1509, 885);
+            this.panel1.Size = new System.Drawing.Size(1642, 882);
             this.panel1.TabIndex = 3;
             // 
             // tabControl1
@@ -232,7 +232,7 @@
             this.tabControl1.Location = new System.Drawing.Point(233, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1276, 870);
+            this.tabControl1.Size = new System.Drawing.Size(1409, 867);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -245,7 +245,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1268, 844);
+            this.tabPage1.Size = new System.Drawing.Size(1401, 841);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Сводка";
             // 
@@ -264,11 +264,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart2.BackColor = System.Drawing.Color.Gray;
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea7.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea7);
-            this.chart2.Location = new System.Drawing.Point(9, 658);
+            chartArea1.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea1);
+            this.chart2.Location = new System.Drawing.Point(6, 649);
             this.chart2.Name = "chart2";
-            this.chart2.Size = new System.Drawing.Size(1291, 186);
+            this.chart2.Size = new System.Drawing.Size(1436, 186);
             this.chart2.TabIndex = 40;
             this.chart2.Text = "chart2";
             this.chart2.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -280,11 +280,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart1.BackColor = System.Drawing.Color.Gray;
             this.chart1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea8.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea8);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Location = new System.Drawing.Point(9, 39);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(1291, 613);
+            this.chart1.Size = new System.Drawing.Size(1433, 623);
             this.chart1.TabIndex = 39;
             this.chart1.Text = "chart1";
             this.chart1.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -317,7 +317,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1268, 844);
+            this.tabPage2.Size = new System.Drawing.Size(1401, 841);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Визуализация";
             // 
@@ -327,9 +327,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox8.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox8.Location = new System.Drawing.Point(33, 641);
+            this.pictureBox8.Location = new System.Drawing.Point(0, 638);
             this.pictureBox8.Name = "pictureBox8";
-            this.pictureBox8.Size = new System.Drawing.Size(1000, 200);
+            this.pictureBox8.Size = new System.Drawing.Size(1186, 200);
             this.pictureBox8.TabIndex = 52;
             this.pictureBox8.TabStop = false;
             // 
@@ -338,7 +338,7 @@
             this.pictureBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox7.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox7.Location = new System.Drawing.Point(1052, 464);
+            this.pictureBox7.Location = new System.Drawing.Point(1188, 461);
             this.pictureBox7.Name = "pictureBox7";
             this.pictureBox7.Size = new System.Drawing.Size(210, 377);
             this.pictureBox7.TabIndex = 51;
@@ -348,7 +348,7 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label17.Location = new System.Drawing.Point(989, 31);
+            this.label17.Location = new System.Drawing.Point(954, 323);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(64, 18);
             this.label17.TabIndex = 50;
@@ -358,7 +358,7 @@
             // 
             this.pictureBox6.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox6.Location = new System.Drawing.Point(319, 15);
+            this.pictureBox6.Location = new System.Drawing.Point(246, 37);
             this.pictureBox6.Name = "pictureBox6";
             this.pictureBox6.Size = new System.Drawing.Size(280, 280);
             this.pictureBox6.TabIndex = 49;
@@ -368,7 +368,7 @@
             // 
             this.pictureBox5.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox5.Location = new System.Drawing.Point(33, 300);
+            this.pictureBox5.Location = new System.Drawing.Point(30, 322);
             this.pictureBox5.Name = "pictureBox5";
             this.pictureBox5.Size = new System.Drawing.Size(280, 280);
             this.pictureBox5.TabIndex = 48;
@@ -378,7 +378,7 @@
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label16.Location = new System.Drawing.Point(960, 508);
+            this.label16.Location = new System.Drawing.Point(1260, 409);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(64, 18);
             this.label16.TabIndex = 47;
@@ -388,7 +388,7 @@
             // 
             this.pictureBox4.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox4.Location = new System.Drawing.Point(605, 15);
+            this.pictureBox4.Location = new System.Drawing.Point(532, 37);
             this.pictureBox4.Name = "pictureBox4";
             this.pictureBox4.Size = new System.Drawing.Size(280, 280);
             this.pictureBox4.TabIndex = 44;
@@ -398,7 +398,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Consolas", 10F);
-            this.label10.Location = new System.Drawing.Point(358, 584);
+            this.label10.Location = new System.Drawing.Point(705, 606);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(192, 34);
             this.label10.TabIndex = 42;
@@ -408,16 +408,16 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Consolas", 10F);
-            this.label2.Location = new System.Drawing.Point(788, 360);
+            this.label2.Location = new System.Drawing.Point(759, 17);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(480, 17);
+            this.label2.Size = new System.Drawing.Size(392, 17);
             this.label2.TabIndex = 41;
-            this.label2.Text = "Фокус внимания  (то, о чём модель \"думает\" в данный момент)";
+            this.label2.Text = "Фокус внимания  (то куда модель хочет дыигаться)";
             // 
             // pictureBox3
             // 
             this.pictureBox3.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pictureBox3.Location = new System.Drawing.Point(904, 67);
+            this.pictureBox3.Location = new System.Drawing.Point(818, 37);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(280, 280);
             this.pictureBox3.TabIndex = 40;
@@ -427,7 +427,7 @@
             // 
             this.pictureBox2.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox2.Location = new System.Drawing.Point(33, 15);
+            this.pictureBox2.Location = new System.Drawing.Point(370, 323);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(280, 280);
             this.pictureBox2.TabIndex = 39;
@@ -437,7 +437,7 @@
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(319, 301);
+            this.pictureBox1.Location = new System.Drawing.Point(656, 323);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(280, 280);
             this.pictureBox1.TabIndex = 38;
@@ -463,6 +463,16 @@
             this.tabPage3.Size = new System.Drawing.Size(1268, 844);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Настройки";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Consolas", 11F);
+            this.label4.Location = new System.Drawing.Point(1048, 17);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(48, 18);
+            this.label4.TabIndex = 40;
+            this.label4.Text = "номер";
             // 
             // groupBox1
             // 
@@ -632,9 +642,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.Controls.Add(this.button4);
             this.panel2.Controls.Add(this.button2);
-            this.panel2.Location = new System.Drawing.Point(7, 836);
+            this.panel2.Location = new System.Drawing.Point(7, 833);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(220, 45);
+            this.panel2.Size = new System.Drawing.Size(353, 45);
             this.panel2.TabIndex = 4;
             // 
             // button4
@@ -665,7 +675,7 @@
             this.Consol.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Consol.Location = new System.Drawing.Point(6, 15);
             this.Consol.Name = "Consol";
-            this.Consol.Size = new System.Drawing.Size(221, 815);
+            this.Consol.Size = new System.Drawing.Size(221, 812);
             this.Consol.TabIndex = 0;
             this.Consol.Text = "";
             // 
@@ -673,21 +683,11 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label4.Location = new System.Drawing.Point(1048, 17);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(48, 18);
-            this.label4.TabIndex = 40;
-            this.label4.Text = "номер";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1533, 924);
+            this.ClientSize = new System.Drawing.Size(1666, 921);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;

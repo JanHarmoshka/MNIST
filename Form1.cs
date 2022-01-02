@@ -320,7 +320,7 @@ namespace MNIST
                                 for (int j = 0; j < focus_scale; ++j)
                                 {
                                     InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
-                                    InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
+                                    //InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
                                     if (TabPagesBool)
                                     {
                                         pixels_[i + 6, j + 6] = pixels[i + Y - 3, j + X - 3];
@@ -343,12 +343,12 @@ namespace MNIST
                                     if (arrayb2[j, i] > 200)
                                     {
                                         InputData.Add(0);
-                                        InputData.Add(0);
+                                        //InputData.Add(0);
                                     }
                                     else
                                     {
                                         InputData.Add(1);
-                                        InputData.Add(1);
+                                        //InputData.Add(1);
                                     }
                                 }
                             }
@@ -575,7 +575,7 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (y1 <= 30)
+                    if (y1 <= 40)
                     {
                         chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
                     }
