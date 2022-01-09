@@ -40,7 +40,7 @@ namespace MNIST
             for (int j = 0; j < ListReverseMatte.Count; j++)
             {
                 //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";//
-                if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.15f & ListReverseMatte[j].Control_value <= 96.0f)
+                if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f)
                     | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f) //)| (ListReverseMatte[j].appeal_ > 0.70f & ListReverseMatte[j].Control_value < 15.0f)
                 {
                     Empty.Add(j);

@@ -12,9 +12,9 @@ namespace MNIST
         int prevX2 = 0;
         int prevY2 = 0;
 
-        public int bufX;
-        public int bufY;
-        byte[] XYBuf = { 7, 7 };
+        public int bufX = 14;
+        public int bufY = 14;
+        byte[] XYBuf = { 14, 14 };
 
         public float n_blekc;
         public float n_green;
@@ -109,7 +109,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if ((counter.summ < 1 & counter.summ2 < 1) | counter.inter_Data_.Count < 1 | X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
+            if ((counter.summ < 1 & counter.summ2 < 1) | counter.inter_Data_.Count < 1 | X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit)//counter.summ > 20 | counter.summ2 > 20 || (X == Xb & Y == Yb)
             {
 
                 InputData.Clear();
@@ -129,21 +129,18 @@ namespace MNIST
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        for (int j = 0; j < 1; ++j)
+                        if (rnd.Next(0, 100) > 50)
                         {
-                            if (rnd.Next(0, 99) > 49)
+                            if (XYBuf[i] >= 0 & XYBuf[i] < 24)
                             {
-                                if (XYBuf[i] >= 0 & XYBuf[i] < 24)
-                                {
-                                    XYBuf[i]++;
-                                }
+                                XYBuf[i]++;
                             }
-                            else
+                        }
+                        else
+                        {
+                            if (XYBuf[i] > 0 & XYBuf[i] <= 24)
                             {
-                                if (XYBuf[i] > 0 & XYBuf[i] <= 24)
-                                {
-                                    XYBuf[i]--;
-                                }
+                                XYBuf[i]--;
                             }
                         }
                     }
@@ -241,17 +238,18 @@ namespace MNIST
 
             if (X < lower_limit | X > Upper_limit)//
             {
-                X = 14;//rnd.Next(lower_limit, Upper_limit)
+                X = rnd.Next(lower_limit, Upper_limit);//rnd.Next(lower_limit, Upper_limit)
                 XYBuf[0] = (byte)X;
             }
 
             if (Y < lower_limit | Y > Upper_limit)//
             {
-                Y = 14;//rnd.Next(lower_limit, Upper_limit)
+                Y = rnd.Next(lower_limit, Upper_limit);//rnd.Next(lower_limit, Upper_limit)
                 XYBuf[1] = (byte)Y;
             }
 
-            if (bufX != 0 & bufX != X)//& col
+
+            if (bufX != X)//& col
             {
                 if (bufX > X)
                 {
@@ -261,10 +259,11 @@ namespace MNIST
                 {
                     X = bufX + 1;
                 }
+                bufX = X;
             }
-            bufX = X;
 
-            if (bufY != 0 & bufY != Y)//& col
+
+            if (bufY != Y)//& col
             {
 
                 if (bufY > Y)
@@ -275,8 +274,9 @@ namespace MNIST
                 {
                     Y = bufY + 1;
                 }
+                bufY = Y;
             }
-            bufY = Y;
+
 
             //X = 3;
             //Y = X;
@@ -307,6 +307,13 @@ namespace MNIST
                 way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, true);
                 way_max = 256;
             }
+
+            //if (col)
+            //{
+            //    XYBuf[0] = (byte)X;
+            //    XYBuf[1] = (byte)Y;
+
+            //}
 
             {//Пустые скобки
                 InputData.Clear();

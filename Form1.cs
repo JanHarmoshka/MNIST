@@ -108,7 +108,7 @@ namespace MNIST
             int bb = 0;
             System.Diagnostics.Stopwatch sw = new Stopwatch();
             bool col;
-            float semblance = 20;
+            float semblance = 10;
 
             sw.Start();
             // проход по файлам данных
@@ -343,12 +343,12 @@ namespace MNIST
                                     if (arrayb2[j, i] > 200)
                                     {
                                         InputData.Add(0);
-                                        //InputData.Add(0);
+                                        InputData.Add(0);
                                     }
                                     else
                                     {
                                         InputData.Add(1);
-                                        //InputData.Add(1);
+                                        InputData.Add(1);
                                     }
                                 }
                             }
@@ -391,15 +391,14 @@ namespace MNIST
 
                         //for (int i = 0; i < InputData.Count; i++)
                         //{
-                        //    if (rnd.Next(0, 9) > 5)
+                        //    if (rnd.Next(0, 9) > 7)
                         //    {
                         //        InputData[i] = 0;
                         //    }
-                        //    if (rnd.Next(0, 9) > 8)
+                        //    if (rnd.Next(0, 9) > 8.5f)
                         //    {
                         //        InputData[i] = 1;
                         //    }
-
                         //}
 
                         for (int i = 0; i < preparation_input.InputData.Count; i++)

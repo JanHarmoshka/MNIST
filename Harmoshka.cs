@@ -249,7 +249,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.7f)//
+                    if (ListReverseMatte[Ind].appeal_ < 0.15f & ListReverseMatte[Ind].appeal_ > 0.001f & Activ_ < 0.9f)//
                     {
                         IndVar = true;
                     }

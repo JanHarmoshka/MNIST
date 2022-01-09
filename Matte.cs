@@ -47,7 +47,7 @@ namespace MNIST
             }
             max_0 = max;
 
-            max = (float)max / 1.8f;//2
+            max = (float)max / 1.85f;//2
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
