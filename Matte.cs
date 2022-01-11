@@ -69,7 +69,7 @@ namespace MNIST
                 }
                 summ_0 = summ_0 + matte[j];
             }
-            if (max_0 < SleepStep)//10 50.0f
+            if (max_0 < 10)// 50.0f SleepStep
             {
                 if (summ_0 < 0.3f)//0.1
                 {
@@ -273,7 +273,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 & appeal_ < 0.9f)//
+                if (Control_value > 0 & appeal_ < 0.8f)//
                 {
                     Control_value--;
                     Contraction_ = true;

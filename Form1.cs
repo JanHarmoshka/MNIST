@@ -108,7 +108,7 @@ namespace MNIST
             int bb = 0;
             System.Diagnostics.Stopwatch sw = new Stopwatch();
             bool col;
-            float semblance = 10;
+            float semblance = 20;
 
             sw.Start();
             // проход по файлам данных
@@ -292,7 +292,7 @@ namespace MNIST
                         n_green += preparation_input.n_green;
                         X = preparation_input.X;
                         Y = preparation_input.Y;
-
+                        semblance = preparation_input.semblance;
 
                         pictureBox3.Invoke((MethodInvoker)delegate
                         {
@@ -301,7 +301,7 @@ namespace MNIST
 
                         if (TabPagesBool)
                         {
-                            bitMap = MakeBitmap.Make_Bitmap(pixels, X, Y, col);
+                            bitMap = MakeBitmap.Make_Bitmap(pixels, X + 3, Y + 3, col);
                             pictureBox1.Invoke((MethodInvoker)delegate
                             {
                                 pictureBox1.Image = bitMap;
@@ -319,11 +319,11 @@ namespace MNIST
                             {
                                 for (int j = 0; j < focus_scale; ++j)
                                 {
-                                    InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
-                                    //InputData.Add(pixels[i + Y - 3, j + X - 3]); // Запись во входящий вектор фокуса зрения
+                                    InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения
+                                    //InputData.Add(pixels[i + Y, j + X] ); // Запись во входящий вектор фокуса зрения - 3- 3
                                     if (TabPagesBool)
                                     {
-                                        pixels_[i + 6, j + 6] = pixels[i + Y - 3, j + X - 3];
+                                        pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
                                     }
                                 }
                             }

@@ -30,13 +30,15 @@ namespace MNIST
         int[,] way = new int[28, 28];
         byte[,] way_byte = new byte[28, 28];
 
-        int lower_limit = 3;
-        int Upper_limit = 24;
+        int lower_limit = 2;
+        int Upper_limit = 22;
         int proportions = 6;
+        public float semblance;
 
 
-        public void PreparationInput_1(Counter counter, float semblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
+        public void PreparationInput_1(Counter counter, float vsemblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
         {
+            semblance = vsemblance;
             col = true;
             double SumX = 0;
             double SumY = 0;
@@ -86,12 +88,12 @@ namespace MNIST
                 }
                 else
                 {
-                    semblance = 11;
+                    semblance = 20;
                 }
             }
             else
             {
-                semblance = 11;
+                semblance = 20;
             }
 
             prevX1 = prevX2;
@@ -109,7 +111,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if ((counter.summ < 1 & counter.summ2 < 1) | counter.inter_Data_.Count < 1 | X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit)//counter.summ > 20 | counter.summ2 > 20 || (X == Xb & Y == Yb)
+            if ((counter.summ < 1 & counter.summ2 < 1) | counter.inter_Data_.Count < 1 | X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit | (X == Xb & Y == Yb))//counter.summ > 20 | counter.summ2 > 20 |
             {
 
                 InputData.Clear();
@@ -129,16 +131,16 @@ namespace MNIST
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if (rnd.Next(0, 100) > 50)
+                        if (rnd.Next(1, 100) > 50)
                         {
-                            if (XYBuf[i] >= 0 & XYBuf[i] < 24)
+                            if (XYBuf[i] >= 0 & XYBuf[i] < Upper_limit)
                             {
                                 XYBuf[i]++;
                             }
                         }
                         else
                         {
-                            if (XYBuf[i] > 0 & XYBuf[i] <= 24)
+                            if (XYBuf[i] > 0 & XYBuf[i] <= Upper_limit)
                             {
                                 XYBuf[i]--;
                             }
@@ -159,10 +161,9 @@ namespace MNIST
                     {
                         // if (i % 2 == 0 & j % 2 == 0)
                         {
-                            if (i + Y > 0 & i + Y < 28 & j + X > 0 & j + X < 28)
+                            if (i + Y + proportions / 2 > 0 & i + Y < 28 & j + X + proportions / 2 > 0 & j + X < 28)
                             {
-                                Coordinate[i + Y, j + X] = 1;//
-                                //Coordinate_[i + Y, j + X] = 1;
+                                Coordinate[i + Y, j + X] = 1;//                                
                             }
                         }
                     }
@@ -228,13 +229,13 @@ namespace MNIST
                         n++;
                     }
                 }
-                X = (int)Math.Ceiling(SumX / num);
-                Y = (int)Math.Ceiling(SumY / num);
+                X = (int)Math.Ceiling(SumX / num) - 3;
+                Y = (int)Math.Ceiling(SumY / num) - 3;
             }
 
             //X -= 3;
             //X += X;//координаты зрачка
-            //Y += Y;
+            //Y += Y;             
 
             if (X < lower_limit | X > Upper_limit)//
             {
@@ -308,43 +309,21 @@ namespace MNIST
                 way_max = 256;
             }
 
-            //if (col)
-            //{
-            //    XYBuf[0] = (byte)X;
-            //    XYBuf[1] = (byte)Y;
-
-            //}
-
             {//Пустые скобки
                 InputData.Clear();
                 byte[,] Coordinate = new byte[28, 28];
-                byte[,] Coordinate_ = new byte[28, 28];
 
                 for (int i = 0; i < proportions; i++)
                 {
                     for (int j = 0; j < proportions; j++)
                     {
-                        if (i + Y > 0 & i + Y < 28 & j + X > 0 & j + X < 28)
+                        if (i + Y + proportions / 2 > 0 & i + Y < 28 & j + X + proportions / 2 > 0 & j + X < 28)
                         {
                             Coordinate[i + Y, j + X] = 1;
-                            Coordinate_[i + Y, j + X] = 1;
                         }
 
                     }
                 }
-
-
-                //for (int i = 0; i < 28; i++)
-                //{
-                //    Coordinate[i, X] = 1;
-                //    Coordinate_[i, X] = 1;
-                //}
-
-                //for (int j = 0; j < 28; j++)
-                //{
-                //    Coordinate[Y, j] = 1;
-                //    Coordinate_[Y, j] = 1;
-                //}
 
                 //for (int i = 0; i < 28; i++)
                 //{
@@ -363,7 +342,7 @@ namespace MNIST
                 //    }
                 //}
 
-                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate_, X, Y, col, 10, false);
+                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinate, X + 3, Y + 3, col, 10, false);
 
                 for (int i = 0; i < 28; i++)
                 {
