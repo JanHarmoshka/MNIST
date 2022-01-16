@@ -5,14 +5,14 @@ namespace MNIST
 {
     class Clearing
     {
-        public string message;
+        //public string message;
         public Clearing(List<Matte> ListMatte, List<ReverseMatte> ListReverseMatte, float satiety)
         {
             List<int> Empty = new List<int>();
             for (int j = 0; j < ListMatte.Count; j++)
             {
                 //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
-                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))//* 2f
+                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety  & ListMatte[j].Control_value < 200))//* 2f
                 {
                     Empty.Add(j);
                 }
@@ -129,10 +129,10 @@ namespace MNIST
                 {
                     inter_result.Add(Activ);
                     ContractionInterResultFirst.Add(inter_result.Count - 1);
-                    if (ActivSecond > -0.0f)
-                    {
-                        ContractionInterResultSecond.Add(inter_result.Count - 1);
-                    }
+                    //if (ActivSecond > -0.0f)
+                    //{
+                    //    ContractionInterResultSecond.Add(inter_result.Count - 1);
+                    //}
                 }
                 else if (ActivSecond > -0.0f)
                 {
@@ -152,13 +152,13 @@ namespace MNIST
         public List<float> AssessmentFirst = new List<float>();
         public List<float> AssessmentSecond = new List<float>();
         public float Activ;
-        float SecondActiv;
+        private float SecondActiv;
         public int Ind;
-        int DefenseLearning;
-        List<ReverseMatte> ListReverseMatte;
-        List<int> ContractionInterResultFirst;
-        List<int> ContractionInterResultSecond;
-        List<float> inter_result;
+        readonly int DefenseLearning;
+        readonly List<ReverseMatte> ListReverseMatte;
+        readonly List<int> ContractionInterResultFirst;
+        readonly List<int> ContractionInterResultSecond;
+        readonly List<float> inter_result;
 
 
         public ActivityReverseMasks(List<ReverseMatte> vListReverseMatte, List<int> vContractionInterResultFirst, List<int> vContractionInterResultSecond, List<float> vinter_result)
@@ -350,13 +350,13 @@ namespace MNIST
 
         public List<float> AssessmentFirst1 = new List<float>();
         public List<float> AssessmentSecond1 = new List<float>();
-        float Activ1;
-        float SecondActiv1;
-        int Ind1;
-        List<ReverseMatte> ListReverseMatte1;
-        List<int> ContractionInterResultFirst1;
-        List<int> ContractionInterResultSecond1;
-        List<float> inter_result1;
+        private float Activ1;
+        private float SecondActiv1;
+        private int Ind1;
+        readonly List<ReverseMatte> ListReverseMatte1;
+        readonly List<int> ContractionInterResultFirst1;
+        readonly List<int> ContractionInterResultSecond1;
+        readonly List<float> inter_result1;
 
         public void ActivityFor1()
         {
@@ -420,10 +420,10 @@ namespace MNIST
         float Activ2;
         float SecondActiv2;
         int Ind2;
-        List<ReverseMatte> ListReverseMatte2;
-        List<int> ContractionInterResultFirst2;
-        List<int> ContractionInterResultSecond2;
-        List<float> inter_result2;
+        readonly List<ReverseMatte> ListReverseMatte2;
+        readonly List<int> ContractionInterResultFirst2;
+        readonly List<int> ContractionInterResultSecond2;
+        readonly List<float> inter_result2;
 
         public void ActivityFor2()
         {
@@ -484,13 +484,13 @@ namespace MNIST
 
         public List<float> AssessmentFirst3 = new List<float>();
         public List<float> AssessmentSecond3 = new List<float>();
-        float Activ3;
-        float SecondActiv3;
-        int Ind3;
-        List<ReverseMatte> ListReverseMatte3;
-        List<int> ContractionInterResultFirst3;
-        List<int> ContractionInterResultSecond3;
-        List<float> inter_result3;
+        private float Activ3;
+        private float SecondActiv3;
+        private int Ind3;
+        readonly List<ReverseMatte> ListReverseMatte3;
+        readonly List<int> ContractionInterResultFirst3;
+        readonly List<int> ContractionInterResultSecond3;
+        readonly List<float> inter_result3;
 
         public void ActivityFor3()
         {
@@ -551,13 +551,13 @@ namespace MNIST
 
         public List<float> AssessmentFirst4 = new List<float>();
         public List<float> AssessmentSecond4 = new List<float>();
-        float Activ4;
-        float SecondActiv4;
-        int Ind4;
-        List<ReverseMatte> ListReverseMatte4;
-        List<int> ContractionInterResultFirst4;
-        List<int> ContractionInterResultSecond4;
-        List<float> inter_result4;
+        private float Activ4;
+        private float SecondActiv4;
+        private int Ind4;
+        readonly List<ReverseMatte> ListReverseMatte4;
+        readonly List<int> ContractionInterResultFirst4;
+        readonly List<int> ContractionInterResultSecond4;
+        readonly List<float> inter_result4;
 
         public void ActivityFor4()
         {

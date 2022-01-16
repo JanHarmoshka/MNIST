@@ -14,7 +14,7 @@ namespace MNIST
         public string message = null;
         public List<Matte> ListMatte = new List<Matte>();
         public List<ReverseMatte> ListReverseMatte = new List<ReverseMatte>();
-        List<float> inter_result_ = new List<float>();
+        readonly List<float> inter_result_ = new List<float>();
 
         private int fulEror = 60000;//Количество элементов
         public void SetFullError(int val) { fulEror = val; }
@@ -48,11 +48,11 @@ namespace MNIST
         public void SetV6(int val) { V6 = val; }
         public int GetV6() { return V6; }
 
-        List<float> AssessmentFirst = new List<float>();
-        List<float> AssessmentSecond = new List<float>();
-        int nnn;
-        int nnnbuf = 0;
-        public int SleepStep = 20;
+        readonly List<float> AssessmentFirst = new List<float>();
+        readonly List<float> AssessmentSecond = new List<float>();
+        private int nnn;
+        private int nnnbuf = 0;
+        public int SleepStep = 22;
 
         public Counter Assessment(int Dispenser, List<float> InputData, float semblance, int IndexData = -1)
         {
@@ -153,7 +153,7 @@ namespace MNIST
             //Расчёт активности масок - поиск совпадений
             float Activ;
             float Activ_ = -1;
-            int n;
+            //int n;
             int Index;
 
             ActivityMasks activityMasks = new ActivityMasks(ListMatte, ContractionInputData, inter_Data, InputDataCount, Dispenser, inter_result, ContractionInterResultFirst, ContractionInterResultSecond);

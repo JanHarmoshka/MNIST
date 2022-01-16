@@ -19,7 +19,7 @@ namespace MNIST
         string images, labels;
         public bool reproduction;
         public int allEror = 0;
-        private List<int> all = new List<int>();
+        readonly List<int> all = new List<int>();
         public int nn = 0;
         public float n_blekc = 0;
         public float n_green = 0;
@@ -67,7 +67,7 @@ namespace MNIST
             return BitConverter.ToInt32(intAsBytes, 0);
         }
 
-        string[] setting = new string[2];
+        //string[] setting = new string[2];
         bool session_flag = false;
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -141,7 +141,7 @@ namespace MNIST
                 Random rnd = new Random();
                 Bitmap bitMap;
                 Bitmap bitMap_;
-                Bitmap bitMap4;
+                //Bitmap bitMap4;
                 Bitmap b2 = new Bitmap(10, 10);
 
                 byte[,] pixelsBuf = new byte[28, 28];
@@ -313,26 +313,19 @@ namespace MNIST
 
                         byte[,] pixels_ = new byte[28, 28];
 
-                        try
+                        for (int i = 0; i < focus_scale; ++i)
                         {
-                            for (int i = 0; i < focus_scale; ++i)
+                            for (int j = 0; j < focus_scale; ++j)
                             {
-                                for (int j = 0; j < focus_scale; ++j)
+                                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения                                                                    
+                                if (TabPagesBool)
                                 {
-                                    InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения
-                                    //InputData.Add(pixels[i + Y, j + X] ); // Запись во входящий вектор фокуса зрения - 3- 3
-                                    if (TabPagesBool)
-                                    {
-                                        pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
-                                    }
+                                    pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            //Выводим ошибку
-                            MessageBox.Show(ex.ToString());
-                        }
+
+
 
                         { //Дабавление перефирийное зрение к входящиму вектору
                             for (int i = 0; i < 12; ++i)
@@ -384,22 +377,28 @@ namespace MNIST
                                 label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
                             });
                         }
-
+                        if (preparation_input.meter == 100)
+                        {
+                            pictureBox9.Invoke((MethodInvoker)delegate
+                            {
+                                pictureBox9.Image = preparation_input.way_Draw;
+                            });
+                        }
 
                         Xb = X;
                         Yb = Y;
 
-                        //for (int i = 0; i < InputData.Count; i++)
-                        //{
-                        //    if (rnd.Next(0, 9) > 7)
-                        //    {
-                        //        InputData[i] = 0;
-                        //    }
-                        //    if (rnd.Next(0, 9) > 8.5f)
-                        //    {
-                        //        InputData[i] = 1;
-                        //    }
-                        //}
+                        for (int i = 0; i < InputData.Count; i++)
+                        {
+                            if (rnd.Next(0, 9) > 8.5)
+                            {
+                                InputData[i] = 0;
+                            }
+                            if (rnd.Next(0, 9) > 8.5f)
+                            {
+                                InputData[i] = 1;
+                            }
+                        }
 
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
@@ -542,8 +541,7 @@ namespace MNIST
         {
             if (e.ProgressPercentage == 0)
             {
-                double y1 = 0;
-                y1 = allEror / 600f;
+                double y1 = allEror / 600f;
 
                 if (n_blekc > 0)
                 {

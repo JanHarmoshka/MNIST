@@ -14,7 +14,7 @@ namespace MNIST
 
         public int bufX = 14;
         public int bufY = 14;
-        byte[] XYBuf = { 14, 14 };
+        readonly byte[] XYBuf = { 14, 14 };
 
         public float n_blekc;
         public float n_green;
@@ -27,13 +27,15 @@ namespace MNIST
         int way_max = 256;
 
         public List<byte> InputData = new List<byte>();
-        int[,] way = new int[28, 28];
-        byte[,] way_byte = new byte[28, 28];
+        readonly int[,] way = new int[28, 28];
+        readonly byte[,] way_byte = new byte[28, 28];
 
-        int lower_limit = 2;
-        int Upper_limit = 22;
-        int proportions = 6;
+        readonly int lower_limit = 2;
+        readonly int Upper_limit = 22;
+        readonly int proportions = 6;
         public float semblance;
+
+        public int meter = 100;
 
 
         public void PreparationInput_1(Counter counter, float vsemblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
@@ -83,17 +85,17 @@ namespace MNIST
 
                     if (semblance > 1)
                     {
-                        semblance -= 3f;
+                        semblance -= 7f;
                     }
                 }
                 else
                 {
-                    semblance = 20;
+                    semblance = 22;
                 }
             }
             else
             {
-                semblance = 20;
+                semblance = 22;
             }
 
             prevX1 = prevX2;
@@ -132,19 +134,20 @@ namespace MNIST
                     for (int i = 0; i < 2; i++)
                     {
                         if (rnd.Next(1, 100) > 50)
-                        {
-                            if (XYBuf[i] >= 0 & XYBuf[i] < Upper_limit)
+                            if (rnd.Next(1, 100) > 50)
                             {
-                                XYBuf[i]++;
+                                if (XYBuf[i] >= 0 & XYBuf[i] < Upper_limit)
+                                {
+                                    XYBuf[i]++;
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (XYBuf[i] > 0 & XYBuf[i] <= Upper_limit)
+                            else
                             {
-                                XYBuf[i]--;
+                                if (XYBuf[i] > 0 & XYBuf[i] <= Upper_limit)
+                                {
+                                    XYBuf[i]--;
+                                }
                             }
-                        }
                     }
                     //XYBuf[0] = (byte)rnd.Next(lower_limit + 1, Upper_limit - 1);
                     //XYBuf[1] = (byte)rnd.Next(lower_limit + 1, Upper_limit - 1);
@@ -189,6 +192,7 @@ namespace MNIST
 
             if ((counter.inter_Data_Full.Count > 0 & !reproduction) | (counter.inter_Data_Full.Count > 0) & TabPagesBool)//Рисовать фокус внимания 
             {
+
                 byte[,] pixels = new byte[28, 28];
                 int n = 0;
                 for (int i = 0; i < 28; i++)
@@ -284,14 +288,15 @@ namespace MNIST
 
             // if (X != 4 & Y != 4)
             {
-                way[X, Y] += 1;
-                if (way_max < way[X, Y])
+                way[X + 2, Y + 2] += 1;
+                if (way_max < way[X + 2, Y + 2])
                 {
-                    way_max = way[X, Y];
+                    way_max = way[X + 2, Y + 2];
                 }
             }
 
-            if (TabPagesBool)
+            meter--;
+            if (TabPagesBool | meter == 0)
             {
                 for (int i = 0; i < 28; i++)
                 {
@@ -305,8 +310,16 @@ namespace MNIST
 
                     }
                 }
-                way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, true);
+                if (meter == 0)
+                {
+                    way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, false);
+                }
+                else
+                {
+                    way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, true);
+                }
                 way_max = 256;
+                meter = 100;
             }
 
             {//Пустые скобки
@@ -329,15 +342,9 @@ namespace MNIST
                 //{
                 //    for (int j = 0; j < 28; j++)
                 //    {
-                //        //if (rnd.Next(0, 9) > 5)
-                //        //{
-                //        //    Coordinate[i / 2, j / 2] = 0;
-                //        //    Coordinate_[i, j] = 0;
-                //        //}
                 //        if (rnd.Next(0, 100) < 1)
                 //        {
                 //            Coordinate[i, j] = 1;
-                //            Coordinate_[i, j] = 1;
                 //        }
                 //    }
                 //}

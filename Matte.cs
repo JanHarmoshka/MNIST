@@ -13,7 +13,7 @@ namespace MNIST
         public bool Contraction_;
         public int Control_value;
         public int SleepStep;
-        private List<float> mask = new List<float>();
+        readonly List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
 
         public Matte(List<float> InputData, ushort Room, float satiety = 0.4f)
@@ -47,13 +47,13 @@ namespace MNIST
             }
             max_0 = max;
 
-            max = (float)max / 1.85f;//2
+            max /= 1.85f;//2
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
                 matte[j] = mask[j] - max;
                 if (matte[j] > 0)
-                    summ = summ + matte[j];
+                    summ += matte[j];
             }
 
             Single summ_0 = 0;
@@ -67,7 +67,7 @@ namespace MNIST
                 {
                     matte[j] = 0;
                 }
-                summ_0 = summ_0 + matte[j];
+                summ_0 += matte[j];
             }
             if (max_0 < 10)// 50.0f SleepStep
             {
@@ -130,9 +130,9 @@ namespace MNIST
         public float Control_value;
         public bool Contraction;
         public bool Contraction_;
-        private float appeal;
+        readonly float appeal;
         public float appeal_;
-        private List<float> mask = new List<float>();
+        readonly List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
         public List<float> Refined = new List<float>();
         public List<float> Correct = new List<float>();
@@ -235,13 +235,13 @@ namespace MNIST
                     max = mask[j];
             }
 
-            max = (float)max / 3f;
+            max /= 3f;
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
                 matte[j] = mask[j] - max;
                 if (matte[j] > 0)
-                    summ = summ + matte[j] * 1f;
+                    summ += matte[j] * 1f;
             }
 
             for (int j = 0; j < mask.Count; j++)
@@ -267,13 +267,13 @@ namespace MNIST
             for (int j = 1; j < Refined.Count; j++)
             {
                 Correct[j] = Refined[j] / max;
-                summ_0 = summ_0 + Correct[j];
+                summ_0 += Correct[j];
             }
-            summ_0 = summ_0 / Correct.Count;
+            summ_0 /= Correct.Count;
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 & appeal_ < 0.8f)//
+                if (Control_value > 0 & appeal_ < 0.95f)//0,8
                 {
                     Control_value--;
                     Contraction_ = true;
