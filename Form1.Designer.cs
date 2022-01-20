@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -188,14 +188,14 @@
             // изображенияToolStripMenuItem
             // 
             this.изображенияToolStripMenuItem.Name = "изображенияToolStripMenuItem";
-            this.изображенияToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.изображенияToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.изображенияToolStripMenuItem.Text = "Изображения";
             this.изображенияToolStripMenuItem.Click += new System.EventHandler(this.изображенияToolStripMenuItem_Click);
             // 
             // индексыToolStripMenuItem1
             // 
             this.индексыToolStripMenuItem1.Name = "индексыToolStripMenuItem1";
-            this.индексыToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.индексыToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.индексыToolStripMenuItem1.Text = "Индексы";
             this.индексыToolStripMenuItem1.Click += new System.EventHandler(this.индексыToolStripMenuItem1_Click);
             // 
@@ -267,11 +267,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart2.BackColor = System.Drawing.Color.Gray;
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea3.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea3);
-            this.chart2.Location = new System.Drawing.Point(6, 649);
+            chartArea1.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea1);
+            this.chart2.Location = new System.Drawing.Point(6, 558);
             this.chart2.Name = "chart2";
-            this.chart2.Size = new System.Drawing.Size(1436, 186);
+            this.chart2.Size = new System.Drawing.Size(1145, 284);
             this.chart2.TabIndex = 40;
             this.chart2.Text = "chart2";
             this.chart2.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -283,11 +283,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart1.BackColor = System.Drawing.Color.Gray;
             this.chart1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Location = new System.Drawing.Point(9, 39);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(1433, 623);
+            this.chart1.Size = new System.Drawing.Size(1433, 529);
             this.chart1.TabIndex = 39;
             this.chart1.Text = "chart1";
             this.chart1.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -379,9 +379,10 @@
             // 
             // label16
             // 
+            this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label16.Location = new System.Drawing.Point(1260, 409);
+            this.label16.Location = new System.Drawing.Point(1185, 409);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(64, 18);
             this.label16.TabIndex = 47;
@@ -691,7 +692,7 @@
             this.pictureBox9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox9.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox9.Location = new System.Drawing.Point(1121, 0);
+            this.pictureBox9.Location = new System.Drawing.Point(1118, 558);
             this.pictureBox9.Name = "pictureBox9";
             this.pictureBox9.Size = new System.Drawing.Size(280, 280);
             this.pictureBox9.TabIndex = 45;

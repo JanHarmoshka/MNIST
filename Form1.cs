@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -150,7 +150,7 @@ namespace MNIST
 
                 int focus_scale = 6;// Размер зрачка
 
-                PreparationInput preparation_input = new PreparationInput();
+                PreparationInput preparation_input = PreparationInput.Instance;
 
                 if (session_flag)
                 {
@@ -279,7 +279,7 @@ namespace MNIST
 
                         try
                         {
-                            preparation_input.PreparationInput_1(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
+                            preparation_input.PrepareInput(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
                         }
                         catch (Exception ex)
                         {
@@ -287,8 +287,8 @@ namespace MNIST
                             MessageBox.Show(ex.ToString());
                         }
 
-                        col = preparation_input.col;
-                        n_blekc += preparation_input.n_blekc;
+                        col = preparation_input.IsColoured;
+                        n_blekc += preparation_input.n_black;
                         n_green += preparation_input.n_green;
                         X = preparation_input.X;
                         Y = preparation_input.Y;
@@ -377,7 +377,7 @@ namespace MNIST
                                 label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
                             });
                         }
-                        if (preparation_input.meter == 100)
+                        if (preparation_input.DrawFocusField)
                         {
                             pictureBox9.Invoke((MethodInvoker)delegate
                             {
@@ -390,11 +390,11 @@ namespace MNIST
 
                         for (int i = 0; i < InputData.Count; i++)
                         {
-                            if (rnd.Next(0, 9) > 8.5)
+                            if (rnd.Next(0, 9) > 8)
                             {
                                 InputData[i] = 0;
                             }
-                            if (rnd.Next(0, 9) > 8.5f)
+                            if (rnd.Next(0, 9) > 8)
                             {
                                 InputData[i] = 1;
                             }
@@ -877,7 +877,6 @@ namespace MNIST
     }
 
 }
-
 
 
 

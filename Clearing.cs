@@ -12,7 +12,7 @@ namespace MNIST
             for (int j = 0; j < ListMatte.Count; j++)
             {
                 //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
-                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety  & ListMatte[j].Control_value < 200))//* 2f
+                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))//* 2f
                 {
                     Empty.Add(j);
                 }
