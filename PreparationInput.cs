@@ -48,7 +48,7 @@ namespace MNIST
         private readonly int Upper_limit = 22;
         private readonly int proportions = 6;
         public float semblance { get; private set; }
-        private int meter { get; set; } = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. Это счётчик вывода картинки ка форму с графиками.
+        private int meter { get; set; } = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. => Это счётчик вывода картинки ка форму с графиками.
         public bool DrawFocusField { get { return meter == 100; } } //TODO: Уточнить название. 
         private PreparationInput() { }
         //TODO: Переименовать в соответствии с выполняемыми действиями. Done.
@@ -64,7 +64,7 @@ namespace MNIST
         public void PrepareInput(Counter counter, float vsemblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
         {
             semblance = vsemblance;
-            IsColoured = true; // Считаем что всегда управлять зрачком будет нейронная сеть. Цвет рамки зелёный
+            IsColoured = true; // Считаем что всегда управлять фокусом будет нейронная сеть. Цвет рамки зелёный
 
             n_green = 0;
             n_black = 0;
@@ -89,7 +89,7 @@ namespace MNIST
             {
 
                 InputData.Clear();
-                IsColoured = false;//Если зрачком управляет гератор движения. Цвет рамки чёрный
+                IsColoured = false;//Если фокусом управляет гератор движения. Цвет рамки чёрный
                 n_black++;
                 n_green--;
 
@@ -101,34 +101,28 @@ namespace MNIST
                 //TODO: Отсюда и ниже выделить в метод UpdateCoordinate или как-то так. Done, но ещё нужно будет подумать над названием. 
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize]; //TODO: Переименовать переменную на CoordinateFlags. Возможно, изменить тип на булевый массив. Done тоже. Вернул, как было, потому что ниже по коду требуется именно byte. 
 
-                InitializeCoordinates(Coordinates, X, Y);                
+                InitializeCoordinates(Coordinates, X, Y); //На сгенерированных координатах фокуса                
 
                 counter.inter_Data_.Clear();
                 for (int i = 0; i < focusFieldSize; i++)
                 {
                     for (int j = 0; j < focusFieldSize; j++)
                     {
-                        counter.inter_Data_.Add(Coordinates[i, j]);
+                        counter.inter_Data_.Add(Coordinates[i, j]);// Имитирует данные о пятне фокуса (подменяет данные из нейронной сети, сгенерированными данными)
                     }
                 }
             }
 
             if ((counter.inter_Data_Full.Count > 0 & !reproduction) | (counter.inter_Data_Full.Count > 0) & TabPagesBool)//Рисовать фокус внимания 
             {
-                DrawFocus(counter, X, Y);
+                DrawFocus(counter, X, Y); // Если нет данных от нейронной сети, создаёт рисунок с данными от генератора.
             }// Конец прорисовки фокуса внимания
 
             InputData.Clear();
 
-            //ВНИМАНИЕ! 
-            //Код, который был здесь, немного отличается от кода метода CalculateXY, но мне показалось, что они взаимозаменяемы, поэтому
-            //я переиспользовал метод дважды, здесь и выше. Если отличия на самом деле значимы, нужно выделять отдельный метод или 
-            //добавлять изменения в CalculateXY, чтобы сделать его более гибким. 
             XY = CalculateXY(counter, X, Y);
             X = XY.Item1;
             Y = XY.Item2;
-
-
 
             BackXYBufInLimits(rnd, XYBuf);
 
@@ -176,18 +170,18 @@ namespace MNIST
                 XYBuf[1] = Y;
             }
 
-            {//Запись данных о фокусе для дальнейшей передачи в нейронную сеть
+            {
                 InputData.Clear();
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
-                InitializeCoordinates(Coordinates, X, Y);
+                InitializeCoordinates(Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
 
-                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false);
+                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
 
                 for (int i = 0; i < focusFieldSize; i++)
                 {
                     for (int j = 0; j < focusFieldSize; j++)
                     {
-                        InputData.Add(Coordinates[i, j]);
+                        InputData.Add(Coordinates[i, j]);//Запись данных о фокусе для дальнейшей передачи в нейронную сеть
                     }
                 }
                 counter.inter_Data_.Clear();
@@ -212,7 +206,6 @@ namespace MNIST
                 bufX = X;
             }
 
-
             if (bufY != Y)
             {
 
@@ -227,6 +220,7 @@ namespace MNIST
                 bufY = Y;
             }
         }
+
         /// <summary>
         /// Эта функция возвращает зрачёк если он оказывается за границами поля. 
         /// </summary>
@@ -245,7 +239,7 @@ namespace MNIST
         }
 
         /// <summary>
-        /// Эта функция отрисовывает ФАКТИЧЕСКРЕ пятно фокуса на поле. 
+        /// Эта функция выводит рисунок пятна фокуса на поле. 
         /// </summary>
         private void DrawFocus(Counter counter, int X, int Y)
         {
@@ -267,7 +261,7 @@ namespace MNIST
         }
 
         /// <summary>
-        /// Эта функция задаёт случайное значение координат с некоторой вероятностью. 
+        /// Эта функция задаёт случайное значение координат фокуса с некоторой вероятностью. 
         /// </summary>
         /// <param name="rnd"></param>
         private void ShakeXYBuf(Random rnd, int[] XYBuf)
@@ -306,7 +300,7 @@ namespace MNIST
         }
 
         /// <summary>
-        /// Эта функция отрисовывает пятно ПЛАНИРУЕМОЕ фокуса на поле. 
+        /// Эта функция создаёт пятно фокуса на поле. 
         /// </summary>
         private void InitializeCoordinates(byte[,] Coordinates, int X, int Y)
         {
