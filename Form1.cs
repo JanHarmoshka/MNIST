@@ -152,36 +152,37 @@ namespace MNIST
 
                 PreparationInput preparation_input = PreparationInput.Instance;
 
-                if (session_flag)
-                {
-                    Harmoshka.SetTrigger(true);
-                }
-                else
-                {
-                    Harmoshka.SetTrigger(false);
-                }
+                Harmoshka.LessonTrigger = session_flag;
+                //if (session_flag) //TODO: переделать на trigget = session_flag. Done. 
+                //{
+                //    Harmoshka.SetTrigger(true);
+                //}
+                //else
+                //{
+                //    Harmoshka.SetTrigger(false);
+                //}
 
                 //поиск файла индекса
 
-                for (int di = 0; di < Harmoshka.GetFullError(); di++)
+                for (int di = 0; di < Harmoshka.FullError; di++)
                 {
                     button1.Invoke((MethodInvoker)delegate
                     {
                         if (button1.Enabled == false)
                         {
-                            try
+                            try //TODO: Возможно, заменить на TryParse. 
                             {
-                                Harmoshka.SetFullError(int.Parse(textBox1.Text));
+                                Harmoshka.FullError = int.Parse(textBox1.Text);
 
-                                Harmoshka.SetSatiety(float.Parse(textBox3.Text));
+                                Harmoshka.Satiety = float.Parse(textBox3.Text);
 
-                                Harmoshka.SetV1(float.Parse(textBox8.Text));
+                                Harmoshka.V1 = float.Parse(textBox8.Text);
 
-                                Harmoshka.SetV2(float.Parse(textBox7.Text));
+                                Harmoshka.V2 = float.Parse(textBox7.Text);
 
-                                Harmoshka.SetV5(float.Parse(textBox12.Text));
+                                Harmoshka.V5 = float.Parse(textBox12.Text);
 
-                                Harmoshka.SetV6(int.Parse(textBox9.Text));
+                                Harmoshka.V6 = int.Parse(textBox9.Text);
 
                             }
                             catch (Exception ex)
@@ -194,7 +195,7 @@ namespace MNIST
                         button1.Enabled = true;
                     });
                     nn++;
-                    if (scroll.Count < Harmoshka.GetFullError())
+                    if (scroll.Count < Harmoshka.FullError)
                     {
                         scroll.Add(false);
                     }
@@ -388,17 +389,17 @@ namespace MNIST
                         Xb = X;
                         Yb = Y;
 
-                        for (int i = 0; i < InputData.Count; i++)
-                        {
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 0;
-                            }
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 1;
-                            }
-                        }
+                        //for (int i = 0; i < InputData.Count; i++)
+                        //{
+                        //    if (rnd.Next(0, 9) > 8)
+                        //    {
+                        //        InputData[i] = 0;
+                        //    }
+                        //    if (rnd.Next(0, 9) > 8)
+                        //    {
+                        //        InputData[i] = 1;
+                        //    }
+                        //}
 
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
@@ -572,7 +573,7 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (y1 <= 40)
+                    if (y1 <= 20)
                     {
                         chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
                     }
@@ -761,7 +762,7 @@ namespace MNIST
             {
                 try
                 {
-                    Harmoshka.LodeMatte(openFileDialog1.FileName.Substring(0, openFileDialog1.FileName.Length - 16));
+                    Harmoshka.LoadMatte(openFileDialog1.FileName.Substring(0, openFileDialog1.FileName.Length - 16));
                     MessageBox.Show("Импорт осуществлён");
                 }
                 catch (Exception ex)

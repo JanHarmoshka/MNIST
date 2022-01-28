@@ -47,6 +47,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.label18 = new System.Windows.Forms.Label();
             this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -88,11 +89,11 @@
             this.Consol = new System.Windows.Forms.RichTextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.tabPage2.SuspendLayout();
@@ -107,7 +108,6 @@
             this.tabPage3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -188,14 +188,14 @@
             // изображенияToolStripMenuItem
             // 
             this.изображенияToolStripMenuItem.Name = "изображенияToolStripMenuItem";
-            this.изображенияToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.изображенияToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.изображенияToolStripMenuItem.Text = "Изображения";
             this.изображенияToolStripMenuItem.Click += new System.EventHandler(this.изображенияToolStripMenuItem_Click);
             // 
             // индексыToolStripMenuItem1
             // 
             this.индексыToolStripMenuItem1.Name = "индексыToolStripMenuItem1";
-            this.индексыToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.индексыToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
             this.индексыToolStripMenuItem1.Text = "Индексы";
             this.индексыToolStripMenuItem1.Click += new System.EventHandler(this.индексыToolStripMenuItem1_Click);
             // 
@@ -251,6 +251,17 @@
             this.tabPage1.Size = new System.Drawing.Size(1401, 841);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Сводка";
+            // 
+            // pictureBox9
+            // 
+            this.pictureBox9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox9.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.pictureBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBox9.Location = new System.Drawing.Point(1118, 558);
+            this.pictureBox9.Name = "pictureBox9";
+            this.pictureBox9.Size = new System.Drawing.Size(280, 280);
+            this.pictureBox9.TabIndex = 45;
+            this.pictureBox9.TabStop = false;
             // 
             // label18
             // 
@@ -687,17 +698,6 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // pictureBox9
-            // 
-            this.pictureBox9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox9.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pictureBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox9.Location = new System.Drawing.Point(1118, 558);
-            this.pictureBox9.Name = "pictureBox9";
-            this.pictureBox9.Size = new System.Drawing.Size(280, 280);
-            this.pictureBox9.TabIndex = 45;
-            this.pictureBox9.TabStop = false;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -717,6 +717,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.tabPage2.ResumeLayout(false);
@@ -734,7 +735,6 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

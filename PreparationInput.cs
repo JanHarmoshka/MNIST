@@ -47,6 +47,8 @@ namespace MNIST
         private readonly int lower_limit = 2;
         private readonly int Upper_limit = 22;
         private readonly int proportions = 6;
+
+        private Random rnd = new Random();
         public float semblance { get; private set; }
         private int meter { get; set; } = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. => Это счётчик вывода картинки ка форму с графиками.
         public bool DrawFocusField { get { return meter == 100; } } //TODO: Уточнить название. 
@@ -68,7 +70,7 @@ namespace MNIST
 
             n_green = 0;
             n_black = 0;
-            Random rnd = new Random();
+           
 
             InputData.Clear();
 

@@ -69,9 +69,9 @@ namespace MNIST
                 }
                 summ_0 += matte[j];
             }
-            if (max_0 < 10)// 50.0f SleepStep
+            if (max_0 < 15)// 50.0f SleepStep
             {
-                if (summ_0 < 0.3f)//0.1
+                if (summ_0 < 0.3f)//0.3
                 {
                     if (Control_value > 0)
                     {
@@ -125,6 +125,8 @@ namespace MNIST
     [Serializable]
     public class ReverseMatte
     {
+        public int ActivityFrequency = 0;
+
         public int room;
         public int Live;
         public float Control_value;

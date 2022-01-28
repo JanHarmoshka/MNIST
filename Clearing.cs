@@ -12,7 +12,7 @@ namespace MNIST
             for (int j = 0; j < ListMatte.Count; j++)
             {
                 //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
-                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))//* 2f
+                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))
                 {
                     Empty.Add(j);
                 }
@@ -39,9 +39,9 @@ namespace MNIST
 
             for (int j = 0; j < ListReverseMatte.Count; j++)
             {
-                //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";//
+                //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";
                 if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f)
-                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f) //)| (ListReverseMatte[j].appeal_ > 0.70f & ListReverseMatte[j].Control_value < 15.0f)
+                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 1000) 
                 {
                     Empty.Add(j);
                 }
@@ -147,7 +147,7 @@ namespace MNIST
             }
         }
     }
-    class ActivityReverseMasks
+    class ActivityReverseMasks //TODO: всюду задаться вопросами нейминга. 
     {
         public List<float> AssessmentFirst = new List<float>();
         public List<float> AssessmentSecond = new List<float>();
@@ -188,7 +188,7 @@ namespace MNIST
             }
             else
             {
-                ListReverseMatte1 = new List<ReverseMatte>(vListReverseMatte);
+                ListReverseMatte1 = new List<ReverseMatte>(vListReverseMatte);//TODO: здесь и ниже переделать в массивы/списки. Роман: этот зверинец для инкапсуляции в отдельных потоках. Если вычисления ActivityReverseMasks можно распоралелить другим способом, то можно всё это убрать.
                 ListReverseMatte2 = new List<ReverseMatte>(vListReverseMatte);
                 ListReverseMatte3 = new List<ReverseMatte>(vListReverseMatte);
                 ListReverseMatte4 = new List<ReverseMatte>(vListReverseMatte);
@@ -240,6 +240,14 @@ namespace MNIST
                 {
                     AssessmentFirst[i] = AssessmentFirst1[i] + AssessmentFirst2[i] + AssessmentFirst3[i] + AssessmentFirst4[i];
                     AssessmentSecond[i] = AssessmentSecond1[i] + AssessmentSecond2[i] + AssessmentSecond3[i] + AssessmentSecond4[i];
+                    if (AssessmentFirst[i] > 0)
+                    {
+                        ListReverseMatte[i].ActivityFrequency++;
+                    }
+                    else
+                    {
+                        ListReverseMatte[i].ActivityFrequency = 0;
+                    }
                 });
 
                 Activ = Activ1;
@@ -425,7 +433,7 @@ namespace MNIST
         readonly List<int> ContractionInterResultSecond2;
         readonly List<float> inter_result2;
 
-        public void ActivityFor2()
+        public void ActivityFor2()//TODO: 2, 3 и 4 методы идентичны, изменить на один или генераторную функцию с каррированием.  
         {
             int n1;
             int n2;
