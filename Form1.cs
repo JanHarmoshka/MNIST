@@ -311,7 +311,6 @@ namespace MNIST
 
                         InputData.Clear();
 
-
                         byte[,] pixels_ = new byte[28, 28];
 
                         for (int i = 0; i < focus_scale; ++i)
@@ -326,23 +325,20 @@ namespace MNIST
                             }
                         }
 
-
-
                         { //Дабавление перефирийное зрение к входящиму вектору
                             for (int i = 0; i < 12; ++i)
                             {
                                 for (int j = 0; j < 12; ++j)
                                 {
-
                                     if (arrayb2[j, i] > 200)
                                     {
                                         InputData.Add(0);
-                                        InputData.Add(0);
+                                        //InputData.Add(0);
                                     }
                                     else
                                     {
                                         InputData.Add(1);
-                                        InputData.Add(1);
+                                        //InputData.Add(1);
                                     }
                                 }
                             }
@@ -377,6 +373,10 @@ namespace MNIST
                                 label16.Text = "Повторение символа: " + ll.ToString();
                                 label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
                             });
+                            if (col)
+                            {
+                                Thread.Sleep(2000);
+                            }
                         }
                         if (preparation_input.DrawFocusField)
                         {
@@ -573,7 +573,7 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (y1 <= 20)
+                    if (y1 <= 25)
                     {
                         chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
                     }

@@ -44,8 +44,8 @@ namespace MNIST
         private readonly int[,] way = new int[focusFieldSize, focusFieldSize]; //TODO: Здесь и всюду дальше заменить 28 на именованную константу. Done, но см. замечание выше. 
         private readonly byte[,] way_byte = new byte[focusFieldSize, focusFieldSize];
 
-        private readonly int lower_limit = 2;
-        private readonly int Upper_limit = 22;
+        private readonly int lower_limit = 0;
+        private readonly int Upper_limit = 24;
         private readonly int proportions = 6;
 
         private Random rnd = new Random();
@@ -70,7 +70,7 @@ namespace MNIST
 
             n_green = 0;
             n_black = 0;
-           
+
 
             InputData.Clear();
 
@@ -79,7 +79,7 @@ namespace MNIST
             X = XY.Item1;
             Y = XY.Item2;
 
-            semblance = CalculateSemblance(Xb, Yb, semblance);
+            // semblance = CalculateSemblance(Xb, Yb, semblance);
 
             prevX2 = X;
             prevY2 = Y;
@@ -103,7 +103,7 @@ namespace MNIST
                 //TODO: Отсюда и ниже выделить в метод UpdateCoordinate или как-то так. Done, но ещё нужно будет подумать над названием. 
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize]; //TODO: Переименовать переменную на CoordinateFlags. Возможно, изменить тип на булевый массив. Done тоже. Вернул, как было, потому что ниже по коду требуется именно byte. 
 
-                InitializeCoordinates(Coordinates, X, Y); //На сгенерированных координатах фокуса                
+                InitializeCoordinates(rnd, Coordinates, X, Y); //На сгенерированных координатах фокуса                
 
                 counter.inter_Data_.Clear();
                 for (int i = 0; i < focusFieldSize; i++)
@@ -166,16 +166,21 @@ namespace MNIST
                     meter = 100;
                 }
             }
-            if (IsColoured)
-            {
-                XYBuf[0] = X;
-                XYBuf[1] = Y;
-            }
 
             {
                 InputData.Clear();
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
-                InitializeCoordinates(Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
+
+                if (IsColoured)
+                {
+                    InitializeCoordinates(rnd, Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти
+                    XYBuf[0] = X;
+                    XYBuf[1] = Y;
+                }
+                else
+                {
+                    InitializeCoordinates(rnd, Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
+                }
 
                 bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
 
@@ -270,8 +275,8 @@ namespace MNIST
         {
             if (bufX == XYBuf[0] & bufY == XYBuf[1])
             {
-                XYBuf[0] = rnd.Next(lower_limit, Upper_limit);
-                XYBuf[1] = rnd.Next(lower_limit, Upper_limit);
+                XYBuf[0] = rnd.Next(lower_limit + 1, Upper_limit - 1);
+                XYBuf[1] = rnd.Next(lower_limit + 1, Upper_limit - 1);
             }
         }
 
@@ -304,8 +309,18 @@ namespace MNIST
         /// <summary>
         /// Эта функция создаёт пятно фокуса на поле. 
         /// </summary>
-        private void InitializeCoordinates(byte[,] Coordinates, int X, int Y)
+        private void InitializeCoordinates(Random rnd, byte[,] Coordinates, int X, int Y)
         {
+            for (int i = 0; i < focusFieldSize; i++)
+            {
+                for (int j = 0; j < focusFieldSize; j++)
+                {
+                    if (rnd.Next(100) <= 1)
+                    {
+                        Coordinates[i, j] = 1;
+                    }
+                }
+            }
             for (int i = 0; i < proportions; i++)
             {
                 for (int j = 0; j < proportions; j++)
