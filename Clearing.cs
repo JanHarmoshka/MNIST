@@ -13,6 +13,7 @@ namespace MNIST
             for (int j = 0; j < ListMatte.Count; j++)
             {
                 //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
+                //TODO: числа с плавающей запятой сравниваются на точное равенство, скорее всего, нужно заменить на сравнение с точностью до машинного эпсилон. 
                 if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))
                 {
                     Empty.Add(j);
@@ -42,7 +43,7 @@ namespace MNIST
             {
                 //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";
                 if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f)
-                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 1000) 
+                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 800)
                 {
                     Empty.Add(j);
                 }
@@ -110,7 +111,7 @@ namespace MNIST
         //Нужно для инкансуляции коллекции, чтобы лишние её методы не торчали наружу и не смущали.
         //Внутри класса можно использовать приватное поле, снаружи - только свойство, которое является типом интерфейса и не позволяет себя менять. 
         //Если это перестанет быть желаемым поведением, можно просто поменять типы свойств с IEnumerable на List.
-        private readonly List<float> interResult; 
+        private readonly List<float> interResult;
         public IEnumerable<float> InterResult { get => interResult; }
         private List<int> contractionInterResultFirst;
         public IEnumerable<int> ContractionInterResultFirst { get => contractionInterResultFirst; }
@@ -157,13 +158,16 @@ namespace MNIST
                         for (int j = 0; j < ContractionInputData.Count; j++)
                         {
                             int n = ContractionInputData[j];
-                            if (n <= InputDataCount - Dispenser)
+                            if (ListMatte[i].matte[n] != 0)// Исключаю операции с 0
                             {
-                                Activ += ListMatte[i].matte[n] * InterData[n];
-                            }
-                            else
-                            {
-                                ActivSecond += ListMatte[i].matte[n] * InterData[n];
+                                if (n <= InputDataCount - Dispenser)
+                                {
+                                    Activ += ListMatte[i].matte[n] * InterData[n];
+                                }
+                                else
+                                {
+                                    ActivSecond += ListMatte[i].matte[n] * InterData[n];
+                                }
                             }
                         }
                     }
@@ -176,7 +180,7 @@ namespace MNIST
                     if (Activ > -0.0f)
                     {
                         interResult.Add(Activ);
-                        contractionInterResultFirst.Add(i); // Изменил. Нужно сохранять единый порядок
+                        contractionInterResultFirst.Add(i); //Единый порядок поэтому i
                     }
                     else if (ActivSecond > -0.0f)
                     {
@@ -214,16 +218,12 @@ namespace MNIST
             var activityList = new List<Activity>(TaskCount);
             //Если этот if запихнуть в ActivityFor, то необходимость в классе Activity в основном пропадает, достаточно будет перетащить
             //его функционал сюда. См. также замечание в самом классе Activity. 
-            if (listMatte.Count < 200) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
+            if (listMatte.Count < 1000) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
             {
                 //Здесь должна быть функция вычисления активностей Activ и SecondActiv. Done.
-                var activity = new Activity(listArgs, inputDataCount, dispenser, 0, 1); 
+                var activity = new Activity(listArgs, inputDataCount, dispenser, 0, 1);
                 activity.Task.RunSynchronously();
-                if (activity.Activ >= Activ_)
-                {
-                    Activ_ = activity.Activ;
-                    Index = activity.Ind;
-                }
+                UpdateArraysAndActiv(interResult, contractionInterResultFirst, contractionInterResultSecond, activity);
             }
             else
             {
@@ -238,14 +238,19 @@ namespace MNIST
             foreach (var activity in activityList)
             {
                 activity.Task.Wait();
-                interResult.AddRange(activity.InterResult);
-                contractionInterResultFirst.AddRange(activity.ContractionInterResultFirst);
-                contractionInterResultSecond.AddRange(activity.ContractionInterResultSecond);
-                if (activity.Activ >= Activ_)
-                {
-                    Activ_ = activity.Activ;
-                    Index = activity.Ind;
-                }
+                UpdateArraysAndActiv(interResult, contractionInterResultFirst, contractionInterResultSecond, activity);
+            }
+        }
+
+        private void UpdateArraysAndActiv(List<float> interResult, List<int> contractionInterResultFirst, List<int> contractionInterResultSecond, Activity activity)
+        {
+            interResult.AddRange(activity.InterResult);
+            contractionInterResultFirst.AddRange(activity.ContractionInterResultFirst);
+            contractionInterResultSecond.AddRange(activity.ContractionInterResultSecond);
+            if (activity.Activ >= Activ_)
+            {
+                Activ_ = activity.Activ;
+                Index = activity.Ind;
             }
         }
     }
@@ -262,7 +267,7 @@ namespace MNIST
         readonly List<int> ContractionInterResultSecond;
         readonly List<float> inter_result;
 
-        private const int TaskCount = 4;
+        private const int TaskCount = 8;
 
         public ActivityReverseMasks(List<ReverseMatte> vListReverseMatte, List<int> vContractionInterResultFirst, List<int> vContractionInterResultSecond, List<float> vinter_result)
         {
@@ -335,7 +340,7 @@ namespace MNIST
                     //Можно было сделать через LINQ и сэкономить пару строчек, но я решил выдерживать более явный стиль кода.
                     AssessmentFirst[i] = 0;
                     AssessmentSecond[i] = 0;
-                    foreach (var activity in activityList)  
+                    foreach (var activity in activityList)
                     {
                         AssessmentFirst[i] += activity.AssessmentFirst[i];
                         AssessmentSecond[i] += activity.AssessmentSecond[i];
@@ -435,7 +440,7 @@ namespace MNIST
         {
             public List<float> AssessmentFirst = new List<float>();
             public List<float> AssessmentSecond = new List<float>();
-           
+
             public int Ind { get; private set; }
             public float Activ { get; private set; }
             public float SecondActiv { get; private set; }
@@ -477,7 +482,7 @@ namespace MNIST
 
                     //TODO: возможно, ошибка с индексами в первоначальном коде, исправить, но не забыть уточнить. Done. 
                     //TODO: также не забыть уточнить, всегда ли ListReverseMatte.Count кратно четырём. 
-                    for (int i = ListReverseMatte.Count / TaskCount * num; i < ListReverseMatte.Count / TaskCount * (num + 1); i++) 
+                    for (int i = ListReverseMatte.Count / TaskCount * num; i < ListReverseMatte.Count / TaskCount * (num + 1); i++)
                     {
                         int arrayCorrectLength = ListReverseMatte[i].Correct.Count;
                         if (ListReverseMatte[i].appeal_ >= 0 & ListReverseMatte[i].Control_value > 0f & arrayCorrectLength > 0)
@@ -487,7 +492,11 @@ namespace MNIST
                                 n1 = ContractionInterResultFirst[j];
                                 if (arrayCorrectLength > n1)
                                 {
-                                    AssessmentFirst[i] += ListReverseMatte[i].Correct[n1] * inter_result[n1];
+                                    if (ListReverseMatte[i].Correct[n1] != 0)// Исключаю операции с 0
+                                    {
+                                        AssessmentFirst[i] += ListReverseMatte[i].Correct[n1] * inter_result[n1];
+                                    }
+
                                 }
                                 else
                                 {
@@ -499,7 +508,11 @@ namespace MNIST
                                 n2 = ContractionInterResultSecond[j];
                                 if (arrayCorrectLength > n2)
                                 {
-                                    AssessmentSecond[i] += ListReverseMatte[i].Correct[n2] * inter_result[n2];
+                                    if (ListReverseMatte[i].Correct[n2] != 0)// Исключаю операции с 0
+                                    {
+                                        AssessmentSecond[i] += ListReverseMatte[i].Correct[n2] * inter_result[n2];
+                                    }
+
                                 }
                                 else
                                 {

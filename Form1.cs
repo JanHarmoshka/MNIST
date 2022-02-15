@@ -333,12 +333,12 @@ namespace MNIST
                                     if (arrayb2[j, i] > 200)
                                     {
                                         InputData.Add(0);
-                                        //InputData.Add(0);
+                                        InputData.Add(0);
                                     }
                                     else
                                     {
                                         InputData.Add(1);
-                                        //InputData.Add(1);
+                                        InputData.Add(1);
                                     }
                                 }
                             }
