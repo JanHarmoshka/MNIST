@@ -43,7 +43,7 @@ namespace MNIST
             {
                 //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";
                 if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f)
-                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 500)
+                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 1000)
                 {
                     Empty.Add(j);
                 }
@@ -99,7 +99,7 @@ namespace MNIST
     class Activity
     {
         public float Activ { get; private set; }
-        private float maxAxtiv = 0; //TODO: возможно, я хочу наоборот сделать maxActiv публичным свойством - это название лучше отражает смысл переменной. 
+        private float maxAxtiv = -1; //TODO: возможно, я хочу наоборот сделать maxActiv публичным свойством - это название лучше отражает смысл переменной. 
         private float ActivSecond;
         public int Ind { get; private set; }
         private int InputDataCount;
@@ -158,21 +158,23 @@ namespace MNIST
                         for (int j = 0; j < ContractionInputData.Count; j++)
                         {
                             int n = ContractionInputData[j];
-                            if (ListMatte[i].matte[n] != 0)// Исключаю операции с 0
+                            float matte = ListMatte[i].matte[n];
+                            if (matte != 0)// Исключаю операции с 0
                             {
                                 if (n <= InputDataCount - Dispenser)
                                 {
-                                    Activ += ListMatte[i].matte[n] * InterData[n];
+                                    Activ += matte * InterData[n];
                                 }
                                 else
                                 {
-                                    ActivSecond += ListMatte[i].matte[n] * InterData[n];
+                                    ActivSecond += matte * InterData[n];
                                 }
+
                             }
                         }
                     }
 
-                    if (Activ > maxAxtiv)
+                    if (Activ >= maxAxtiv)
                     {
                         maxAxtiv = Activ;
                         Ind = i;
@@ -192,6 +194,7 @@ namespace MNIST
                         interResult.Add(0);
                     }
                 }
+                Activ = maxAxtiv;
             }
             return ActivityFor;
         }
@@ -218,7 +221,7 @@ namespace MNIST
             var activityList = new List<Activity>(TaskCount);
             //Если этот if запихнуть в ActivityFor, то необходимость в классе Activity в основном пропадает, достаточно будет перетащить
             //его функционал сюда. См. также замечание в самом классе Activity. 
-            if (listMatte.Count < 1000) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
+            if (listMatte.Count < 500) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
             {
                 //Здесь должна быть функция вычисления активностей Activ и SecondActiv. Done.
                 var activity = new Activity(listArgs, inputDataCount, dispenser, 0, 1);
@@ -247,7 +250,7 @@ namespace MNIST
             interResult.AddRange(activity.InterResult);
             contractionInterResultFirst.AddRange(activity.ContractionInterResultFirst);
             contractionInterResultSecond.AddRange(activity.ContractionInterResultSecond);
-            if (activity.Activ >= Activ_)
+            if (activity.Activ > Activ_)
             {
                 Activ_ = activity.Activ;
                 Index = activity.Ind;
