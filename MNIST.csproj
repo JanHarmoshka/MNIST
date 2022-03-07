@@ -55,6 +55,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Harmoshka.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Matte.cs" />
     <Compile Include="PreparationInput.cs" />
     <Compile Include="Program.cs" />

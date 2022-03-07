@@ -9,7 +9,7 @@ namespace MNIST
 
     /// Анализ активности и обучение масок.
     [Serializable]
-    public class Harmoshka
+    public class Harmoshka //TODO: сделать синглтоном тоже? 
     {
         public string message = null;
         public List<Matte> ListMatte = new List<Matte>();

@@ -18,10 +18,10 @@ namespace MNIST
         public List<int> series2 = null;
         string images, labels;
         public bool reproduction;
-        public int allEror = 0;
+        public int allError = 0;
         readonly List<int> all = new List<int>();
         public int nn = 0;
-        public float n_blekc = 0;
+        public float n_black = 0;
         public float n_green = 0;
         double n_col = 0;
         string writePath = "";
@@ -78,6 +78,7 @@ namespace MNIST
         BackgroundWorker worker;
         bool get_files = false;
 
+        //TODO: очень длинно, рефакторить. А не хочу ли я вынести это в отдельный класс? Явно же здесь логика. Done, вынес в класс-помощник. 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
@@ -86,14 +87,11 @@ namespace MNIST
             List<float> inter_result = new List<float>();
             int Index = 0;
             List<bool> scroll = new List<bool>();
-            List<float> List_get_files_end = new List<float>();
+            //List<float> List_get_files_end = new List<float>();
             Counter counter = new Counter();
-            List<float> InputData_ = new List<float>();
+            //List<float> InputData_ = new List<float>();
 
             List<float> InputData = new List<float>();
-            List<byte> InputDataP = new List<byte>();
-            List<byte> InputDataP2 = new List<byte>();
-            List<byte> InputDataP3 = new List<byte>();
             List<byte> InputDataBuf = new List<byte>();
             byte[] IndexList = new byte[10];
             bool Eror_Bool;
@@ -106,7 +104,7 @@ namespace MNIST
             int Yb = 0;
 
             int bb = 0;
-            System.Diagnostics.Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new Stopwatch();
             bool col;
             float semblance = 20;
 
@@ -121,22 +119,11 @@ namespace MNIST
                 BinaryReader brImages = new BinaryReader(ifsPixels);
                 BinaryReader brLabels = new BinaryReader(ifsLabels);
 
-                int magic1 = brImages.ReadInt32();
-                magic1 = ReverseBytes(magic1);
-
-                int imageCount = brImages.ReadInt32();
-                imageCount = ReverseBytes(imageCount);
-
-                int numRows = brImages.ReadInt32();
-                numRows = ReverseBytes(numRows);
-                int numCols = brImages.ReadInt32();
-                numCols = ReverseBytes(numCols);
-
-                int magic2 = brLabels.ReadInt32();
-                magic2 = ReverseBytes(magic2);
-
-                int numLabels = brLabels.ReadInt32();
-                numLabels = ReverseBytes(numLabels);
+                //Используется исключительно для сдвига указателя в файлах с заголовка на собственно данные,
+                //заголовок не используется, поэтому функция ничего не возвращает. Вместо этого можно написать
+                //ifsPixels.Position = 16; ifsLabels.Position = 8;
+                //где 16 - длина заголовка файла с изображениями (4 раза по int32), 8 - длина заголовка файла с индексами (2 int32). 
+                ReadHeader(brImages, brLabels); 
 
                 Random rnd = new Random();
                 Bitmap bitMap;
@@ -148,19 +135,11 @@ namespace MNIST
                 byte[,] arrayb2 = new byte[12, 12];
                 byte[,] pixels = new byte[28, 28];
 
-                int focus_scale = 6;// Размер зрачка
+                int focusSize = 6;// Размер зрачка
 
                 PreparationInput preparation_input = PreparationInput.Instance;
 
                 Harmoshka.LessonTrigger = session_flag;
-                //if (session_flag) //TODO: переделать на trigget = session_flag. Done. 
-                //{
-                //    Harmoshka.SetTrigger(true);
-                //}
-                //else
-                //{
-                //    Harmoshka.SetTrigger(false);
-                //}
 
                 //поиск файла индекса
 
@@ -170,20 +149,9 @@ namespace MNIST
                     {
                         if (button1.Enabled == false)
                         {
-                            try //TODO: Возможно, заменить на TryParse. 
+                            try //TODO: Возможно, заменить на TryParse и вынести в инициализацию, едва ли это часто меняется. 
                             {
-                                Harmoshka.FullError = int.Parse(textBox1.Text);
-
-                                Harmoshka.Satiety = float.Parse(textBox3.Text);
-
-                                Harmoshka.V1 = float.Parse(textBox8.Text);
-
-                                Harmoshka.V2 = float.Parse(textBox7.Text);
-
-                                Harmoshka.V5 = float.Parse(textBox12.Text);
-
-                                Harmoshka.V6 = int.Parse(textBox9.Text);
-
+                                InitializeHarmoshka();
                             }
                             catch (Exception ex)
                             {
@@ -214,49 +182,25 @@ namespace MNIST
                     }
 
                     {//Подготовка изображения для загрузки в нейронную сеть
-                        InputDataBuf.Clear();
-                        byte b = 0;
-                        for (int i = 0; i < 28; ++i)// Исходное изображение переписывается в массив с порогом яркости
-                        {
-                            for (int j = 0; j < 28; ++j)
-                            {
-
-                                b = brImages.ReadByte();
-                                if (b > 190) // Порог яркости
-                                {
-                                    InputDataBuf.Add(1);
-                                    pixels[i, j] = 1;
-                                }
-                                else
-                                {
-                                    InputDataBuf.Add(0);
-                                    pixels[i, j] = 0;
-                                }
-                            }
-                        }
+                        byte[] sourceImage = brImages.ReadBytes(28 * 28);
+                        BackgroundWorkerHelper.FormPixelsByThreshold(InputDataBuf, pixels, sourceImage, 190);
                         b2 = MakeBitmap.Make_Bitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
                         b2 = new Bitmap(b2, new Size(12, 12));
-                        for (int i = 0; i < 12; ++i)
-                        {
-                            for (int j = 0; j < 12; ++j)
-                            {
-                                arrayb2[j, i] = b2.GetPixel(j, i).R;
-                            }
-                        }
+                        BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
                     }// Конец подготовки изображения
 
                     Index = (int)brLabels.ReadByte();// Индекс изображения для обучения
 
                     if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
                     {
-                        Harmoshka.message += String.Format(">>>{0:000}% ", (bb / 600.001f)) + allEror;
+                        Harmoshka.message += String.Format(">>>{0:000}% ", (bb / 600.001f)) + allError;
                         Harmoshka.message += String.Format(" {00:00.00}", sw.ElapsedMilliseconds / 1000.0f) + "c." + "\r\n";
                         sw.Restart();
                     }
 
                     bb++;
 
-                    allEror++;
+                    allError++;
                     all.Add(1);
                     Eror_Bool = true;
 
@@ -264,10 +208,7 @@ namespace MNIST
                     bool TabPagesBool = false;
                     tabControl1.Invoke((MethodInvoker)delegate
                     {
-                        if (tabControl1.SelectedIndex == 1)
-                        {
-                            TabPagesBool = true;
-                        }
+                        TabPagesBool = tabControl1.SelectedIndex == 1;
                     });
 
                     int ll = 0;
@@ -289,128 +230,66 @@ namespace MNIST
                         }
 
                         col = preparation_input.IsColoured;
-                        n_blekc += preparation_input.n_black;
+                        n_black += preparation_input.n_black;
                         n_green += preparation_input.n_green;
                         X = preparation_input.X;
                         Y = preparation_input.Y;
                         semblance = preparation_input.semblance;
 
-                        pictureBox3.Invoke((MethodInvoker)delegate
-                        {
-                            pictureBox3.Image = preparation_input.bitMap;
-                        });
+                        DrawImage(pictureBox3, preparation_input.bitMap);
 
                         if (TabPagesBool)
                         {
                             bitMap = MakeBitmap.Make_Bitmap(pixels, X + 3, Y + 3, col);
-                            pictureBox1.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox1.Image = bitMap;
-                            });
+                            DrawImage(pictureBox1, bitMap);
                         }
 
-                        InputData.Clear();
-
-                        byte[,] pixels_ = new byte[28, 28];
-
-                        for (int i = 0; i < focus_scale; ++i)
-                        {
-                            for (int j = 0; j < focus_scale; ++j)
-                            {
-                                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения                                                                    
-                                if (TabPagesBool)
-                                {
-                                    pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
-                                }
-                            }
-                        }
-
-                        { //Дабавление перефирийное зрение к входящиму вектору
-                            for (int i = 0; i < 12; ++i)
-                            {
-                                for (int j = 0; j < 12; ++j)
-                                {
-                                    if (arrayb2[j, i] > 200)
-                                    {
-                                        InputData.Add(0);
-                                        //InputData.Add(0);
-                                    }
-                                    else
-                                    {
-                                        InputData.Add(1);
-                                        //InputData.Add(1);
-                                    }
-                                }
-                            }
-                        }
+                        BackgroundWorkerHelper.FillInputData(InputData, arrayb2, pixels, focusSize, X, Y);
 
                         if (TabPagesBool)
                         {
+                            byte[,] pixels_ = BackgroundWorkerHelper.CreateFocusArray(X, Y, pixels, focusSize);
                             bitMap_ = MakeBitmap.Make_Bitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
-                            pictureBox2.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox2.Image = bitMap_;
-                            });
+                            DrawImage(pictureBox2, bitMap_);
 
                             b2 = new Bitmap(b2, new Size(280, 280)); //прорисовка переферийного зрения
-                            pictureBox5.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox5.Image = b2;
-                            });
-
-                            pictureBox6.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox6.Image = preparation_input.bitMap_Draw;
-                            });
-
-                            pictureBox4.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox4.Image = preparation_input.way_Draw;
-                            });
+                            DrawImage(pictureBox5, b2);
+                            DrawImage(pictureBox6, preparation_input.bitMap_Draw);
+                            DrawImage(pictureBox4, preparation_input.way_Draw);
 
                             label16.Invoke((MethodInvoker)delegate
                             {
                                 label16.Text = "Повторение символа: " + ll.ToString();
                                 label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
                             });
-                            if (col)
-                            {
-                                Thread.Sleep(2000);
-                            }
+                            //if (col)
+                            //{
+                            //    Thread.Sleep(2000);
+                            //}
                         }
                         if (preparation_input.DrawFocusField)
                         {
-                            pictureBox9.Invoke((MethodInvoker)delegate
-                            {
-                                pictureBox9.Image = preparation_input.way_Draw;
-                            });
+                            DrawImage(pictureBox9, preparation_input.way_Draw);
                         }
 
                         Xb = X;
                         Yb = Y;
 
-                        //for (int i = 0; i < InputData.Count; i++)
-                        //{
-                        //    if (rnd.Next(0, 9) > 8)
-                        //    {
-                        //        InputData[i] = 0;
-                        //    }
-                        //    if (rnd.Next(0, 9) > 8)
-                        //    {
-                        //        InputData[i] = 1;
-                        //    }
-                        //}
+                        for (int i = 0; i < InputData.Count; i++)
+                        {
+                            if (rnd.Next(0, 9) > 8)
+                            {
+                                InputData[i] = 0;
+                            }
+                            if (rnd.Next(0, 9) > 8)
+                            {
+                                InputData[i] = 1;
+                            }
+                        }
 
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
-                            if (preparation_input.InputData[i] > 0)
-                            {
-                                InputData.Add(1);
-                            }
-                            else
-                            {
-                                InputData.Add(0);
-                            }
+                            InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
                         }
 
                         try
@@ -435,38 +314,8 @@ namespace MNIST
 
                     if (TabPagesBool)
                     {
-                        pictureBox7.Invoke((MethodInvoker)delegate
-                        {
-                            Graphics g = pictureBox7.CreateGraphics();
-                            g.Clear(Color.White);
-                            SolidBrush sbIndex = new SolidBrush(Color.Red);
-                            for (int i = 0; i < 10; i++)
-                            {
-                                sbIndex.Color = Color.Black;
-                                if (i == Index)
-                                {
-                                    sbIndex.Color = Color.Red;
-                                }
-                                g.FillRectangle(sbIndex, 21 * i, 370 - (7 * IndexList[i] + 5), 20, (7 * IndexList[i] + 5));
-                            }
-
-                        });
-                        pictureBox8.Invoke((MethodInvoker)delegate
-                        {
-                            Graphics g = pictureBox8.CreateGraphics();
-                            g.Clear(Color.White);
-                            Pen blackPen = new Pen(Color.Red, 1);
-                            for (int i = 0; i < counter.Assessment.Count; i++)
-                            {
-                                blackPen.Color = Color.Black;
-                                if (counter.room[i] == Index)
-                                {
-                                    blackPen.Color = Color.Red;
-                                }
-                                g.DrawLine(blackPen, i, 200, i, 200 - counter.Assessment[i] * 100);
-                            }
-
-                        });
+                        DrawNumberHistogram(Index, IndexList);
+                        DrawActivityHistogram(Index, counter);
                     }
                     int indexVar = IndexList[Index];
                     bool indexBool = false;
@@ -480,7 +329,7 @@ namespace MNIST
                     }
                     if (!indexBool)
                     {
-                        allEror--;
+                        allError--;
                         all[all.Count - 1] = 0;
                     }
 
@@ -493,7 +342,7 @@ namespace MNIST
 
                     if (l > 0)
                     {
-                        allEror -= all[0];
+                        allError -= all[0];
                         all.RemoveAt(0);
                     }
 
@@ -510,6 +359,90 @@ namespace MNIST
                 InputData.Clear();
                 InputData.TrimExcess();
             }
+        }
+
+        //TODO: написать функцию, которая просто смещает указатель, и сослаться на неё в комментарии. Done. 
+        private static void ReadHeader(BinaryReader brImages, BinaryReader brLabels)
+        {
+            int magic1 = brImages.ReadInt32();
+            magic1 = ReverseBytes(magic1);
+
+            int imageCount = brImages.ReadInt32();
+            imageCount = ReverseBytes(imageCount);
+
+            int numRows = brImages.ReadInt32();
+            numRows = ReverseBytes(numRows);
+            int numCols = brImages.ReadInt32();
+            numCols = ReverseBytes(numCols);
+
+            int magic2 = brLabels.ReadInt32();
+            magic2 = ReverseBytes(magic2);
+
+            int numLabels = brLabels.ReadInt32();
+            numLabels = ReverseBytes(numLabels);
+        }
+
+        private void DrawActivityHistogram(int Index, Counter counter) //TODO: уточнить, что именно здесь рисуется. Done. 
+        {
+            pictureBox8.Invoke((MethodInvoker)delegate
+            {
+                Graphics g = pictureBox8.CreateGraphics();
+                g.Clear(Color.White);
+                Pen blackPen = new Pen(Color.Red, 1);
+                for (int i = 0; i < counter.Assessment.Count; i++)
+                {
+                    blackPen.Color = Color.Black;
+                    if (counter.room[i] == Index)
+                    {
+                        blackPen.Color = Color.Red;
+                    }
+                    g.DrawLine(blackPen, i, 200, i, 200 - counter.Assessment[i] * 100);
+                }
+
+            });
+        }
+
+        private void DrawNumberHistogram(int Index, byte[] IndexList)
+        {
+            pictureBox7.Invoke((MethodInvoker)delegate
+            {
+                Graphics g = pictureBox7.CreateGraphics();
+                g.Clear(Color.White);
+                SolidBrush sbIndex = new SolidBrush(Color.Red);
+                for (int i = 0; i < 10; i++)
+                {
+                    sbIndex.Color = Color.Black;
+                    if (i == Index)
+                    {
+                        sbIndex.Color = Color.Red;
+                    }
+                    g.FillRectangle(sbIndex, 21 * i, 370 - (7 * IndexList[i] + 5), 20, (7 * IndexList[i] + 5));
+                }
+
+            });
+        }
+
+        private void DrawImage(PictureBox pictureBox, Bitmap bitmap)
+        {
+            pictureBox.Invoke((MethodInvoker)delegate
+            {
+                pictureBox.Image = bitmap;
+            });
+        }
+
+        private void InitializeHarmoshka()
+        {
+            Harmoshka.FullError = int.Parse(textBox1.Text);
+
+            Harmoshka.Satiety = float.Parse(textBox3.Text);
+
+            Harmoshka.V1 = float.Parse(textBox8.Text);
+
+            Harmoshka.V2 = float.Parse(textBox7.Text);
+
+            Harmoshka.V5 = float.Parse(textBox12.Text);
+
+            Harmoshka.V6 = int.Parse(textBox9.Text);
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -542,26 +475,26 @@ namespace MNIST
         {
             if (e.ProgressPercentage == 0)
             {
-                double y1 = allEror / 600f;
+                double y1 = allError / 600f;
 
-                if (n_blekc > 0)
+                if (n_black > 0)
                 {
                     if (n_col == 0)
                     {
-                        n_col = n_green / n_blekc;
+                        n_col = n_green / n_black;
                     }
                     else
                     {
-                        n_col = (n_green / n_blekc + n_col) / 2f;
+                        n_col = (n_green / n_black + n_col) / 2f;
                     }
 
                 }
-                n_blekc = 0;
+                n_black = 0;
                 n_green = 0;
 
                 if (nn < 60000)
                 {
-                    y1 = 100 - (((nn - allEror) / 600f) / (nn / 600f)) * 100;
+                    y1 = 100 - (((nn - allError) / 600f) / (nn / 600f)) * 100;
                 }
                 writePath = String.Format("{0:00.00}%", y1) + "\r\n" + writePath;
                 label18.Text = writePath;

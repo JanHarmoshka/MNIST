@@ -24,6 +24,7 @@ namespace MNIST
         //int prevY1;
         private int prevX2 = 0;
         private int prevY2 = 0;
+        private int waiting = 0;
 
         private int bufX = 14; //TODO: нет внешних ссылок. Заменить уровень доступа? Done.
         private int bufY = 14;
@@ -39,7 +40,7 @@ namespace MNIST
         public int Y { get; private set; }
         private int way_max = 256;
 
-        public List<byte> InputData = new List<byte>();
+        public List<byte> InputData = new List<byte>(); //TODO: Возможно, удалить лишние вызовы Clear. 
         private const int focusFieldSize = 28; //Размер поля. 
         private readonly int[,] way = new int[focusFieldSize, focusFieldSize]; //TODO: Здесь и всюду дальше заменить 28 на именованную константу. Done, но см. замечание выше. 
         private readonly byte[,] way_byte = new byte[focusFieldSize, focusFieldSize];
@@ -273,11 +274,13 @@ namespace MNIST
         /// <param name="rnd"></param>
         private void ShakeXYBuf(Random rnd, int[] XYBuf)
         {
-            if (bufX == XYBuf[0] & bufY == XYBuf[1])
+            if ((bufX == XYBuf[0] & bufY == XYBuf[1]) | waiting == 10)
             {
+                waiting = 0;
                 XYBuf[0] = rnd.Next(lower_limit + 1, Upper_limit - 1);
                 XYBuf[1] = rnd.Next(lower_limit + 1, Upper_limit - 1);
             }
+            waiting++;
         }
 
         /// <summary>
