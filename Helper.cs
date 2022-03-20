@@ -71,3 +71,10 @@ public static class BackgroundWorkerHelper
         }
     }
 }
+
+public enum WorkMode
+{
+    Recording, 
+    Reproducing,
+    Default
+}

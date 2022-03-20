@@ -30,28 +30,28 @@ namespace MNIST
         private int bufY = 14;
         private readonly int[] XYBuf = { 14, 14 };
 
-        public float n_black;
-        public float n_green;
-        public Bitmap bitMap;
+        public float BlackCount;
+        public float GreenCount;
+        public Bitmap bitMap; //TODO: уточнить, где именно используются эти три битмапа, и соответствующим образом переименовать.  
         public Bitmap bitMap_Draw;
         public Bitmap way_Draw;
 
         public int X { get; private set; }
         public int Y { get; private set; }
-        private int way_max = 256;
+        private int wayMax = 256; //TODO: подумать ещё над именем. Здесь должно быть что-то вроде maxFocusWayTrace, но, быть может, покороче. 
 
         public List<byte> InputData = new List<byte>(); //TODO: Возможно, удалить лишние вызовы Clear. 
         private const int focusFieldSize = 28; //Размер поля. 
         private readonly int[,] way = new int[focusFieldSize, focusFieldSize]; //TODO: Здесь и всюду дальше заменить 28 на именованную константу. Done, но см. замечание выше. 
-        private readonly byte[,] way_byte = new byte[focusFieldSize, focusFieldSize];
+        private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
-        private readonly int lower_limit = 0;
-        private readonly int Upper_limit = 24;
+        private readonly int lowerLimit = 0;
+        private readonly int upperLimit = 24;
         private readonly int proportions = 6;
 
         private Random rnd = new Random();
-        public float semblance { get; private set; }
-        private int meter { get; set; } = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. => Это счётчик вывода картинки ка форму с графиками.
+        public float Semblance { get; private set; }
+        private int meter = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. => Это счётчик вывода картинки ка форму с графиками.
         public bool DrawFocusField { get { return meter == 100; } } //TODO: Уточнить название. 
         private PreparationInput() { }
         //TODO: Переименовать в соответствии с выполняемыми действиями. Done.
@@ -63,14 +63,14 @@ namespace MNIST
         /// <param name="Xb"></param>
         /// <param name="Yb"></param>
         /// <param name="reproduction"></param>
-        /// <param name="TabPagesBool"></param>
-        public void PrepareInput(Counter counter, float vsemblance, int Xb, int Yb, bool reproduction, bool TabPagesBool)
+        /// <param name="isVisualSelected"></param>
+        public void PrepareInput(Counter counter, float vsemblance, int Xb, int Yb, bool reproduction, bool isVisualSelected)
         {
-            semblance = vsemblance;
+            Semblance = vsemblance;
             IsColoured = true; // Считаем что всегда управлять фокусом будет нейронная сеть. Цвет рамки зелёный
 
-            n_green = 0;
-            n_black = 0;
+            GreenCount = 0;
+            BlackCount = 0;
 
 
             InputData.Clear();
@@ -86,15 +86,15 @@ namespace MNIST
             prevY2 = Y;
 
             //TODO: Выделить в булеву переменную? На Ваше усмотрение
-            if ((counter.summ < 1 & counter.summ2 < 1) |
-                counter.inter_Data_.Count < 1 |
-                X > Upper_limit | Y > Upper_limit | X < lower_limit | Y < lower_limit | (X == Xb & Y == Yb))//Условия для запуска генератора движения
+            if ((counter.summ < 1 && counter.summ2 < 1) ||
+                counter.inter_Data_.Count < 1 ||
+                X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения
             {
 
                 InputData.Clear();
                 IsColoured = false;//Если фокусом управляет гератор движения. Цвет рамки чёрный
-                n_black++;
-                n_green--;
+                BlackCount++;
+                GreenCount--;
 
                 ShakeXYBuf(rnd, XYBuf);
 
@@ -116,7 +116,7 @@ namespace MNIST
                 }
             }
 
-            if ((counter.inter_Data_Full.Count > 0 & !reproduction) | (counter.inter_Data_Full.Count > 0) & TabPagesBool)//Рисовать фокус внимания 
+            if ((counter.inter_Data_Full.Count > 0 && !reproduction) || (counter.inter_Data_Full.Count > 0) && isVisualSelected)//Рисовать фокус внимания 
             {
                 DrawFocus(counter, X, Y); // Если нет данных от нейронной сети, создаёт рисунок с данными от генератора.
             }// Конец прорисовки фокуса внимания
@@ -134,36 +134,36 @@ namespace MNIST
 
             {// Прорисовка того, как зрачёк движится по полю (в каких точках он бывает чаще). Чем меньше пятно в центре и чем сельнее контраст между центром и перефериеей, тем лучше обучена нейронная сеть. Идеально - красный квадрат в центре белого поля.
                 way[X + 2, Y + 2] += 1;
-                if (way_max < way[X + 2, Y + 2])
+                if (wayMax < way[X + 2, Y + 2])
                 {
-                    way_max = way[X + 2, Y + 2];
+                    wayMax = way[X + 2, Y + 2];
                 }
 
 
                 meter--;
-                if (TabPagesBool | meter == 0)
+                if (isVisualSelected || meter == 0)
                 {
                     for (int i = 0; i < focusFieldSize; i++)
                     {
                         for (int j = 0; j < focusFieldSize; j++)
                         {
-                            way_byte[i, j] = (byte)(256 - (255f * way[i, j] / way_max)); //чем темнее тем сильнее (при прорисовке раскрашивается)
+                            wayByte[i, j] = (byte)(256 - (255f * way[i, j] / wayMax)); //чем темнее тем сильнее (при прорисовке раскрашивается)
                             if (way[i, j] > 0)
                             {
-                                way[i, j] = 256 - way_byte[i, j];
+                                way[i, j] = 256 - wayByte[i, j];
                             }
 
                         }
                     }
                     if (meter == 0)
                     {
-                        way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, false);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, false);
                     }
                     else
                     {
-                        way_Draw = MakeBitmap.Make_Bitmap_grey(way_byte, X + 3, Y + 3, true);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, true);
                     }
-                    way_max = 256;
+                    wayMax = 256;
                     meter = 100;
                 }
             }
@@ -183,7 +183,7 @@ namespace MNIST
                     InitializeCoordinates(rnd, Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
                 }
 
-                bitMap_Draw = MakeBitmap.Make_Bitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
+                bitMap_Draw = BitmapMaker.MakeBitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
 
                 for (int i = 0; i < focusFieldSize; i++)
                 {
@@ -234,14 +234,14 @@ namespace MNIST
         /// </summary>
         private void BackXYBufInLimits(Random rnd, int[] XYBuf)
         {
-            if (X < lower_limit | X > Upper_limit)
+            if (X < lowerLimit || X > upperLimit)
             {
-                X = rnd.Next(lower_limit, Upper_limit);
+                X = rnd.Next(lowerLimit, upperLimit);
                 XYBuf[0] = (byte)X;
             }
-            if (Y < lower_limit | Y > Upper_limit)
+            if (Y < lowerLimit || Y > upperLimit)
             {
-                Y = rnd.Next(lower_limit, Upper_limit);
+                Y = rnd.Next(lowerLimit, upperLimit);
                 XYBuf[1] = (byte)Y;
             }
         }
@@ -265,7 +265,7 @@ namespace MNIST
                     n++;
                 }
             }
-            bitMap = MakeBitmap.Make_Bitmap(pixels, X + 3, Y + 3, IsColoured, 10, true);
+            bitMap = BitmapMaker.MakeBitmap(pixels, X + 3, Y + 3, IsColoured, 10, true);
         }
 
         /// <summary>
@@ -274,11 +274,11 @@ namespace MNIST
         /// <param name="rnd"></param>
         private void ShakeXYBuf(Random rnd, int[] XYBuf)
         {
-            if ((bufX == XYBuf[0] & bufY == XYBuf[1]) | waiting == 10)
+            if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 10)
             {
                 waiting = 0;
-                XYBuf[0] = rnd.Next(lower_limit + 1, Upper_limit - 1);
-                XYBuf[1] = rnd.Next(lower_limit + 1, Upper_limit - 1);
+                XYBuf[0] = rnd.Next(lowerLimit + 1, upperLimit - 1);
+                XYBuf[1] = rnd.Next(lowerLimit + 1, upperLimit - 1);
             }
             waiting++;
         }
@@ -288,9 +288,9 @@ namespace MNIST
         /// </summary>
         private float CalculateSemblance(int Xb, int Yb, float semblance)
         {
-            if (prevX2 > 0 & prevY2 > 0)
+            if (prevX2 > 0 && prevY2 > 0)
             {
-                if ((prevX2 == X & prevY2 == Y) | (prevX2 == Xb & prevY2 == Yb))
+                if ((prevX2 == X && prevY2 == Y) || (prevX2 == Xb && prevY2 == Yb))
                 {
                     if (semblance > 1)
                     {
@@ -328,8 +328,8 @@ namespace MNIST
             {
                 for (int j = 0; j < proportions; j++)
                 {
-                    bool cond = i + Y + proportions / 2 > 0 & i + Y < focusFieldSize &
-                        j + X + proportions / 2 > 0 & j + X < focusFieldSize;
+                    bool cond = i + Y + proportions / 2 > 0 && i + Y < focusFieldSize &&
+                        j + X + proportions / 2 > 0 && j + X < focusFieldSize;
                     if (cond) Coordinates[i + Y, j + X] = 1;
 
                 }
@@ -374,9 +374,9 @@ namespace MNIST
     /// <summary>
     ///  Эта функция рисует как зрачёк заполняет поле. 
     /// </summary>
-    class MakeBitmap
+    class BitmapMaker
     {
-        public static Bitmap Make_Bitmap_grey(byte[,] pixels, int X, int Y, bool DrawR = true)
+        public static Bitmap MakeGreyBitmap(byte[,] pixels, int X, int Y, bool isRectDrawn = true)
         {
             int mag = 10;
             int width = 28 * mag;
@@ -398,7 +398,7 @@ namespace MNIST
                     }
                 }
             }
-            if (DrawR)
+            if (isRectDrawn)
             {
                 Pen blackPen = new Pen(Color.FromArgb(255, 0, 0, 0), 5);
                 gr.DrawRectangle(blackPen, (X - 3) * mag, (Y - 3) * mag, 6 * mag, 6 * mag);
@@ -409,7 +409,7 @@ namespace MNIST
         /// <summary>
         /// Эта функция рисует поле, со зрачком.
         /// </summary>
-        public static Bitmap Make_Bitmap(byte[,] pixels, int X, int Y, bool Col, int mag = 10, bool DrawR = true)
+        public static Bitmap MakeBitmap(byte[,] pixels, int X, int Y, bool isColoured, int mag = 10, bool isRectDrawn = true)
         {
             int width = 28 * mag;
             int height = 28 * mag;
@@ -427,10 +427,10 @@ namespace MNIST
                     }
                 }
             }
-            if (DrawR)
+            if (isRectDrawn)
             {
                 Pen blackPen = new Pen(Color.FromArgb(255, 0, 0, 0), 5);
-                if (Col)
+                if (isColoured)
                 {
                     blackPen = new Pen(Color.FromArgb(255, 0, 200, 50), 5);
                 }

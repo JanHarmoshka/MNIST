@@ -21,10 +21,13 @@ namespace MNIST
         public int allError = 0;
         readonly List<int> all = new List<int>();
         public int nn = 0;
-        public float n_black = 0;
-        public float n_green = 0;
-        double n_col = 0;
+        public float BlackCount = 0;
+        public float GreenCount = 0;
+        double greenToBlackRatio = 0;
         string writePath = "";
+        // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
+        // нет ли ошибки в выставлении этого флага. 
+        //private WorkMode mode = WorkMode.Default;
 
         public Form1()
         {
@@ -57,7 +60,7 @@ namespace MNIST
             chart2.ChartAreas[0].AxisX.Minimum = 0;
 
             string path = Directory.GetCurrentDirectory() + "\\settings.ini";
-            Harmoshka = new Harmoshka();
+            Harmoshka = Harmoshka.Instance;
         }
 
         public static int ReverseBytes(int v)
@@ -68,13 +71,13 @@ namespace MNIST
         }
 
         //string[] setting = new string[2];
-        bool session_flag = false;
+        bool sessionFlag = false;
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
 
-        public Harmoshka Harmoshka;
+        private Harmoshka Harmoshka;
         BackgroundWorker worker;
         bool get_files = false;
 
@@ -123,7 +126,7 @@ namespace MNIST
                 //заголовок не используется, поэтому функция ничего не возвращает. Вместо этого можно написать
                 //ifsPixels.Position = 16; ifsLabels.Position = 8;
                 //где 16 - длина заголовка файла с изображениями (4 раза по int32), 8 - длина заголовка файла с индексами (2 int32). 
-                ReadHeader(brImages, brLabels); 
+                ReadHeader(brImages, brLabels);
 
                 Random rnd = new Random();
                 Bitmap bitMap;
@@ -139,11 +142,11 @@ namespace MNIST
 
                 PreparationInput preparation_input = PreparationInput.Instance;
 
-                Harmoshka.LessonTrigger = session_flag;
+                Harmoshka.LessonTrigger = sessionFlag;
 
                 //поиск файла индекса
 
-                for (int di = 0; di < Harmoshka.FullError; di++)
+                for (int di = 0; di < Harmoshka.ErrorCount; di++)
                 {
                     button1.Invoke((MethodInvoker)delegate
                     {
@@ -163,7 +166,7 @@ namespace MNIST
                         button1.Enabled = true;
                     });
                     nn++;
-                    if (scroll.Count < Harmoshka.FullError)
+                    if (scroll.Count < Harmoshka.ErrorCount)
                     {
                         scroll.Add(false);
                     }
@@ -184,7 +187,7 @@ namespace MNIST
                     {//Подготовка изображения для загрузки в нейронную сеть
                         byte[] sourceImage = brImages.ReadBytes(28 * 28);
                         BackgroundWorkerHelper.FormPixelsByThreshold(InputDataBuf, pixels, sourceImage, 190);
-                        b2 = MakeBitmap.Make_Bitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
+                        b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
                         b2 = new Bitmap(b2, new Size(12, 12));
                         BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
                     }// Конец подготовки изображения
@@ -193,8 +196,8 @@ namespace MNIST
 
                     if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
                     {
-                        Harmoshka.message += String.Format(">>>{0:000}% ", (bb / 600.001f)) + allError;
-                        Harmoshka.message += String.Format(" {00:00.00}", sw.ElapsedMilliseconds / 1000.0f) + "c." + "\r\n";
+                        Harmoshka.Message += String.Format(">>>{0:000}% ", (bb / 600.001f)) + allError;
+                        Harmoshka.Message += String.Format(" {00:00.00}", sw.ElapsedMilliseconds / 1000.0f) + "c." + "\r\n";
                         sw.Restart();
                     }
 
@@ -217,7 +220,7 @@ namespace MNIST
                     do //обработка одного изображения в цикле узнавания
                     {
                         col = true;
-                        n_green++;
+                        GreenCount++;
 
                         try
                         {
@@ -230,17 +233,17 @@ namespace MNIST
                         }
 
                         col = preparation_input.IsColoured;
-                        n_black += preparation_input.n_black;
-                        n_green += preparation_input.n_green;
+                        BlackCount += preparation_input.BlackCount;
+                        GreenCount += preparation_input.GreenCount;
                         X = preparation_input.X;
                         Y = preparation_input.Y;
-                        semblance = preparation_input.semblance;
+                        semblance = preparation_input.Semblance;
 
                         DrawImage(pictureBox3, preparation_input.bitMap);
 
                         if (TabPagesBool)
                         {
-                            bitMap = MakeBitmap.Make_Bitmap(pixels, X + 3, Y + 3, col);
+                            bitMap = BitmapMaker.MakeBitmap(pixels, X + 3, Y + 3, col);
                             DrawImage(pictureBox1, bitMap);
                         }
 
@@ -249,7 +252,7 @@ namespace MNIST
                         if (TabPagesBool)
                         {
                             byte[,] pixels_ = BackgroundWorkerHelper.CreateFocusArray(X, Y, pixels, focusSize);
-                            bitMap_ = MakeBitmap.Make_Bitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
+                            bitMap_ = BitmapMaker.MakeBitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
                             DrawImage(pictureBox2, bitMap_);
 
                             b2 = new Bitmap(b2, new Size(280, 280)); //прорисовка переферийного зрения
@@ -302,14 +305,14 @@ namespace MNIST
                             MessageBox.Show(ex.ToString());
                         }
 
-                        if (counter.str2 & Eror_Bool)
+                        if (counter.str2 && Eror_Bool)
                         {
                             Eror_Bool = false;
                         }
                         IndexList[counter.Index]++;
                         ll++;
                     }
-                    while ((ll < 25 | Eror_Bool) & ll < 50);//
+                    while ((ll < 25 || Eror_Bool) && ll < 50);//
 
 
                     if (TabPagesBool)
@@ -334,10 +337,10 @@ namespace MNIST
                     }
 
 
-                    if (Harmoshka.message != null)
+                    if (Harmoshka.Message != null)
                     {
-                        worker.ReportProgress(di, Harmoshka.message);
-                        Harmoshka.message = null;
+                        worker.ReportProgress(di, Harmoshka.Message);
+                        Harmoshka.Message = null;
                     }
 
                     if (l > 0)
@@ -432,17 +435,17 @@ namespace MNIST
 
         private void InitializeHarmoshka()
         {
-            Harmoshka.FullError = int.Parse(textBox1.Text);
+            Harmoshka.ErrorCount = int.Parse(textBox1.Text);
 
             Harmoshka.Satiety = float.Parse(textBox3.Text);
 
-            Harmoshka.V1 = float.Parse(textBox8.Text);
+            Harmoshka.CorrectionThreshold = float.Parse(textBox8.Text);
 
             Harmoshka.V2 = float.Parse(textBox7.Text);
 
             Harmoshka.V5 = float.Parse(textBox12.Text);
 
-            Harmoshka.V6 = int.Parse(textBox9.Text);
+            Harmoshka.MemoryDuration = int.Parse(textBox9.Text);
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -477,20 +480,20 @@ namespace MNIST
             {
                 double y1 = allError / 600f;
 
-                if (n_black > 0)
+                if (BlackCount > 0)
                 {
-                    if (n_col == 0)
+                    if (greenToBlackRatio == 0)
                     {
-                        n_col = n_green / n_black;
+                        greenToBlackRatio = GreenCount / BlackCount;
                     }
                     else
                     {
-                        n_col = (n_green / n_black + n_col) / 2f;
+                        greenToBlackRatio = (GreenCount / BlackCount + greenToBlackRatio) / 2f;
                     }
 
                 }
-                n_black = 0;
-                n_green = 0;
+                BlackCount = 0;
+                GreenCount = 0;
 
                 if (nn < 60000)
                 {
@@ -511,9 +514,9 @@ namespace MNIST
                         chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
                     }
 
-                    if (n_col > 0)
+                    if (greenToBlackRatio > 0)
                     {
-                        chart2.Series["N"].Points.AddXY(series.Count - 2, n_col);
+                        chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio);
                     }
                 }
                 if (get_files == false)
@@ -553,12 +556,12 @@ namespace MNIST
             }
         }
 
-        private void выходToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (images == null)
             {
@@ -599,23 +602,25 @@ namespace MNIST
 
                 path = path + "_session.ini";
                 File.Create(path).Close();
-                List<string> session = new List<string>();
-                session.Add(images);
-                session.Add(labels);
-                session.Add(copy);
-                session.Add(textBox1.Text);
-                session.Add(textBox3.Text);
-                session.Add(textBox8.Text);
-                session.Add(textBox7.Text);
-                session.Add(textBox5.Text);
-                session.Add(textBox12.Text);
+                List<string> session = new List<string>
+                {
+                    images,
+                    labels,
+                    copy,
+                    textBox1.Text,
+                    textBox3.Text,
+                    textBox8.Text,
+                    textBox7.Text,
+                    textBox5.Text,
+                    textBox12.Text
+                };
                 File.WriteAllLines(path, session.ToArray());
                 MessageBox.Show("Сессия сохранена");
             }
         }
-        private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openFileDialog1.Filter = "ini files (*.ini)|*.ini";
+            openFileDialog1.Filter = "ini files (*.ini)||*.ini";
             openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -648,7 +653,7 @@ namespace MNIST
             }
         }
 
-        private void изображенияToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImagesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog1.Filter = "ini files (*.idx3-ubyte)|*.idx3-ubyte";
             openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
@@ -657,7 +662,7 @@ namespace MNIST
                 images = openFileDialog1.FileName;
             }
         }
-        private void индексыToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void IndicesToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             openFileDialog1.Filter = "ini files (*.idx1-ubyte)|*.idx1-ubyte";
             openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
@@ -667,7 +672,7 @@ namespace MNIST
             }
         }
 
-        private void экспортБазыToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExportBaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             folderBrowserDialog1.SelectedPath = Directory.GetCurrentDirectory();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
@@ -687,7 +692,7 @@ namespace MNIST
             }
         }
 
-        private void импортБазыToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImportBaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog1.Filter = "ini files (*ReverseMatte.dat)|*ReverseMatte.dat";
             openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
@@ -710,6 +715,9 @@ namespace MNIST
         private void button4_Click(object sender, EventArgs e)
         {
             string path = Directory.GetCurrentDirectory() + "\\settings.ini";
+            // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
+            // нет ли ошибки в выставлении этого флага. 
+            //mode = WorkMode.Recording; 
             reproduction = true;
 
 
@@ -731,7 +739,7 @@ namespace MNIST
                 backgroundWorker1.RunWorkerAsync();
                 button2.Enabled = false;
                 button4.Text = "Стоп";
-                session_flag = true;
+                sessionFlag = true;
             }
             else
             {
@@ -752,7 +760,7 @@ namespace MNIST
                     }
                     button2.Enabled = true;
                     button4.Text = "Запись";
-                    session_flag = false;
+                    sessionFlag = false;
                 }
             }
         }
@@ -760,6 +768,9 @@ namespace MNIST
         private void button2_Click(object sender, EventArgs e)
         {
             string path = Directory.GetCurrentDirectory() + "\\settings.ini";
+            // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
+            // нет ли ошибки в выставлении этого флага. 
+            //mode = WorkMode.Reproducing; 
             reproduction = false;
 
             if (backgroundWorker1.IsBusy != true)
@@ -780,7 +791,7 @@ namespace MNIST
                 backgroundWorker1.RunWorkerAsync(); //запуск потока
                 button4.Enabled = false;
                 button2.Text = "Стоп";
-                session_flag = false;
+                sessionFlag = false;
             }
             else if (backgroundWorker1.WorkerSupportsCancellation == true)
             {
@@ -799,7 +810,7 @@ namespace MNIST
                 }
                 button4.Enabled = true;
                 button2.Text = "Воспроизведение";
-                session_flag = true;
+                sessionFlag = true;
             }
         }
 

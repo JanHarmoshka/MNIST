@@ -32,16 +32,16 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.открытьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.экспортБазыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.импортБазыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OpenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExportBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImportBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.изображенияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.индексыToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.IndicesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -114,90 +114,90 @@
             // 
             this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.файлToolStripMenuItem,
-            this.настройкиToolStripMenuItem,
+            this.FileToolStripMenuItem,
+            this.SettingsToolStripMenuItem,
             this.toolStripMenuItem2});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1666, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1517, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // файлToolStripMenuItem
+            // FileToolStripMenuItem
             // 
-            this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.открытьToolStripMenuItem,
-            this.сохранитьToolStripMenuItem,
-            this.экспортБазыToolStripMenuItem,
-            this.импортБазыToolStripMenuItem,
+            this.FileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OpenToolStripMenuItem,
+            this.SaveToolStripMenuItem,
+            this.ExportBaseToolStripMenuItem,
+            this.ImportBaseToolStripMenuItem,
             this.toolStripMenuItem1,
-            this.выходToolStripMenuItem});
-            this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
-            this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-            this.файлToolStripMenuItem.Text = "Файл";
+            this.ExitToolStripMenuItem});
+            this.FileToolStripMenuItem.Name = "FileToolStripMenuItem";
+            this.FileToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.FileToolStripMenuItem.Text = "Файл";
             // 
-            // открытьToolStripMenuItem
+            // OpenToolStripMenuItem
             // 
-            this.открытьToolStripMenuItem.Name = "открытьToolStripMenuItem";
-            this.открытьToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.открытьToolStripMenuItem.Text = "Открыть";
-            this.открытьToolStripMenuItem.Click += new System.EventHandler(this.открытьToolStripMenuItem_Click);
+            this.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem";
+            this.OpenToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.OpenToolStripMenuItem.Text = "Открыть";
+            this.OpenToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
-            // сохранитьToolStripMenuItem
+            // SaveToolStripMenuItem
             // 
-            this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.сохранитьToolStripMenuItem.Text = "Сохранить";
-            this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
+            this.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
+            this.SaveToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.SaveToolStripMenuItem.Text = "Сохранить";
+            this.SaveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
             // 
-            // экспортБазыToolStripMenuItem
+            // ExportBaseToolStripMenuItem
             // 
-            this.экспортБазыToolStripMenuItem.Name = "экспортБазыToolStripMenuItem";
-            this.экспортБазыToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.экспортБазыToolStripMenuItem.Text = "Экспорт базы";
-            this.экспортБазыToolStripMenuItem.Click += new System.EventHandler(this.экспортБазыToolStripMenuItem_Click);
+            this.ExportBaseToolStripMenuItem.Name = "ExportBaseToolStripMenuItem";
+            this.ExportBaseToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.ExportBaseToolStripMenuItem.Text = "Экспорт базы";
+            this.ExportBaseToolStripMenuItem.Click += new System.EventHandler(this.ExportBaseToolStripMenuItem_Click);
             // 
-            // импортБазыToolStripMenuItem
+            // ImportBaseToolStripMenuItem
             // 
-            this.импортБазыToolStripMenuItem.Name = "импортБазыToolStripMenuItem";
-            this.импортБазыToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.импортБазыToolStripMenuItem.Text = "Импорт базы";
-            this.импортБазыToolStripMenuItem.Click += new System.EventHandler(this.импортБазыToolStripMenuItem_Click);
+            this.ImportBaseToolStripMenuItem.Name = "ImportBaseToolStripMenuItem";
+            this.ImportBaseToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.ImportBaseToolStripMenuItem.Text = "Импорт базы";
+            this.ImportBaseToolStripMenuItem.Click += new System.EventHandler(this.ImportBaseToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(146, 6);
             // 
-            // выходToolStripMenuItem
+            // ExitToolStripMenuItem
             // 
-            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.выходToolStripMenuItem.Text = "Выход";
-            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
+            this.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem";
+            this.ExitToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.ExitToolStripMenuItem.Text = "Выход";
+            this.ExitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
-            // настройкиToolStripMenuItem
+            // SettingsToolStripMenuItem
             // 
-            this.настройкиToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.изображенияToolStripMenuItem,
-            this.индексыToolStripMenuItem1});
-            this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
-            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(121, 20);
-            this.настройкиToolStripMenuItem.Text = "База изображений";
+            this.SettingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ImagesToolStripMenuItem,
+            this.IndicesToolStripMenuItem1});
+            this.SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem";
+            this.SettingsToolStripMenuItem.Size = new System.Drawing.Size(121, 20);
+            this.SettingsToolStripMenuItem.Text = "База изображений";
             // 
-            // изображенияToolStripMenuItem
+            // ImagesToolStripMenuItem
             // 
-            this.изображенияToolStripMenuItem.Name = "изображенияToolStripMenuItem";
-            this.изображенияToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
-            this.изображенияToolStripMenuItem.Text = "Изображения";
-            this.изображенияToolStripMenuItem.Click += new System.EventHandler(this.изображенияToolStripMenuItem_Click);
+            this.ImagesToolStripMenuItem.Name = "ImagesToolStripMenuItem";
+            this.ImagesToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.ImagesToolStripMenuItem.Text = "Изображения";
+            this.ImagesToolStripMenuItem.Click += new System.EventHandler(this.ImagesToolStripMenuItem_Click);
             // 
-            // индексыToolStripMenuItem1
+            // IndicesToolStripMenuItem1
             // 
-            this.индексыToolStripMenuItem1.Name = "индексыToolStripMenuItem1";
-            this.индексыToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
-            this.индексыToolStripMenuItem1.Text = "Индексы";
-            this.индексыToolStripMenuItem1.Click += new System.EventHandler(this.индексыToolStripMenuItem1_Click);
+            this.IndicesToolStripMenuItem1.Name = "IndicesToolStripMenuItem1";
+            this.IndicesToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.IndicesToolStripMenuItem1.Text = "Индексы";
+            this.IndicesToolStripMenuItem1.Click += new System.EventHandler(this.IndicesToolStripMenuItem1_Click);
             // 
             // toolStripMenuItem2
             // 
@@ -220,7 +220,7 @@
             this.panel1.Controls.Add(this.Consol);
             this.panel1.Location = new System.Drawing.Point(12, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1642, 882);
+            this.panel1.Size = new System.Drawing.Size(1715, 931);
             this.panel1.TabIndex = 3;
             // 
             // tabControl1
@@ -234,7 +234,7 @@
             this.tabControl1.Location = new System.Drawing.Point(233, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1409, 867);
+            this.tabControl1.Size = new System.Drawing.Size(1260, 876);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -248,7 +248,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1401, 841);
+            this.tabPage1.Size = new System.Drawing.Size(1252, 850);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Сводка";
             // 
@@ -257,7 +257,7 @@
             this.pictureBox9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox9.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox9.Location = new System.Drawing.Point(1118, 558);
+            this.pictureBox9.Location = new System.Drawing.Point(969, 567);
             this.pictureBox9.Name = "pictureBox9";
             this.pictureBox9.Size = new System.Drawing.Size(280, 280);
             this.pictureBox9.TabIndex = 45;
@@ -280,9 +280,9 @@
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             chartArea1.Name = "ChartArea1";
             this.chart2.ChartAreas.Add(chartArea1);
-            this.chart2.Location = new System.Drawing.Point(6, 558);
+            this.chart2.Location = new System.Drawing.Point(6, 567);
             this.chart2.Name = "chart2";
-            this.chart2.Size = new System.Drawing.Size(1145, 284);
+            this.chart2.Size = new System.Drawing.Size(996, 284);
             this.chart2.TabIndex = 40;
             this.chart2.Text = "chart2";
             this.chart2.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -298,7 +298,7 @@
             this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Location = new System.Drawing.Point(9, 39);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(1433, 529);
+            this.chart1.Size = new System.Drawing.Size(1284, 538);
             this.chart1.TabIndex = 39;
             this.chart1.Text = "chart1";
             this.chart1.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -331,7 +331,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1401, 841);
+            this.tabPage2.Size = new System.Drawing.Size(1252, 850);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Визуализация";
             // 
@@ -341,9 +341,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox8.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox8.Location = new System.Drawing.Point(0, 638);
+            this.pictureBox8.Location = new System.Drawing.Point(0, 647);
             this.pictureBox8.Name = "pictureBox8";
-            this.pictureBox8.Size = new System.Drawing.Size(1186, 200);
+            this.pictureBox8.Size = new System.Drawing.Size(1037, 200);
             this.pictureBox8.TabIndex = 52;
             this.pictureBox8.TabStop = false;
             // 
@@ -352,7 +352,7 @@
             this.pictureBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox7.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox7.Location = new System.Drawing.Point(1188, 461);
+            this.pictureBox7.Location = new System.Drawing.Point(1039, 470);
             this.pictureBox7.Name = "pictureBox7";
             this.pictureBox7.Size = new System.Drawing.Size(210, 377);
             this.pictureBox7.TabIndex = 51;
@@ -393,7 +393,7 @@
             this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("Consolas", 11F);
-            this.label16.Location = new System.Drawing.Point(1185, 409);
+            this.label16.Location = new System.Drawing.Point(1036, 418);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(64, 18);
             this.label16.TabIndex = 47;
@@ -475,7 +475,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1401, 841);
+            this.tabPage3.Size = new System.Drawing.Size(1252, 850);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Настройки";
             // 
@@ -583,7 +583,7 @@
             this.button1.BackColor = System.Drawing.Color.DarkOrange;
             this.button1.Enabled = false;
             this.button1.Font = new System.Drawing.Font("Consolas", 11F);
-            this.button1.Location = new System.Drawing.Point(1176, 811);
+            this.button1.Location = new System.Drawing.Point(1038, 781);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(86, 27);
             this.button1.TabIndex = 37;
@@ -618,7 +618,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(48, 25);
             this.textBox3.TabIndex = 30;
-            this.textBox3.Text = "0,1";
+            this.textBox3.Text = "0,15";
             this.textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
@@ -657,9 +657,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.Controls.Add(this.button4);
             this.panel2.Controls.Add(this.button2);
-            this.panel2.Location = new System.Drawing.Point(7, 833);
+            this.panel2.Location = new System.Drawing.Point(6, 843);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(353, 45);
+            this.panel2.Size = new System.Drawing.Size(294, 45);
             this.panel2.TabIndex = 4;
             // 
             // button4
@@ -688,9 +688,9 @@
             | System.Windows.Forms.AnchorStyles.Left)));
             this.Consol.BackColor = System.Drawing.Color.Gray;
             this.Consol.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.Consol.Location = new System.Drawing.Point(6, 15);
+            this.Consol.Location = new System.Drawing.Point(6, -36);
             this.Consol.Name = "Consol";
-            this.Consol.Size = new System.Drawing.Size(221, 812);
+            this.Consol.Size = new System.Drawing.Size(221, 861);
             this.Consol.TabIndex = 0;
             this.Consol.Text = "";
             // 
@@ -702,7 +702,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1666, 921);
+            this.ClientSize = new System.Drawing.Size(1517, 930);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
@@ -742,22 +742,22 @@
 
         #endregion
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem файлToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem открытьToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem FileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem OpenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem выходToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ExitToolStripMenuItem;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         public System.Windows.Forms.RichTextBox Consol;
-        private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem изображенияToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem индексыToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem SettingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ImagesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem IndicesToolStripMenuItem1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.ToolStripMenuItem экспортБазыToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem импортБазыToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ExportBaseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ImportBaseToolStripMenuItem;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button2;

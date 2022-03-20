@@ -197,7 +197,7 @@ namespace MNIST
                 {
                     if (inter_result[j] > 0.0f)
                     {
-                        if (Correct[j] * 10f >= Appeal[j] | Correct[j] < 0.00001f)
+                        if (Correct[j] * 10f >= Appeal[j] || Correct[j] < 0.00001f)
                         {
                             Refined[j] = (float)(Refined[j] + inter_result[j] * res);
                             if (Appeal[j] < 0.3f)
@@ -275,7 +275,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 & appeal_ < 0.99f)//0,8
+                if (Control_value > 0 && appeal_ < 0.99f)//0,8
                 {
                     Control_value--;
                     Contraction_ = true;

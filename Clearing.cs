@@ -7,80 +7,80 @@ namespace MNIST
     class Clearing
     {
         //public string message;
-        public Clearing(List<Matte> ListMatte, List<ReverseMatte> ListReverseMatte, float satiety)
+        public Clearing(List<Matte> mattes, List<ReverseMatte> reverseMattes, float satiety)
         {
-            List<int> Empty = new List<int>();
-            for (int j = 0; j < ListMatte.Count; j++)
+            List<int> empty = new List<int>();
+            for (int j = 0; j < mattes.Count; j++)
             {
                 //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
                 //TODO: числа с плавающей запятой сравниваются на точное равенство, скорее всего, нужно заменить на сравнение с точностью до машинного эпсилон. 
-                if ((ListMatte[j].appeal == satiety & ListMatte[j].Control_value <= 0) | (ListMatte[j].Control_value < 0) | (ListMatte[j].appeal < satiety & ListMatte[j].Control_value < 200))
+                if ((mattes[j].appeal == satiety && mattes[j].Control_value <= 0) || (mattes[j].Control_value < 0) || (mattes[j].appeal < satiety && mattes[j].Control_value < 200))
                 {
-                    Empty.Add(j);
+                    empty.Add(j);
                 }
             }
 
-            if (Empty.Count > 0)
+            if (empty.Count > 0)
             {
                 int e;
-                for (int j = 0; j < Empty.Count; j++)
+                for (int j = 0; j < empty.Count; j++)
                 {
-                    e = Empty[j] - j;
-                    ListMatte.RemoveAt(e);
-                    for (int i = 0; i < ListReverseMatte.Count; i++)
+                    e = empty[j] - j;
+                    mattes.RemoveAt(e);
+                    for (int i = 0; i < reverseMattes.Count; i++)
                     {
-                        if (ListReverseMatte[i].Correct.Count > e)
+                        if (reverseMattes[i].Correct.Count > e)
                         {
-                            ListReverseMatte[i].Correct.RemoveAt(e);
-                            ListReverseMatte[i].Refined.RemoveAt(e);
+                            reverseMattes[i].Correct.RemoveAt(e);
+                            reverseMattes[i].Refined.RemoveAt(e);
                         }
                     }
                 }
             }
-            Empty.Clear();
+            empty.Clear();
 
-            for (int j = 0; j < ListReverseMatte.Count; j++)
+            for (int j = 0; j < reverseMattes.Count; j++)
             {
                 //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";
-                if ((ListReverseMatte[j].appeal_ <= 0 & ListReverseMatte[j].Control_value <= 0f) | ListReverseMatte[j].Control_value <= 0 | (ListReverseMatte[j].appeal_ <= 0.10f & ListReverseMatte[j].Control_value <= 97.0f)
-                    | ListReverseMatte[j].Correct.Count < ListMatte.Count * 0.1f | ListReverseMatte[j].ActivityFrequency > 1000)
+                if ((reverseMattes[j].appeal_ <= 0 && reverseMattes[j].Control_value <= 0f) || reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
+                    || reverseMattes[j].Correct.Count < mattes.Count * 0.1f || reverseMattes[j].ActivityFrequency > 1000)
                 {
-                    Empty.Add(j);
+                    empty.Add(j);
                 }
             }
-            if (Empty.Count > 0)
+            if (empty.Count > 0)
             {
-                for (int j = Empty.Count - 1; j >= 0; j--)
+                for (int j = empty.Count - 1; j >= 0; j--)
                 {
-                    ListReverseMatte.RemoveAt(Empty[j]);
+                    reverseMattes.RemoveAt(empty[j]);
                 }
             }
 
-            Empty.Clear();
+            empty.Clear();
         }
     }
 
     class Correction
     {
-        public Correction(int InputDataCount, List<ReverseMatte> ListReverseMatte, List<float> AssessmentFirst, List<float> AssessmentSecond, float[] inter_Data, float semblance)
+        public Correction(int inputDataCount, List<ReverseMatte> reverseMattes, List<float> firstAssessment, List<float> secondAssessment, float[] interData, float semblance)
         {
-            if (AssessmentSecond.Count < AssessmentFirst.Count)
+            if (secondAssessment.Count < firstAssessment.Count)
             {
-                for (int i = AssessmentSecond.Count; i < AssessmentFirst.Count; i++)
+                for (int i = secondAssessment.Count; i < firstAssessment.Count; i++)
                 {
-                    AssessmentSecond.Add(0);
+                    secondAssessment.Add(0);
                 }
             }
-            for (int j = 0; j < ListReverseMatte.Count; j++)
+            for (int j = 0; j < reverseMattes.Count; j++)
             {
-                if (ListReverseMatte[j].Control_value > 0f)
+                if (reverseMattes[j].Control_value > 0f)
                 {
-                    float VFirst_ = (AssessmentSecond[j] * AssessmentFirst[j]) * ListReverseMatte[j].appeal_ * semblance;
+                    float VFirst_ = (secondAssessment[j] * firstAssessment[j]) * reverseMattes[j].appeal_ * semblance;
                     if (VFirst_ != 0)
                     {
-                        for (int i = 0; i < InputDataCount; i++)
+                        for (int i = 0; i < inputDataCount; i++)
                         {
-                            inter_Data[i] += ListReverseMatte[j].matte[i] * VFirst_;
+                            interData[i] += reverseMattes[j].matte[i] * VFirst_;
                         }
                     }
 
@@ -91,7 +91,7 @@ namespace MNIST
 
     struct ActivityArgs
     {
-        public List<Matte> ListMatte;
+        public List<Matte> Mattes;
         public List<int> ContractionInputData;
         public float[] InterData;
     }
@@ -101,34 +101,34 @@ namespace MNIST
         public float Activ { get; private set; }
         private float maxAxtiv = -1; //TODO: возможно, я хочу наоборот сделать maxActiv публичным свойством - это название лучше отражает смысл переменной. 
         private float ActivSecond;
-        public int Ind { get; private set; }
+        public int Ind { get; private set; } //TODO: Возможно, заменить на MaxActivityIndex или как-то так. 
         private int InputDataCount;
         private int Dispenser;
-        private List<Matte> ListMatte;
-        private List<int> ContractionInputData;
-        private float[] InterData;
+        private List<Matte> mattes;
+        private List<int> contractionInputData;
+        private float[] interData;
 
         //Нужно для инкансуляции коллекции, чтобы лишние её методы не торчали наружу и не смущали.
         //Внутри класса можно использовать приватное поле, снаружи - только свойство, которое является типом интерфейса и не позволяет себя менять. 
         //Если это перестанет быть желаемым поведением, можно просто поменять типы свойств с IEnumerable на List.
         private readonly List<float> interResult;
         public IEnumerable<float> InterResult { get => interResult; }
-        private List<int> contractionInterResultFirst;
-        public IEnumerable<int> ContractionInterResultFirst { get => contractionInterResultFirst; }
-        private List<int> contractionInterResultSecond;
-        public IEnumerable<int> ContractionInterResultSecond { get => contractionInterResultSecond; }
+        private List<int> firstContractionInterResult;
+        public IEnumerable<int> FirstContractionInterResult { get => firstContractionInterResult; }
+        private List<int> secondContractionInterResult;
+        public IEnumerable<int> SecondContractionInterResult { get => secondContractionInterResult; }
         public Task Task { get; private set; }
 
         public Activity(ActivityArgs listArgs, int inputDataCount, int dispenser, int taskIdx, int taskCount = 4, float activ = 0, float activeSecond = 0, int ind = 0)
         {
-            ListMatte = listArgs.ListMatte;
-            ContractionInputData = listArgs.ContractionInputData;
-            InterData = listArgs.InterData;
+            mattes = listArgs.Mattes;
+            contractionInputData = listArgs.ContractionInputData;
+            interData = listArgs.InterData;
 
-            var len = ListMatte.Count;
+            var len = mattes.Count;
             interResult = new List<float>(len); //Здесь и ниже длина этих трёх списков не больше ListMatte.Count.
-            contractionInterResultFirst = new List<int>(len);
-            contractionInterResultSecond = new List<int>(len);
+            firstContractionInterResult = new List<int>(len);
+            secondContractionInterResult = new List<int>(len);
 
             Activ = activ;
             ActivSecond = activeSecond;
@@ -149,25 +149,25 @@ namespace MNIST
             //TODO: временное название, чтобы выдержать целостность терминологии аналогично с ReverseActivity. Не забыть потом изменить название и здесь, и там. 
             void ActivityFor() //TODO: сделать что-то подобное ActivityReverseMasks - длинные списки дробить и обрабатывать асинхронно. Done. 
             {
-                for (int i = ListMatte.Count / taskCount * taskIdx; i < ListMatte.Count / taskCount * (taskIdx + 1); i++) //TODO: проверить, вроде бы здесь ошибка с определением границ цикла. 
+                for (int i = mattes.Count / taskCount * taskIdx; i < mattes.Count / taskCount * (taskIdx + 1); i++) //TODO: проверить, вроде бы здесь ошибка с определением границ цикла. 
                 {
                     Activ = 0;
                     ActivSecond = 0;
-                    if (ListMatte[i].Control_value > 0)
+                    if (mattes[i].Control_value > 0)
                     {
-                        for (int j = 0; j < ContractionInputData.Count; j++)
+                        for (int j = 0; j < contractionInputData.Count; j++)
                         {
-                            int n = ContractionInputData[j];
-                            float matte = ListMatte[i].matte[n];
+                            int n = contractionInputData[j];
+                            float matte = mattes[i].matte[n];
                             if (matte != 0)// Исключаю операции с 0
                             {
                                 if (n <= InputDataCount - Dispenser)
                                 {
-                                    Activ += matte * InterData[n];
+                                    Activ += matte * interData[n];
                                 }
                                 else
                                 {
-                                    ActivSecond += matte * InterData[n];
+                                    ActivSecond += matte * interData[n];
                                 }
 
                             }
@@ -182,12 +182,12 @@ namespace MNIST
                     if (Activ > -0.0f)
                     {
                         interResult.Add(Activ);
-                        contractionInterResultFirst.Add(i); //Единый порядок поэтому i
+                        firstContractionInterResult.Add(i); //Единый порядок поэтому i
                     }
                     else if (ActivSecond > -0.0f)
                     {
                         interResult.Add(ActivSecond);
-                        contractionInterResultSecond.Add(i);
+                        secondContractionInterResult.Add(i);
                     }
                     else
                     {
@@ -206,8 +206,8 @@ namespace MNIST
         public int Index;
 
         private const int TaskCount = 4;
-        public ActivityMasks(List<Matte> listMatte, List<int> contractionInputData, float[] interData,
-            int inputDataCount, int dispenser, List<float> interResult, List<int> contractionInterResultFirst, List<int> contractionInterResultSecond)
+        public ActivityMasks(List<Matte> mattes, List<int> contractionInputData, float[] interData,
+            int inputDataCount, int dispenser, List<float> interResult, List<int> firstContractionInterResult, List<int> secondContractionInterResult)
         {
             Activ_ = -1;
             Index = 0;
@@ -216,17 +216,17 @@ namespace MNIST
             {
                 ContractionInputData = contractionInputData, //Компилятор умный, компилятор и так поймёт. 
                 InterData = interData, //А я - нет, так что TODO: изменить названия аргументов конструктора, чтобы начинались с маленькой буквы. Done. 
-                ListMatte = listMatte
+                Mattes = mattes
             };
-            var activityList = new List<Activity>(TaskCount);
+            var activities = new List<Activity>(TaskCount);
             //Если этот if запихнуть в ActivityFor, то необходимость в классе Activity в основном пропадает, достаточно будет перетащить
             //его функционал сюда. См. также замечание в самом классе Activity. 
-            if (listMatte.Count < 500) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
+            if (mattes.Count < 500) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
             {
                 //Здесь должна быть функция вычисления активностей Activ и SecondActiv. Done.
                 var activity = new Activity(listArgs, inputDataCount, dispenser, 0, 1);
                 activity.Task.RunSynchronously();
-                UpdateArraysAndActiv(interResult, contractionInterResultFirst, contractionInterResultSecond, activity);
+                UpdateArraysAndActiv(interResult, firstContractionInterResult, secondContractionInterResult, activity);
             }
             else
             {
@@ -234,22 +234,22 @@ namespace MNIST
                 for (int i = 0; i < TaskCount; i++)
                 {
                     var activity = new Activity(listArgs, inputDataCount, dispenser, i);
-                    activityList.Add(activity);
+                    activities.Add(activity);
                     activity.Task.Start();
                 }
             }
-            foreach (var activity in activityList)
+            foreach (var activity in activities)
             {
                 activity.Task.Wait();
-                UpdateArraysAndActiv(interResult, contractionInterResultFirst, contractionInterResultSecond, activity);
+                UpdateArraysAndActiv(interResult, firstContractionInterResult, secondContractionInterResult, activity);
             }
         }
 
         private void UpdateArraysAndActiv(List<float> interResult, List<int> contractionInterResultFirst, List<int> contractionInterResultSecond, Activity activity)
         {
             interResult.AddRange(activity.InterResult);
-            contractionInterResultFirst.AddRange(activity.ContractionInterResultFirst);
-            contractionInterResultSecond.AddRange(activity.ContractionInterResultSecond);
+            contractionInterResultFirst.AddRange(activity.FirstContractionInterResult);
+            contractionInterResultSecond.AddRange(activity.SecondContractionInterResult);
             if (activity.Activ > Activ_)
             {
                 Activ_ = activity.Activ;
@@ -259,47 +259,47 @@ namespace MNIST
     }
     class ActivityReverseMasks //TODO: всюду задаться вопросами нейминга. 
     {
-        public List<float> AssessmentFirst = new List<float>();
-        public List<float> AssessmentSecond = new List<float>();
+        public List<float> FirstAssessment = new List<float>();
+        public List<float> SecondAssessment = new List<float>();
         public float Activ { get; private set; } // Было приватным полем, но вызывалось извне. Возможно, просто ошибка текущего изменения, но на всякий случай добавлю комментарий. 
-        private float SecondActiv;
+        private float secondActiv;
         public int Ind;
-        readonly int DefenseLearning;
-        readonly List<ReverseMatte> ListReverseMatte;
-        readonly List<int> ContractionInterResultFirst;
-        readonly List<int> ContractionInterResultSecond;
-        readonly List<float> inter_result;
+        readonly int defenseLearning;
+        readonly List<ReverseMatte> reverseMattes;
+        readonly List<int> firstContractionInterResult;
+        readonly List<int> secondContractionInterResult;
+        readonly List<float> interResult;
 
         private const int TaskCount = 8;
 
-        public ActivityReverseMasks(List<ReverseMatte> vListReverseMatte, List<int> vContractionInterResultFirst, List<int> vContractionInterResultSecond, List<float> vinter_result)
+        public ActivityReverseMasks(List<ReverseMatte> vReverseMattes, List<int> vFirstContractionInterResult, List<int> vSecondContractionInterResult, List<float> vInterResult)
         {
-            DefenseLearning = 20;//20
+            defenseLearning = 20;//20
 
             Activ = 0;
-            SecondActiv = -1;
+            secondActiv = -1;
             Ind = -1;
 
-            ListReverseMatte = new List<ReverseMatte>(vListReverseMatte);
+            reverseMattes = new List<ReverseMatte>(vReverseMattes);
 
-            for (int i = 0; i < ListReverseMatte.Count; i++)
+            for (int i = 0; i < reverseMattes.Count; i++)
             {
-                AssessmentFirst.Add(0);
+                FirstAssessment.Add(0);
             }
-            AssessmentSecond.AddRange(AssessmentFirst);
+            SecondAssessment.AddRange(FirstAssessment);
 
-            if (ListReverseMatte.Count < 200)
+            if (reverseMattes.Count < 200)
             {
-                ContractionInterResultFirst = new List<int>(vContractionInterResultFirst);
-                ContractionInterResultSecond = new List<int>(vContractionInterResultSecond);
+                firstContractionInterResult = new List<int>(vFirstContractionInterResult);
+                secondContractionInterResult = new List<int>(vSecondContractionInterResult);
 
-                inter_result = new List<float>(vinter_result);
+                interResult = new List<float>(vInterResult);
 
                 ActivityFor();
             }
             else
             {
-                var activityList = new List<ReverseActivity>(TaskCount);
+                var activities = new List<ReverseActivity>(TaskCount);
                 for (int i = 0; i < TaskCount; i++)
                 {
                     //var listArgs = new ActivityArgs()
@@ -312,65 +312,65 @@ namespace MNIST
 
                     var listArgs = new ReverseActivityArgs()
                     {
-                        ContractionInterResultFirst = vContractionInterResultFirst,
-                        ContractionInterResultSecond = vContractionInterResultSecond,
-                        InterResult = vinter_result,
-                        ListReverseMatte = vListReverseMatte
+                        FirstContractionInterResult = vFirstContractionInterResult,
+                        SecondContractionInterResult = vSecondContractionInterResult,
+                        InterResult = vInterResult,
+                        ReverseMattes = vReverseMattes
                     };
                     var activity = new ReverseActivity(listArgs,
                                                 i,
-                                                DefenseLearning);
-                    activity.AssessmentSecond.AddRange(AssessmentFirst); //TODO: уточнить, не опечатка ли? 
-                    activity.AssessmentFirst.AddRange(AssessmentFirst);
-                    activityList.Add(activity);
+                                                defenseLearning);
+                    activity.SecondAssessment.AddRange(FirstAssessment); //TODO: уточнить, не опечатка ли? 
+                    activity.FirstAssessment.AddRange(FirstAssessment);
+                    activities.Add(activity);
                     if (i != 0) activity.Task.Start(); //TODO: не забыть уточнить, почему первый из методов ActivityFor запускается в главном потоке. 
                 }
 
-                activityList[0].Task.RunSynchronously();
+                activities[0].Task.RunSynchronously();
                 for (int i = 1; i < TaskCount; i++) //Не опечатка, цикл должен начинаться с единицы. См. также комментарий выше про ActivityFor. 
                 {
-                    activityList[i].Task.Wait();
-                    if (Activ < activityList[i].Activ)
+                    activities[i].Task.Wait();
+                    if (Activ < activities[i].Activ)
                     {
-                        Activ = activityList[i].Activ;
-                        Ind = activityList[i].Ind;
+                        Activ = activities[i].Activ;
+                        Ind = activities[i].Ind;
                     }
-                    if (SecondActiv < activityList[i].SecondActiv) SecondActiv = activityList[i].SecondActiv;
+                    if (secondActiv < activities[i].SecondActiv) secondActiv = activities[i].SecondActiv;
                 }
 
-                Parallel.For(0, AssessmentFirst.Count, i =>
+                Parallel.For(0, FirstAssessment.Count, i =>
                 {
                     //Можно было сделать через LINQ и сэкономить пару строчек, но я решил выдерживать более явный стиль кода.
-                    AssessmentFirst[i] = 0;
-                    AssessmentSecond[i] = 0;
-                    foreach (var activity in activityList)
+                    FirstAssessment[i] = 0;
+                    SecondAssessment[i] = 0;
+                    foreach (var activity in activities)
                     {
-                        AssessmentFirst[i] += activity.AssessmentFirst[i];
-                        AssessmentSecond[i] += activity.AssessmentSecond[i];
+                        FirstAssessment[i] += activity.FirstAssessment[i];
+                        SecondAssessment[i] += activity.SecondAssessment[i];
                     }
-                    if (AssessmentFirst[i] > 0)
+                    if (FirstAssessment[i] > 0)
                     {
-                        ListReverseMatte[i].ActivityFrequency++;
+                        reverseMattes[i].ActivityFrequency++;
                     }
                     else
                     {
-                        ListReverseMatte[i].ActivityFrequency = 0;
+                        reverseMattes[i].ActivityFrequency = 0;
                     }
                 });
             }
             if (Activ > 1)
             {
-                Parallel.For(0, ListReverseMatte.Count, i =>
+                Parallel.For(0, reverseMattes.Count, i =>
                 {
-                    AssessmentFirst[i] = AssessmentFirst[i] / Activ; //TODO: убрать явное приведение к float. Done. 
+                    FirstAssessment[i] = FirstAssessment[i] / Activ; //TODO: убрать явное приведение к float. Done. 
                 });
             }
 
-            if (SecondActiv > 1)
+            if (secondActiv > 1)
             {
-                Parallel.For(0, ListReverseMatte.Count, i =>
+                Parallel.For(0, reverseMattes.Count, i =>
                 {
-                    AssessmentSecond[i] = (float)AssessmentSecond[i] / SecondActiv; //TODO: то же самое. 
+                    SecondAssessment[i] = (float)SecondAssessment[i] / secondActiv; //TODO: то же самое. 
                 });
             }
         }
@@ -379,35 +379,35 @@ namespace MNIST
             int n1;
             int n2;
             Activ = 0;
-            SecondActiv = 0;
+            secondActiv = 0;
             Ind = -1;
 
-            int ContractionInterResultFirstCount = ContractionInterResultFirst.Count;
-            int ContractionInterResultSecondCount = ContractionInterResultSecond.Count;
+            int firstContractionInterResultCount = firstContractionInterResult.Count;
+            int secondContractionInterResultCount = secondContractionInterResult.Count;
 
-            for (int i = 0; i < ListReverseMatte.Count; i++)
+            for (int i = 0; i < reverseMattes.Count; i++)
             {
-                int arrayCorrectLength = ListReverseMatte[i].Correct.Count;
-                if (ListReverseMatte[i].appeal_ >= 0 & ListReverseMatte[i].Control_value > 0f & arrayCorrectLength > 0)
+                int arrayCorrectLength = reverseMattes[i].Correct.Count;
+                if (reverseMattes[i].appeal_ >= 0 && reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)
                 {
-                    for (int j = 0; j < ContractionInterResultFirstCount; j++)
+                    for (int j = 0; j < firstContractionInterResultCount; j++)
                     {
-                        n1 = ContractionInterResultFirst[j];
+                        n1 = firstContractionInterResult[j];
                         if (arrayCorrectLength > n1)
                         {
-                            AssessmentFirst[i] += ListReverseMatte[i].Correct[n1] * inter_result[n1];
+                            FirstAssessment[i] += reverseMattes[i].Correct[n1] * interResult[n1];
                         }
                         else
                         {
                             break;
                         }
                     }
-                    for (int j = 0; j < ContractionInterResultSecondCount; j++)
+                    for (int j = 0; j < secondContractionInterResultCount; j++)
                     {
-                        n2 = ContractionInterResultSecond[j];
+                        n2 = secondContractionInterResult[j];
                         if (arrayCorrectLength > n2)
                         {
-                            AssessmentSecond[i] += ListReverseMatte[i].Correct[n2] * inter_result[n2];
+                            SecondAssessment[i] += reverseMattes[i].Correct[n2] * interResult[n2];
                         }
                         else
                         {
@@ -417,15 +417,15 @@ namespace MNIST
                 }
             }
 
-            for (int i = 0; i < ListReverseMatte.Count; i++)
+            for (int i = 0; i < reverseMattes.Count; i++)
             {
-                if (AssessmentSecond[i] >= SecondActiv)
+                if (SecondAssessment[i] >= secondActiv)
                 {
-                    SecondActiv = AssessmentSecond[i];
+                    secondActiv = SecondAssessment[i];
                 }
-                if (Activ < AssessmentFirst[i] & AssessmentFirst[i] > 0 & i < ListReverseMatte.Count - DefenseLearning)
+                if (Activ < FirstAssessment[i] && FirstAssessment[i] > 0 && i < reverseMattes.Count - defenseLearning)
                 {
-                    Activ = AssessmentFirst[i];
+                    Activ = FirstAssessment[i];
                     Ind = i;
                 }
             }
@@ -433,25 +433,25 @@ namespace MNIST
 
         private struct ReverseActivityArgs
         {
-            public List<ReverseMatte> ListReverseMatte;
-            public List<int> ContractionInterResultFirst;
-            public List<int> ContractionInterResultSecond;
+            public List<ReverseMatte> ReverseMattes;
+            public List<int> FirstContractionInterResult;
+            public List<int> SecondContractionInterResult;
             public List<float> InterResult;
         }
         //TODO: перетащить таск в этот класс. Done. 
         private class ReverseActivity
         {
-            public List<float> AssessmentFirst = new List<float>();
-            public List<float> AssessmentSecond = new List<float>();
+            public List<float> FirstAssessment = new List<float>();
+            public List<float> SecondAssessment = new List<float>();
 
-            public int Ind { get; private set; }
+            public int Ind { get; private set; } //TODO: см. замечание к аналогичному полю в классе Activity. 
             public float Activ { get; private set; }
             public float SecondActiv { get; private set; }
             public Task Task { get; private set; } //TODO: возможно, лучше переименовать, чтобы имя переменной не совпадало с именем класса. 
-            readonly List<ReverseMatte> ListReverseMatte;
-            readonly List<int> ContractionInterResultFirst;
-            readonly List<int> ContractionInterResultSecond;
-            readonly List<float> inter_result;
+            readonly List<ReverseMatte> reverseMattes;
+            readonly List<int> firstContractionInterResult;
+            readonly List<int> secondContractionInterResult;
+            readonly List<float> interResult;
 
             public ReverseActivity(ReverseActivityArgs listArgs,
                             int num,
@@ -462,10 +462,10 @@ namespace MNIST
             {
                 Activ = activ;
                 SecondActiv = secondActiv;
-                ListReverseMatte = listArgs.ListReverseMatte;
-                ContractionInterResultFirst = listArgs.ContractionInterResultFirst;
-                ContractionInterResultSecond = listArgs.ContractionInterResultSecond;
-                this.inter_result = listArgs.InterResult;
+                reverseMattes = listArgs.ReverseMattes;
+                firstContractionInterResult = listArgs.FirstContractionInterResult;
+                secondContractionInterResult = listArgs.SecondContractionInterResult;
+                interResult = listArgs.InterResult;
                 Ind = ind;
                 Task = new Task(GenerateActivityFunction(defenseLearning, num));
             }
@@ -480,24 +480,24 @@ namespace MNIST
                     SecondActiv = 0;
                     Ind = -1;
 
-                    int ContractionInterResultFirstCount = ContractionInterResultFirst.Count;
-                    int ContractionInterResultSecondCount = ContractionInterResultSecond.Count;
+                    int firstContractionInterResultCount = firstContractionInterResult.Count;
+                    int secondContractionInterResultCount = secondContractionInterResult.Count;
 
                     //TODO: возможно, ошибка с индексами в первоначальном коде, исправить, но не забыть уточнить. Done. 
                     //TODO: также не забыть уточнить, всегда ли ListReverseMatte.Count кратно четырём. 
-                    for (int i = ListReverseMatte.Count / TaskCount * num; i < ListReverseMatte.Count / TaskCount * (num + 1); i++)
+                    for (int i = reverseMattes.Count / TaskCount * num; i < reverseMattes.Count / TaskCount * (num + 1); i++)
                     {
-                        int arrayCorrectLength = ListReverseMatte[i].Correct.Count;
-                        if (ListReverseMatte[i].appeal_ >= 0 & ListReverseMatte[i].Control_value > 0f & arrayCorrectLength > 0)
+                        int arrayCorrectLength = reverseMattes[i].Correct.Count;
+                        if (reverseMattes[i].appeal_ >= 0 && reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)
                         {
-                            for (int j = 0; j < ContractionInterResultFirstCount; j++)
+                            for (int j = 0; j < firstContractionInterResultCount; j++)
                             {
-                                n1 = ContractionInterResultFirst[j];
+                                n1 = firstContractionInterResult[j];
                                 if (arrayCorrectLength > n1)
                                 {
-                                    if (ListReverseMatte[i].Correct[n1] != 0)// Исключаю операции с 0
+                                    if (reverseMattes[i].Correct[n1] != 0)// Исключаю операции с 0
                                     {
-                                        AssessmentFirst[i] += ListReverseMatte[i].Correct[n1] * inter_result[n1];
+                                        FirstAssessment[i] += reverseMattes[i].Correct[n1] * interResult[n1];
                                     }
 
                                 }
@@ -506,14 +506,14 @@ namespace MNIST
                                     break;
                                 }
                             }
-                            for (int j = 0; j < ContractionInterResultSecondCount; j++)
+                            for (int j = 0; j < secondContractionInterResultCount; j++)
                             {
-                                n2 = ContractionInterResultSecond[j];
+                                n2 = secondContractionInterResult[j];
                                 if (arrayCorrectLength > n2)
                                 {
-                                    if (ListReverseMatte[i].Correct[n2] != 0)// Исключаю операции с 0
+                                    if (reverseMattes[i].Correct[n2] != 0)// Исключаю операции с 0
                                     {
-                                        AssessmentSecond[i] += ListReverseMatte[i].Correct[n2] * inter_result[n2];
+                                        SecondAssessment[i] += reverseMattes[i].Correct[n2] * interResult[n2];
                                     }
 
                                 }
@@ -525,15 +525,15 @@ namespace MNIST
                         }
                     }
 
-                    for (int i = 0; i < ListReverseMatte.Count; i++)
+                    for (int i = 0; i < reverseMattes.Count; i++)
                     {
-                        if (AssessmentSecond[i] >= SecondActiv)
+                        if (SecondAssessment[i] >= SecondActiv)
                         {
-                            SecondActiv = AssessmentSecond[i];
+                            SecondActiv = SecondAssessment[i];
                         }
-                        if (Activ < AssessmentFirst[i] & AssessmentFirst[i] > 0 & i < ListReverseMatte.Count - DefenseLearning)
+                        if (Activ < FirstAssessment[i] && FirstAssessment[i] > 0 && i < reverseMattes.Count - DefenseLearning)
                         {
-                            Activ = AssessmentFirst[i];
+                            Activ = FirstAssessment[i];
                             Ind = i;
                         }
                     }
