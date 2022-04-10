@@ -69,9 +69,9 @@ namespace MNIST
                 }
                 summ_0 += matte[j];
             }
-            if (max_0 < 15)// 50.0f SleepStep
+            if (max_0 < 10)// 25
             {
-                if (summ_0 < 0.3f)//0.3
+                if (summ_0 < 0.3f)//0.6
                 {
                     if (Control_value > 0)
                     {
@@ -300,5 +300,6 @@ namespace MNIST
         public int summ;
         public int summ2;
         public int Index;
+        public string message;
     }
 }

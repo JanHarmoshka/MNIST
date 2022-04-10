@@ -51,19 +51,35 @@ namespace MNIST
         private readonly List<float> firstAssessment = new List<float>();
         private readonly List<float> secondAssessment = new List<float>();
 
-        private int assessmentCounter = 0; //TODO: Уточнить, зачем нужны переменные nn, nnn и nnnbuf, и переименовать соответственно. 
+        private int assessmentCounter = 0; //TODO: Уточнить, зачем нужны переменные nn, nnn и nnnbuf, и переименовать соответственно. Done. 
         private int reverseMatteCounter;
         private int reverseMatteCounterBuf = 0;
 
+        private List<float> interResult = new List<float>();
+        private List<int> contractionInputData = new List<int>();
+        private List<int> firstContractionInterResult = new List<int>();
+        private List<int> secondContractionInterResult = new List<int>();
+
+        //TODO: вытащить в конструктор и создать глобальную константу TaskCount. 
+        //Также TODO: Инициализировать списки каким-нибудь Capacity. 
+        private InternalActivityMasksArgs internalActivityMasksArgs = new InternalActivityMasksArgs()
+        {
+            interResults = new List<List<float>>()
+            { new List<float>(1000), new List<float>(1000), new List<float>(1000), new List<float>(1000) },
+            firstContractionInterResults = new List<List<int>>()
+            { new List<int>(1000), new List<int>(1000), new List<int>(1000), new List<int>(1000) },
+            secondContractionInterResults = new List<List<int>>()
+            { new List<int>(1000), new List<int>(1000), new List<int>(1000), new List<int>(1000) }
+        };
         //TODO: длинновато, декомпозировать. Done. 
         public Counter Assessment(int dispenser, List<float> inputData, float semblance, int indexData = -1)
         {
-            //TODO: функция вызывается внутри тройного цикла, возможно, нужно убрать создание списков наружу и переиспользовать заранее созданные. 
+            //TODO: функция вызывается внутри тройного цикла, возможно, нужно убрать создание списков наружу и переиспользовать заранее созданные. Done. 
             //также TODO: привести нейминг списков к единообразному виду. Done. 
-            List<float> interResult = new List<float>();
-            List<int> contractionInputData = new List<int>();
-            List<int> firstContractionInterResult = new List<int>();
-            List<int> secondContractionInterResult = new List<int>();
+            interResult.Clear();
+            contractionInputData.Clear();
+            firstContractionInterResult.Clear();
+            secondContractionInterResult.Clear();
             bool correctTrigger = true;
             bool pass = true;
             float reverseSatiety = 0.0f;
@@ -75,9 +91,8 @@ namespace MNIST
 
             if (assessmentCounter % MemoryDuration == 0)
             {
-                // Чистка
-                _ = new Clearing(Mattes, ReverseMattes, Satiety); //TODO: заменить на символ удаления. Done. 
-                //message = сlearing.message;
+
+                _ = new Clearing(Mattes, ReverseMattes, Satiety); //TODO: заменить на символ удаления. Done.                
             }
 
             float[] interData = inputData.ToArray();
@@ -131,7 +146,16 @@ namespace MNIST
                 Mattes.Add(matte);
             }
 
-            ActivityMasks activityMasks = new ActivityMasks(Mattes, contractionInputData, interData, inputDataCount, dispenser, interResult, firstContractionInterResult, secondContractionInterResult);
+            var activityMasksArgs = new ActivityMasksArgs()
+            {
+                contractionInputData = contractionInputData,
+                firstContractionInterResult = firstContractionInterResult,
+                interData = interData,
+                interResult = interResult,
+                mattes = Mattes,
+                secondContractionInterResult = secondContractionInterResult
+            };
+            ActivityMasks activityMasks = new ActivityMasks(activityMasksArgs, internalActivityMasksArgs, inputDataCount, dispenser);
             float Activ_ = activityMasks.Activ_;
             //int n;
             int Index = activityMasks.Index;
@@ -160,7 +184,7 @@ namespace MNIST
             }
 
             //TODO: заменить на nn % 2000 == 0? 0_o
-            if (assessmentCounter / 2000f == Math.Round((double)(assessmentCounter / 2000)))//Вывод ошибки
+            if (assessmentCounter % 2000 == 0)//Вывод ошибки
             {
                 Message += "нейр:" + Mattes.Count.ToString() + " гр:" + ReverseMattes.Count.ToString() + " ";
                 if (ReverseMattes.Count > 1)
@@ -192,7 +216,6 @@ namespace MNIST
                     CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter);
                     maxActivityIndex = ReverseMattes.Count - 1;
                     firstAssessment.Add(1);
-                    //ListReverseMatte[Ind].Sleep();
                     pass = false;
                     reverseMatteCounter++;
                 }
@@ -255,10 +278,6 @@ namespace MNIST
                 for (int i = 0; i < ReverseMattes.Count; i++)
                 {
                     firstAssessment[i] = (float)firstAssessment[i] / activ;
-                    //if (AssessmentFirst[i] > 1 && ListReverseMatte[i].room != IndexData)
-                    //{
-                    //    AssessmentFirst[i] = 0.1f;
-                    //}
                 }
             }
 

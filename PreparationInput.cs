@@ -46,8 +46,8 @@ namespace MNIST
         private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
         private readonly int lowerLimit = 0;
-        private readonly int upperLimit = 24;
-        private readonly int proportions = 6;
+        private readonly int upperLimit = 23;
+        private readonly int proportions = 7;
 
         private Random rnd = new Random();
         public float Semblance { get; private set; }

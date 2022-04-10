@@ -12,9 +12,8 @@ namespace MNIST
             List<int> empty = new List<int>();
             for (int j = 0; j < mattes.Count; j++)
             {
-                //message += "app " + ListMatte[j].appeal.ToString() + " C_v " + ListMatte[j].Control_value.ToString() + " >> " + ListMatte[j].room.ToString() + "\r\n";
                 //TODO: числа с плавающей запятой сравниваются на точное равенство, скорее всего, нужно заменить на сравнение с точностью до машинного эпсилон. 
-                if ((mattes[j].appeal == satiety && mattes[j].Control_value <= 0) || (mattes[j].Control_value < 0) || (mattes[j].appeal < satiety && mattes[j].Control_value < 200))
+                if ((mattes[j].Control_value <= 0) || (mattes[j].appeal < satiety && mattes[j].Control_value < 200))
                 {
                     empty.Add(j);
                 }
@@ -41,8 +40,7 @@ namespace MNIST
 
             for (int j = 0; j < reverseMattes.Count; j++)
             {
-                //message += "ap " + ListReverseMatte[j].appeal_.ToString() + " C " + ListReverseMatte[j].Control_value.ToString() + " r " + ListReverseMatte[j].room.ToString() + "\r\n";
-                if ((reverseMattes[j].appeal_ <= 0 && reverseMattes[j].Control_value <= 0f) || reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
+                if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
                     || reverseMattes[j].Correct.Count < mattes.Count * 0.1f || reverseMattes[j].ActivityFrequency > 1000)
                 {
                     empty.Add(j);
@@ -119,16 +117,22 @@ namespace MNIST
         public IEnumerable<int> SecondContractionInterResult { get => secondContractionInterResult; }
         public Task Task { get; private set; }
 
-        public Activity(ActivityArgs listArgs, int inputDataCount, int dispenser, int taskIdx, int taskCount = 4, float activ = 0, float activeSecond = 0, int ind = 0)
+        public Activity(ActivityArgs listArgs, InternalAcitivityArgs internalArgs, int inputDataCount, int dispenser, int taskIdx, int taskCount = 4, float activ = 0, float activeSecond = 0, int ind = 0)
         {
             mattes = listArgs.Mattes;
             contractionInputData = listArgs.ContractionInputData;
             interData = listArgs.InterData;
 
             var len = mattes.Count;
-            interResult = new List<float>(len); //Здесь и ниже длина этих трёх списков не больше ListMatte.Count.
-            firstContractionInterResult = new List<int>(len);
-            secondContractionInterResult = new List<int>(len);
+            //interResult = new List<float>(len); //Здесь и ниже длина этих трёх списков не больше mattes.Count.
+            //firstContractionInterResult = new List<int>(len);
+            //secondContractionInterResult = new List<int>(len);
+            interResult = internalArgs.interResult;
+            firstContractionInterResult = internalArgs.firstContractionInterResult;
+            secondContractionInterResult = internalArgs.secondContractionInterResult;
+            interResult.Clear();
+            firstContractionInterResult.Clear();
+            secondContractionInterResult.Clear();
 
             Activ = activ;
             ActivSecond = activeSecond;
@@ -149,7 +153,7 @@ namespace MNIST
             //TODO: временное название, чтобы выдержать целостность терминологии аналогично с ReverseActivity. Не забыть потом изменить название и здесь, и там. 
             void ActivityFor() //TODO: сделать что-то подобное ActivityReverseMasks - длинные списки дробить и обрабатывать асинхронно. Done. 
             {
-                for (int i = mattes.Count / taskCount * taskIdx; i < mattes.Count / taskCount * (taskIdx + 1); i++) //TODO: проверить, вроде бы здесь ошибка с определением границ цикла. 
+                for (int i = mattes.Count / taskCount * taskIdx; i < mattes.Count / taskCount * (taskIdx + 1); i++) //TODO: проверить, вроде бы здесь ошибка с определением границ цикла. Done, исправлено. 
                 {
                     Activ = 0;
                     ActivSecond = 0;
@@ -200,40 +204,75 @@ namespace MNIST
         }
     }
 
+    struct InternalActivityMasksArgs
+    {
+        public List<List<float>> interResults;
+        public List<List<int>> firstContractionInterResults;
+        public List<List<int>> secondContractionInterResults;
+    }
+
+    struct InternalAcitivityArgs
+    {
+        public List<float> interResult;
+        public List<int> firstContractionInterResult;
+        public List<int> secondContractionInterResult;
+    }
+
+    struct ActivityMasksArgs
+    {
+        public List<Matte> mattes;
+        public List<int> contractionInputData;
+        public float[] interData;
+        public List<float> interResult;
+        public List<int> firstContractionInterResult;
+        public List<int> secondContractionInterResult;
+    }
+
     class ActivityMasks
     {
         public float Activ_;
         public int Index;
 
         private const int TaskCount = 4;
-        public ActivityMasks(List<Matte> mattes, List<int> contractionInputData, float[] interData,
-            int inputDataCount, int dispenser, List<float> interResult, List<int> firstContractionInterResult, List<int> secondContractionInterResult)
+        public ActivityMasks(ActivityMasksArgs args, InternalActivityMasksArgs internalArgs, int inputDataCount, int dispenser)
         {
             Activ_ = -1;
             Index = 0;
 
             var listArgs = new ActivityArgs()
             {
-                ContractionInputData = contractionInputData, //Компилятор умный, компилятор и так поймёт. 
-                InterData = interData, //А я - нет, так что TODO: изменить названия аргументов конструктора, чтобы начинались с маленькой буквы. Done. 
-                Mattes = mattes
+                ContractionInputData = args.contractionInputData, //Компилятор умный, компилятор и так поймёт. 
+                InterData = args.interData, //А я - нет, так что TODO: изменить названия аргументов конструктора, чтобы начинались с маленькой буквы. Done. 
+                Mattes = args.mattes
             };
             var activities = new List<Activity>(TaskCount);
             //Если этот if запихнуть в ActivityFor, то необходимость в классе Activity в основном пропадает, достаточно будет перетащить
             //его функционал сюда. См. также замечание в самом классе Activity. 
-            if (mattes.Count < 500) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
+            if (args.mattes.Count < 500) //TODO: заменить магическую константу на именованную, то же самое и в ReverseMasks. 
             {
                 //Здесь должна быть функция вычисления активностей Activ и SecondActiv. Done.
-                var activity = new Activity(listArgs, inputDataCount, dispenser, 0, 1);
+                var internals = new InternalAcitivityArgs()
+                {
+                    interResult = internalArgs.interResults[0],
+                    firstContractionInterResult = internalArgs.firstContractionInterResults[0],
+                    secondContractionInterResult = internalArgs.secondContractionInterResults[0]
+                };
+                var activity = new Activity(listArgs, internals, inputDataCount, dispenser, 0, 1);
                 activity.Task.RunSynchronously();
-                UpdateArraysAndActiv(interResult, firstContractionInterResult, secondContractionInterResult, activity);
+                UpdateArraysAndActiv(args.interResult, args.firstContractionInterResult, args.secondContractionInterResult, activity);
             }
             else
             {
                 //А здесь она же, но применённая асинхронно к ListMatte, разбитому на куски. Done.
                 for (int i = 0; i < TaskCount; i++)
                 {
-                    var activity = new Activity(listArgs, inputDataCount, dispenser, i);
+                    var internals = new InternalAcitivityArgs()
+                    {
+                        interResult = internalArgs.interResults[i],
+                        firstContractionInterResult = internalArgs.firstContractionInterResults[i],
+                        secondContractionInterResult = internalArgs.secondContractionInterResults[i]
+                    };
+                    var activity = new Activity(listArgs, internals, inputDataCount, dispenser, i);
                     activities.Add(activity);
                     activity.Task.Start();
                 }
@@ -241,7 +280,7 @@ namespace MNIST
             foreach (var activity in activities)
             {
                 activity.Task.Wait();
-                UpdateArraysAndActiv(interResult, firstContractionInterResult, secondContractionInterResult, activity);
+                UpdateArraysAndActiv(args.interResult, args.firstContractionInterResult, args.secondContractionInterResult, activity);
             }
         }
 

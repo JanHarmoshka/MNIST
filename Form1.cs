@@ -72,6 +72,7 @@ namespace MNIST
 
         //string[] setting = new string[2];
         bool sessionFlag = false;
+        bool gameFlag = true;// штатно false
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -111,6 +112,8 @@ namespace MNIST
             bool col;
             float semblance = 20;
 
+            int baseСoordinate = 5;
+
             sw.Start();
             // проход по файлам данных
             for (int l = 0; l < 100; l++)
@@ -141,6 +144,7 @@ namespace MNIST
                 int focusSize = 6;// Размер зрачка
 
                 PreparationInput preparation_input = PreparationInput.Instance;
+                BreakOut game = new BreakOut();
 
                 Harmoshka.LessonTrigger = sessionFlag;
 
@@ -179,20 +183,33 @@ namespace MNIST
                         return;
                     }
 
-                    if (di % 100 == 0) // Частота прорисовки графиков
+                    if (di % 200 == 0) // Частота прорисовки графиков
                     {
                         worker.ReportProgress(0);
                     }
 
                     {//Подготовка изображения для загрузки в нейронную сеть
+
                         byte[] sourceImage = brImages.ReadBytes(28 * 28);
-                        BackgroundWorkerHelper.FormPixelsByThreshold(InputDataBuf, pixels, sourceImage, 190);
+                        if (gameFlag) //переключение на игру
+                        {
+                            pixels = game.MoveGame(baseСoordinate);
+                        }
+                        else
+                        {
+                            BackgroundWorkerHelper.FormPixelsByThreshold(InputDataBuf, pixels, sourceImage, 190);
+                        }
+
                         b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
                         b2 = new Bitmap(b2, new Size(12, 12));
                         BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
                     }// Конец подготовки изображения
 
                     Index = (int)brLabels.ReadByte();// Индекс изображения для обучения
+                    if (gameFlag) // При переключении на игру
+                    {
+                        Index = game.bollСoordinate;
+                    }
 
                     if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
                     {
@@ -278,17 +295,17 @@ namespace MNIST
                         Xb = X;
                         Yb = Y;
 
-                        for (int i = 0; i < InputData.Count; i++)
-                        {
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 0;
-                            }
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 1;
-                            }
-                        }
+                        //for (int i = 0; i < InputData.Count; i++)
+                        //{
+                        //    if (rnd.Next(0, 9) > 8)
+                        //    {
+                        //        InputData[i] = 0;
+                        //    }
+                        //    if (rnd.Next(0, 9) > 8)
+                        //    {
+                        //        InputData[i] = 1;
+                        //    }
+                        //}
 
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
@@ -320,6 +337,18 @@ namespace MNIST
                         DrawNumberHistogram(Index, IndexList);
                         DrawActivityHistogram(Index, counter);
                     }
+
+                    int IndexLisBuf = 0;//поиск самой активной группы, для определения координаты платформы
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (IndexList[i] > IndexLisBuf)
+                        {
+                            IndexLisBuf = IndexList[i];
+                            baseСoordinate = i;//результат поиска
+                        }
+
+                    }
+
                     int indexVar = IndexList[Index];
                     bool indexBool = false;
                     for (int i = 0; i < 10; i++)
@@ -509,14 +538,23 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (y1 <= 25)
-                    {
-                        chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
-                    }
+                    //if (y1 <= 25)
+                    //{
+                    chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
+                    //if (chart1.Series["Y"].Points.Count>200)
+                    //{
+                    //    chart1.Series["Y"].Points.RemoveAt(0);
+                    //}
+                    
+                    // }
 
                     if (greenToBlackRatio > 0)
                     {
                         chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio);
+                        //if (chart1.Series["N"].Points.Count > 200)
+                        //{
+                        //    chart1.Series["N"].Points.RemoveAt(0);
+                        //}
                     }
                 }
                 if (get_files == false)

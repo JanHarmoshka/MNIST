@@ -15,16 +15,28 @@ public static class BackgroundWorkerHelper
                 InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения                                                                    
             }
         }
-
-        { //Дабавление перефирийное зрение к входящиму вектору
-            for (int i = 0; i < 12; ++i)
+        for (int i = 0; i < focusSize; ++i)//дублирование
+        {
+            for (int j = 0; j < focusSize; ++j)
             {
-                for (int j = 0; j < 12; ++j)
-                {
-                    InputData.Add(peripheralArray[j, i] > 200 ? 0 : 1);
-                }
+                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения                                                                    
             }
         }
+
+        for (int i = 0; i < 12; ++i)//Дабавление перефирийное зрение к входящиму вектору
+        {
+            for (int j = 0; j < 12; ++j)
+            {
+                InputData.Add(peripheralArray[j, i] > 200 ? 0 : 1);
+            }
+        }
+        //for (int i = 0; i < 12; ++i)//дублирование
+        //{
+        //    for (int j = 0; j < 12; ++j)
+        //    {
+        //        InputData.Add(peripheralArray[j, i] > 200 ? 0 : 1);
+        //    }
+        //}        
     }
 
     public static byte[,] CreateFocusArray(int X, int Y, byte[,] pixels, int focusSize)
@@ -74,7 +86,7 @@ public static class BackgroundWorkerHelper
 
 public enum WorkMode
 {
-    Recording, 
+    Recording,
     Reproducing,
     Default
 }
