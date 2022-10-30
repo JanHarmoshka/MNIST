@@ -39,6 +39,7 @@ namespace MNIST
         public int X { get; private set; }
         public int Y { get; private set; }
         private int wayMax = 256; //TODO: подумать ещё над именем. Здесь должно быть что-то вроде maxFocusWayTrace, но, быть может, покороче. 
+        private int wayMin = 255;
 
         public List<byte> InputData = new List<byte>(); //TODO: Возможно, удалить лишние вызовы Clear. 
         private const int focusFieldSize = 28; //Размер поля. 
@@ -46,7 +47,7 @@ namespace MNIST
         private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
         private readonly int lowerLimit = 0;
-        private readonly int upperLimit = 23;
+        private readonly int upperLimit = 28;
         private readonly int proportions = 7;
 
         private Random rnd = new Random();
@@ -127,7 +128,7 @@ namespace MNIST
             X = XY.Item1;
             Y = XY.Item2;
 
-            BackXYBufInLimits(rnd, XYBuf);
+            //BackXYBufInLimits(rnd, XYBuf);
 
             UpdateXY();
 
@@ -136,7 +137,7 @@ namespace MNIST
                 way[X + 2, Y + 2] += 1;
                 if (wayMax < way[X + 2, Y + 2])
                 {
-                    wayMax = way[X + 2, Y + 2];
+                    wayMax = way[X + 2, Y + 2] + 1;
                 }
 
 
@@ -151,19 +152,24 @@ namespace MNIST
                             if (way[i, j] > 0)
                             {
                                 way[i, j] = 256 - wayByte[i, j];
+                                if (wayByte[i, j] < wayMin && wayByte[i, j] > 10)
+                                {
+                                    wayMin = wayByte[i, j];
+                                }
                             }
 
                         }
                     }
                     if (meter == 0)
                     {
-                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, false);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, wayMin + 10, false);
                     }
                     else
                     {
-                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, true);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, wayMin + 10, true);
                     }
                     wayMax = 256;
+                    wayMin = 256;
                     meter = 100;
                 }
             }
@@ -175,8 +181,8 @@ namespace MNIST
                 if (IsColoured)
                 {
                     InitializeCoordinates(rnd, Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти
-                    XYBuf[0] = X;
-                    XYBuf[1] = Y;
+                    //XYBuf[0] = X;
+                    //XYBuf[1] = Y;
                 }
                 else
                 {
@@ -274,11 +280,11 @@ namespace MNIST
         /// <param name="rnd"></param>
         private void ShakeXYBuf(Random rnd, int[] XYBuf)
         {
-            if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 10)
+            if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 20)
             {
                 waiting = 0;
-                XYBuf[0] = rnd.Next(lowerLimit + 1, upperLimit - 1);
-                XYBuf[1] = rnd.Next(lowerLimit + 1, upperLimit - 1);
+                XYBuf[0] = upperLimit - rnd.Next(lowerLimit, upperLimit);
+                XYBuf[1] = upperLimit - rnd.Next(lowerLimit, upperLimit);
             }
             waiting++;
         }
@@ -376,7 +382,7 @@ namespace MNIST
     /// </summary>
     class BitmapMaker
     {
-        public static Bitmap MakeGreyBitmap(byte[,] pixels, int X, int Y, bool isRectDrawn = true)
+        public static Bitmap MakeGreyBitmap(byte[,] pixels, int X, int Y, int wayMin, bool isRectDrawn = true)
         {
             int mag = 10;
             int width = 28 * mag;
@@ -384,16 +390,16 @@ namespace MNIST
             byte Color_grey;
             Bitmap result = new Bitmap(width, height);
             Graphics gr = Graphics.FromImage(result);
-            gr.Clear(Color.FromArgb(255, 255, 255));
+            //gr.Clear(Color.FromArgb(255, 255, 255));
             SolidBrush sb = new SolidBrush(Color.FromArgb(0, 0, 0));
             for (int i = 0; i < 28; ++i)
             {
                 for (int j = 0; j < 28; ++j)
                 {
-                    if (pixels[i, j] > 0)
+                    if (pixels[i, j] > 0 && pixels[i, j] < 230)
                     {
                         Color_grey = pixels[i, j];
-                        sb.Color = Color.FromArgb(256 - Color_grey, 100, Color_grey);//красное чаще, синие реже
+                        sb.Color = Color.FromArgb(255 - Color_grey, 100, Color_grey);//красное чаще, синие реже
                         gr.FillRectangle(sb, j * mag, i * mag, mag, mag);
                     }
                 }

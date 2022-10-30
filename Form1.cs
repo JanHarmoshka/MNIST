@@ -24,7 +24,6 @@ namespace MNIST
         public float BlackCount = 0;
         public float GreenCount = 0;
         double greenToBlackRatio = 0;
-        string writePath = "";
         // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
         // нет ли ошибки в выставлении этого флага. 
         //private WorkMode mode = WorkMode.Default;
@@ -72,7 +71,6 @@ namespace MNIST
 
         //string[] setting = new string[2];
         bool sessionFlag = false;
-        bool gameFlag = true;// штатно false
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -80,7 +78,8 @@ namespace MNIST
 
         private Harmoshka Harmoshka;
         BackgroundWorker worker;
-        bool get_files = false;
+        byte minWoll = 0;
+        int WollError = 0;
 
         //TODO: очень длинно, рефакторить. А не хочу ли я вынести это в отдельный класс? Явно же здесь логика. Done, вынес в класс-помощник. 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -91,14 +90,13 @@ namespace MNIST
             List<float> inter_result = new List<float>();
             int Index = 0;
             List<bool> scroll = new List<bool>();
-            //List<float> List_get_files_end = new List<float>();
             Counter counter = new Counter();
-            //List<float> InputData_ = new List<float>();
 
             List<float> InputData = new List<float>();
             List<byte> InputDataBuf = new List<byte>();
-            byte[] IndexList = new byte[10];
+            byte[] IndexList = new byte[14];
             bool Eror_Bool;
+            int NumberGames = 0;
 
             int X = 7;
             int Y = 7;
@@ -113,28 +111,16 @@ namespace MNIST
             float semblance = 20;
 
             int baseСoordinate = 5;
+            int baseСoordinateBuf = -1;
 
             sw.Start();
             // проход по файлам данных
             for (int l = 0; l < 100; l++)
             {
 
-                FileStream ifsPixels = new FileStream(images, FileMode.Open);
-                FileStream ifsLabels = new FileStream(labels, FileMode.Open);
-
-                BinaryReader brImages = new BinaryReader(ifsPixels);
-                BinaryReader brLabels = new BinaryReader(ifsLabels);
-
-                //Используется исключительно для сдвига указателя в файлах с заголовка на собственно данные,
-                //заголовок не используется, поэтому функция ничего не возвращает. Вместо этого можно написать
-                //ifsPixels.Position = 16; ifsLabels.Position = 8;
-                //где 16 - длина заголовка файла с изображениями (4 раза по int32), 8 - длина заголовка файла с индексами (2 int32). 
-                ReadHeader(brImages, brLabels);
-
                 Random rnd = new Random();
                 Bitmap bitMap;
                 Bitmap bitMap_;
-                //Bitmap bitMap4;
                 Bitmap b2 = new Bitmap(10, 10);
 
                 byte[,] pixelsBuf = new byte[28, 28];
@@ -178,44 +164,40 @@ namespace MNIST
                     if (worker.CancellationPending == true)
                     {
                         e.Cancel = true;
-                        ifsPixels.Close();
-                        ifsLabels.Close();
                         return;
                     }
 
-                    if (di % 200 == 0) // Частота прорисовки графиков
+                    if (di % 500 == 0) // Частота прорисовки графиков
                     {
                         worker.ReportProgress(0);
                     }
 
                     {//Подготовка изображения для загрузки в нейронную сеть
 
-                        byte[] sourceImage = brImages.ReadBytes(28 * 28);
-                        if (gameFlag) //переключение на игру
+                        if (minWoll == 0)
                         {
-                            pixels = game.MoveGame(baseСoordinate);
+                            game.minWoll = 6;//22 количество блоков
+                            NumberGames++;
                         }
-                        else
-                        {
-                            BackgroundWorkerHelper.FormPixelsByThreshold(InputDataBuf, pixels, sourceImage, 190);
-                        }
+                        pixels = game.MoveGame(baseСoordinate);
 
                         b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
                         b2 = new Bitmap(b2, new Size(12, 12));
                         BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
                     }// Конец подготовки изображения
 
-                    Index = (int)brLabels.ReadByte();// Индекс изображения для обучения
-                    if (gameFlag) // При переключении на игру
+                    Index = game.bollСoordinate;
+                    if (game.woll == 0)
                     {
-                        Index = game.bollСoordinate;
+                        minWoll = game.minWoll;
                     }
 
                     if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
                     {
-                        Harmoshka.Message += String.Format(">>>{0:000}% ", (bb / 600.001f)) + allError;
-                        Harmoshka.Message += String.Format(" {00:00.00}", sw.ElapsedMilliseconds / 1000.0f) + "c." + "\r\n";
+                        Harmoshka.Message += String.Format(">>{0:000}% ", (bb / 600.001f)) + "Сыграно:" + NumberGames;
+                        Harmoshka.Message += String.Format(" {00:00.0}", sw.ElapsedMilliseconds / 1000.0f) + "c" + "\r\n" + "\r\n";
                         sw.Restart();
+                        NumberGames = 0;
                     }
 
                     bb++;
@@ -282,10 +264,6 @@ namespace MNIST
                                 label16.Text = "Повторение символа: " + ll.ToString();
                                 label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
                             });
-                            //if (col)
-                            //{
-                            //    Thread.Sleep(2000);
-                            //}
                         }
                         if (preparation_input.DrawFocusField)
                         {
@@ -295,18 +273,17 @@ namespace MNIST
                         Xb = X;
                         Yb = Y;
 
-                        //for (int i = 0; i < InputData.Count; i++)
-                        //{
-                        //    if (rnd.Next(0, 9) > 8)
-                        //    {
-                        //        InputData[i] = 0;
-                        //    }
-                        //    if (rnd.Next(0, 9) > 8)
-                        //    {
-                        //        InputData[i] = 1;
-                        //    }
-                        //}
-
+                        for (int i = 0; i < InputData.Count; i++)
+                        {
+                            if (rnd.Next(0, 9) > 8)
+                            {
+                                InputData[i] = 0;
+                            }
+                            if (rnd.Next(0, 9) > 8)
+                            {
+                                InputData[i] = 1;
+                            }
+                        }
                         for (int i = 0; i < preparation_input.InputData.Count; i++)
                         {
                             InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
@@ -314,7 +291,7 @@ namespace MNIST
 
                         try
                         {
-                            counter = Harmoshka.Assessment(28 * 28, InputData, semblance, Index);
+                            counter = Harmoshka.Assessment(784, InputData, semblance);//, game.bollСoordinate
                         }
                         catch (Exception ex)
                         {
@@ -326,10 +303,19 @@ namespace MNIST
                         {
                             Eror_Bool = false;
                         }
-                        IndexList[counter.Index]++;
+                        int p = (int)(Math.Round(Y / 1.7f) - 3);
+                        if (p < 0)
+                        {
+                            p = 0;
+                        }
+                        if (p > 9)
+                        {
+                            p = 9;
+                        }
+                        IndexList[p]++;
                         ll++;
                     }
-                    while ((ll < 25 || Eror_Bool) && ll < 50);//
+                    while (ll < 50);//(ll < 25 || Eror_Bool) && (ll < 50)
 
 
                     if (TabPagesBool)
@@ -349,17 +335,21 @@ namespace MNIST
 
                     }
 
+                    baseСoordinateBuf = baseСoordinate;
+
                     int indexVar = IndexList[Index];
+                    int sunset = 0;
                     bool indexBool = false;
                     for (int i = 0; i < 10; i++)
                     {
                         if (IndexList[i] > indexVar)
                         {
                             indexBool = true;
+                            sunset++;
                         }
                         IndexList[i] = 0;
                     }
-                    if (!indexBool)
+                    if ((!indexBool || sunset < 2) & indexVar != 0)//
                     {
                         allError--;
                         all[all.Count - 1] = 0;
@@ -378,40 +368,19 @@ namespace MNIST
                         all.RemoveAt(0);
                     }
 
+                    if (minWoll == 0 & game.woll == 0)
+                    {
+                        WollError++;
+                    }
                 }
-                if (Harmoshka.SleepStep < 200)
-                {
-                    Harmoshka.SleepStep += 5;
-                }
+                //if (Harmoshka.SleepStep < 200)
+                //{
+                //    Harmoshka.SleepStep += 5;
+                //}
 
-                ifsPixels.Close();
-                brImages.Close();
-                ifsLabels.Close();
-                brLabels.Close();
                 InputData.Clear();
                 InputData.TrimExcess();
             }
-        }
-
-        //TODO: написать функцию, которая просто смещает указатель, и сослаться на неё в комментарии. Done. 
-        private static void ReadHeader(BinaryReader brImages, BinaryReader brLabels)
-        {
-            int magic1 = brImages.ReadInt32();
-            magic1 = ReverseBytes(magic1);
-
-            int imageCount = brImages.ReadInt32();
-            imageCount = ReverseBytes(imageCount);
-
-            int numRows = brImages.ReadInt32();
-            numRows = ReverseBytes(numRows);
-            int numCols = brImages.ReadInt32();
-            numCols = ReverseBytes(numCols);
-
-            int magic2 = brLabels.ReadInt32();
-            magic2 = ReverseBytes(magic2);
-
-            int numLabels = brLabels.ReadInt32();
-            numLabels = ReverseBytes(numLabels);
         }
 
         private void DrawActivityHistogram(int Index, Counter counter) //TODO: уточнить, что именно здесь рисуется. Done. 
@@ -507,7 +476,10 @@ namespace MNIST
         {
             if (e.ProgressPercentage == 0)
             {
-                double y1 = allError / 600f;
+                double y1 = (double)(WollError);
+                label18.Text = y1.ToString();
+                minWoll = 0;
+
 
                 if (BlackCount > 0)
                 {
@@ -524,12 +496,7 @@ namespace MNIST
                 BlackCount = 0;
                 GreenCount = 0;
 
-                if (nn < 60000)
-                {
-                    y1 = 100 - (((nn - allError) / 600f) / (nn / 600f)) * 100;
-                }
-                writePath = String.Format("{0:00.00}%", y1) + "\r\n" + writePath;
-                label18.Text = writePath;
+
 
                 if (series == null)
                 {
@@ -538,30 +505,11 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    //if (y1 <= 25)
-                    //{
-                    chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
-                    //if (chart1.Series["Y"].Points.Count>200)
-                    //{
-                    //    chart1.Series["Y"].Points.RemoveAt(0);
-                    //}
-                    
-                    // }
-
                     if (greenToBlackRatio > 0)
                     {
                         chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio);
-                        //if (chart1.Series["N"].Points.Count > 200)
-                        //{
-                        //    chart1.Series["N"].Points.RemoveAt(0);
-                        //}
+                        chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
                     }
-                }
-                if (get_files == false)
-                {
-                    Consol.Text += "Файл изображения " + images + "\r\n";
-                    Consol.Text += "Файл индексов " + labels + "\r\n";
-                    get_files = true;
                 }
                 return;
             }
@@ -775,7 +723,6 @@ namespace MNIST
                 chart1.Series[0].Points.Clear();
                 chart2.Series[0].Points.Clear();
                 backgroundWorker1.RunWorkerAsync();
-                button2.Enabled = false;
                 button4.Text = "Стоп";
                 sessionFlag = true;
             }
@@ -796,7 +743,6 @@ namespace MNIST
                         }
                         if (obj is TextBox) obj.Enabled = true;
                     }
-                    button2.Enabled = true;
                     button4.Text = "Запись";
                     sessionFlag = false;
                 }
@@ -828,7 +774,6 @@ namespace MNIST
                 chart2.Series[0].Points.Clear();
                 backgroundWorker1.RunWorkerAsync(); //запуск потока
                 button4.Enabled = false;
-                button2.Text = "Стоп";
                 sessionFlag = false;
             }
             else if (backgroundWorker1.WorkerSupportsCancellation == true)
@@ -847,7 +792,6 @@ namespace MNIST
                     if (obj is TextBox) obj.Enabled = true;
                 }
                 button4.Enabled = true;
-                button2.Text = "Воспроизведение";
                 sessionFlag = true;
             }
         }

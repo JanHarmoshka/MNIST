@@ -7,16 +7,20 @@ namespace MNIST
     class Clearing
     {
         //public string message;
-        public Clearing(List<Matte> mattes, List<ReverseMatte> reverseMattes, float satiety)
+        public Clearing(List<Matte> mattes, List<ReverseMatte> reverseMattes, float satiety, int Matteselect)
         {
             List<int> empty = new List<int>();
             for (int j = 0; j < mattes.Count; j++)
             {
                 //TODO: числа с плавающей запятой сравниваются на точное равенство, скорее всего, нужно заменить на сравнение с точностью до машинного эпсилон. 
-                if ((mattes[j].Control_value <= 0) || (mattes[j].appeal < satiety && mattes[j].Control_value < 200))
+                if (!mattes[j].elect)
                 {
-                    empty.Add(j);
+                    if ((mattes[j].Control_value <= 0) || (mattes[j].appeal < satiety && mattes[j].Control_value < 220) || mattes[j].ActivityFrequency > 10000)
+                    {
+                        empty.Add(j);
+                    }
                 }
+
             }
 
             if (empty.Count > 0)
@@ -40,11 +44,20 @@ namespace MNIST
 
             for (int j = 0; j < reverseMattes.Count; j++)
             {
-                if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
-                    || reverseMattes[j].Correct.Count < mattes.Count * 0.1f || reverseMattes[j].ActivityFrequency > 1000)
+                if (!reverseMattes[j].elect || reverseMattes[j].Correct.Count < 1)
                 {
-                    empty.Add(j);
+
+                    if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
+                        || reverseMattes[j].Correct.Count < mattes.Count * 0.1f || reverseMattes[j].ActivityFrequency > 1000)
+                    {
+                        if (reverseMattes[j].elect)
+                        {
+                            Matteselect--;
+                        }
+                        empty.Add(j);
+                    }
                 }
+
             }
             if (empty.Count > 0)
             {
@@ -60,8 +73,10 @@ namespace MNIST
 
     class Correction
     {
-        public Correction(int inputDataCount, List<ReverseMatte> reverseMattes, List<float> firstAssessment, List<float> secondAssessment, float[] interData, float semblance)
+        public float participation;
+        public Correction(int inputDataCount, List<ReverseMatte> reverseMattes, List<float> firstAssessment, List<float> secondAssessment, float[] interData, float semblance, List<int> indexData_)
         {
+            participation = 4;
             if (secondAssessment.Count < firstAssessment.Count)
             {
                 for (int i = secondAssessment.Count; i < firstAssessment.Count; i++)
@@ -81,9 +96,26 @@ namespace MNIST
                             interData[i] += reverseMattes[j].matte[i] * VFirst_;
                         }
                     }
-
+                    if (VFirst_ > 0)
+                    {
+                        reverseMattes[j].participation++;
+                        if (participation <= reverseMattes[j].participation)
+                        {
+                            participation = reverseMattes[j].participation;
+                            indexData_.Add(j);
+                        }
+                    }
+                    else
+                    {
+                        reverseMattes[j].participation = 0;
+                    }
                 }
             }
+            if (indexData_.Count == 0)
+            {
+                indexData_.Add(-1);
+            }
+
         }
     }
 
@@ -197,6 +229,15 @@ namespace MNIST
                     {
                         interResult.Add(0);
                     }
+                    if (Activ <= 0)
+                    {
+                        mattes[i].ActivityFrequency++;
+                    }
+                    else
+                    {
+                        mattes[i].ActivityFrequency = 0;
+                    }
+
                 }
                 Activ = maxAxtiv;
             }
@@ -427,7 +468,7 @@ namespace MNIST
             for (int i = 0; i < reverseMattes.Count; i++)
             {
                 int arrayCorrectLength = reverseMattes[i].Correct.Count;
-                if (reverseMattes[i].appeal_ >= 0 && reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)
+                if (reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)//reverseMattes[i].appeal_ >= 0 &&
                 {
                     for (int j = 0; j < firstContractionInterResultCount; j++)
                     {
@@ -527,7 +568,7 @@ namespace MNIST
                     for (int i = reverseMattes.Count / TaskCount * num; i < reverseMattes.Count / TaskCount * (num + 1); i++)
                     {
                         int arrayCorrectLength = reverseMattes[i].Correct.Count;
-                        if (reverseMattes[i].appeal_ >= 0 && reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)
+                        if (reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)//reverseMattes[i].appeal_ >= 0 &&
                         {
                             for (int j = 0; j < firstContractionInterResultCount; j++)
                             {

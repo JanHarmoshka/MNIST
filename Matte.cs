@@ -7,18 +7,22 @@ namespace MNIST
     [Serializable]
     public class Matte
     {
+        public int ActivityFrequency = 0;
+
         public int room;
         public float appeal;
         public bool Contraction;
         public bool Contraction_;
         public int Control_value;
         public int SleepStep;
+        public bool elect;
         readonly List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
 
-        public Matte(List<float> InputData, ushort Room, float satiety = 0.4f)
+        public Matte(List<float> InputData, ushort Room, float satiety = 0.4f, bool elect_ = false)
         {
             room = Room;
+            elect = elect_;
             mask = InputData.GetRange(0, InputData.Count);
             for (int i = 0; i < mask.Count; i++)
             {
@@ -73,7 +77,7 @@ namespace MNIST
             {
                 if (summ_0 < 0.3f)//0.6
                 {
-                    if (Control_value > 0)
+                    if (Control_value > 0 && !elect)
                     {
                         Control_value--;
                         Contraction_ = true;
@@ -134,17 +138,21 @@ namespace MNIST
         public bool Contraction_;
         readonly float appeal;
         public float appeal_;
+        public float participation;
+        public bool elect;
         readonly List<float> mask = new List<float>();
         public List<float> matte = new List<float>();
         public List<float> Refined = new List<float>();
         public List<float> Correct = new List<float>();
         public List<float> Appeal = new List<float>();
 
-        public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, int nn, float satiety = 0.3f)
+        public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, int nn, float satiety = 0.3f, bool elect_ = false)
         {
             appeal = satiety;
             appeal_ = 0.0f;
             room = IndexData;
+            elect = elect_;
+            participation = 0;
             //mask = InputData.GetRange(0, InputData.Count);
             //Refined = inter_result.GetRange(0, inter_result.Count);
             Live = nn;
@@ -275,7 +283,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 && appeal_ < 0.99f)//0,8
+                if (Control_value > 0 && appeal_ < 0.99f && !elect)//0,8
                 {
                     Control_value--;
                     Contraction_ = true;

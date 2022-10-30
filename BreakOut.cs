@@ -11,9 +11,10 @@ namespace MNIST
         private readonly List<int[]> trail = new List<int[]>();
         private readonly int[] ballСhange = { 0, 1 };
         private readonly int[,] Word = new int[11, 11];
-        private byte bas = 5;
+        public byte bas = 5;
         private byte basBuf = 5;
-        private byte woll = 0;
+        public byte woll = 0;
+        public byte minWoll = 0;
 
         private System.Random rnd = new Random();
 
@@ -23,25 +24,31 @@ namespace MNIST
             if (woll == 0)//Начало новой игры
             {
                 bas = 5;
-                woll = 22;
+                woll = 6;//22
                 trail.Clear(); //стираю след мяча
                 boll[0] = 5;
                 boll[1] = 1;
                 ballСhange[0] = 0;
                 ballСhange[1] = 1;
-                for (int i = 0; i < 11; i++)
-                {
-                    Word[i, 6] = 1;
-                    Word[i, 9] = 1;
-                }
-                for (int i = 0; i < 3; i++)
-                {
-                    Word[i * 3 + 2, 7] = 1;
-                    Word[i * 3 + 1, 8] = 1;
-                }
+                //for (int i = 0; i < 11; i++) // Ряд блоков
+                //{
+                //    Word[i, 6] = 1;
+                //    Word[i, 9] = 1;
+                //}
+                //for (int i = 0; i < 3; i++) // Ряд блоков
+                //{
+                //    Word[i * 3 + 2, 6] = 1;
+                //    Word[i * 3 + 2, 8] = 1;
+                //}
+                Word[2, 6] = 1; Word[5, 6] = 1; Word[8, 6] = 1;
+                Word[2, 8] = 1; Word[6, 8] = 1; Word[8, 8] = 1;
             }
             else
             {
+                if (Math.Abs(X - bas) > 2)
+                {
+                    X = Math.Abs(X - bas) / (X - bas) + basBuf;
+                }
                 bas = (byte)X;
                 if (bas < 2 || bas > 8)
                 {
@@ -62,12 +69,28 @@ namespace MNIST
                 {
                     Word[boll[0], boll[1]] = 0;
                     woll--;
+                    if (woll == 0)
+                    {
+                        ;
+                    }
+                    if (woll < 3)
+                    {
+                        ;
+                    }
+                    if (woll < 4)
+                    {
+                        ;
+                    }
+                    if (woll < minWoll)
+                    {
+                        minWoll = woll;
+                    }
                 }
 
                 boll[0] = ballСhange[0] + boll[0];//смена траектории от касания
                 boll[1] = ballСhange[1] + boll[1];
                 trail.Add((int[])boll.Clone());
-                if (trail.Count > 15)
+                if (trail.Count > 7)
                 {
                     trail.RemoveAt(0);
                 }
@@ -108,12 +131,12 @@ namespace MNIST
             }
 
             bollСoordinate = (byte)boll[0];
-            if (bollСoordinate < 2 || bollСoordinate > 8)
+            if (bollСoordinate < 0 || bollСoordinate > 9)
             {
                 bollСoordinate = bollСoordinateBuf;
             }
             bollСoordinateBuf = bollСoordinate;
-
+            ////boll[0] = bollСoordinate + 1;
 
 
             byte a = (byte)rnd.Next(2);
@@ -126,10 +149,10 @@ namespace MNIST
                 {
                     if (Word[i, j] == 1)
                     {
-                        //pixels[i * 2 + 3, j * 2 + 3] = 1;
+                        pixels[i * 2 + 3 + a, j * 2 + 3 + b] = 1;
                         pixels[i * 2 + 3 + a, j * 2 + 4 + b] = 1;
                         pixels[i * 2 + 4 + a, j * 2 + 3 + b] = 1;
-                        //pixels[i * 2 + 4, j * 2 + 4] = 1;
+                        pixels[i * 2 + 4 + a, j * 2 + 4 + b] = 1;
                     }
                 }
             }
@@ -137,22 +160,27 @@ namespace MNIST
             for (int i = 0; i < trail.Count; i++) // траектория мяча
             {
                 pixels[trail[i][0] * 2 + 3 + a, trail[i][1] * 2 + 3 + b] = 1;//мячь
-                //pixels[trail[i][0] * 2 + 3 + a, trail[i][1] * 2 + 4 + b] = 1;
-                //pixels[trail[i][0] * 2 + 4 + a, trail[i][1] * 2 + 3 + b] = 1;
+                pixels[trail[i][0] * 2 + 3 + a, trail[i][1] * 2 + 4 + b] = 1;
+                pixels[trail[i][0] * 2 + 4 + a, trail[i][1] * 2 + 3 + b] = 1;
                 pixels[trail[i][0] * 2 + 4 + a, trail[i][1] * 2 + 4 + b] = 1;
+                if (i == trail.Count - 1)
+                {
+                    pixels[trail[i][0] * 2 + 4 + a, trail[i][1] * 2 + 3 + b] = 0;
+                    pixels[trail[i][0] * 2 + 3 + a, trail[i][1] * 2 + 4 + b] = 0;
+                }
             }
 
-            pixels[bas * 2 + 3 + a, 2 + b] = 1;//платформа
+            pixels[bas * 2 + 3 + a, 3 + b] = 1;//платформа
             pixels[bas * 2 + 3 + a, 4 + b] = 1;
-            pixels[bas * 2 + 4 + a, 2 + b] = 1;
+            pixels[bas * 2 + 4 + a, 3 + b] = 1;
             pixels[bas * 2 + 4 + a, 4 + b] = 1;
-            pixels[(bas - 1) * 2 + 3 + a, 2 + b] = 1;
+            pixels[(bas - 1) * 2 + 3 + a, 3 + b] = 1;
             pixels[(bas - 1) * 2 + 3 + a, 4 + b] = 1;
-            pixels[(bas - 1) * 2 + 4 + a, 2 + b] = 1;
+            pixels[(bas - 1) * 2 + 4 + a, 3 + b] = 1;
             pixels[(bas - 1) * 2 + 4 + a, 4 + b] = 1;
-            pixels[(bas + 1) * 2 + 3 + a, 2 + b] = 1;
+            pixels[(bas + 1) * 2 + 3 + a, 3 + b] = 1;
             pixels[(bas + 1) * 2 + 3 + a, 4 + b] = 1;
-            pixels[(bas + 1) * 2 + 4 + a, 2 + b] = 1;
+            pixels[(bas + 1) * 2 + 4 + a, 3 + b] = 1;
             pixels[(bas + 1) * 2 + 4 + a, 4 + b] = 1;
 
             return pixels;
