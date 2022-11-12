@@ -31,14 +31,14 @@ namespace MNIST
         public List<ReverseMatte> ReverseMattes = new List<ReverseMatte>();
         readonly List<float> inter_result_ = new List<float>(); //TODO: уточнить, что это именно, и переименовать соответствующе. 
 
-        //TODO: здесь и ниже переделать в свойства. Done. 
-        public int ErrorCount { get; set; } = 60000;//Количество элементов. TODO: Сменить название. Done, но, возможно, нужно будет поменять ещё раз, пока просто исправил орфографию. Done дважды, переименовал. 
 
-        public bool LessonTrigger { get; set; } = false; //TODO: Переименовать. Done. 
+        public int ErrorCount { get; set; } = 60000;//Количество элементов. 
+
+        public bool LessonTrigger { get; set; } = false;
 
         public float Satiety { get; set; } = 0.15f; //Порог жизни маски
 
-        public float CorrectionThreshold { get; set; } = 0.5f;//Порог коррекции входа. TODO: возможно, сменить название здесь и ниже для прочих V. 
+        public float CorrectionThreshold { get; set; } = 0.5f; 
 
         public float V2 { get; set; } = 0.7f;//Мах возраст участия
 
@@ -53,7 +53,7 @@ namespace MNIST
         private readonly List<float> firstAssessment = new List<float>();
         private readonly List<float> secondAssessment = new List<float>();
 
-        private int assessmentCounter = 0; //TODO: Уточнить, зачем нужны переменные nn, nnn и nnnbuf, и переименовать соответственно. Done. 
+        private int assessmentCounter = 0;
         private int reverseMatteCounter;
 
         private List<float> interResult = new List<float>();
@@ -63,7 +63,7 @@ namespace MNIST
 
         private float Reverse_appeal_max = 0.65f;
         private float Reverse_Control_value_max = 43.0f;
-        private float Mattes_Activ_max = 1.05f;
+        private float Mattes_Activ_max = 1.01f;
         private float Mattes_appeal_max = 0.7009f;
         private int Mattes_Control_value_max = 243;
 
@@ -79,8 +79,6 @@ namespace MNIST
         private float Mattes_appeal_max__ = 0;
         private int Mattes_Control_value_max__ = 0;
 
-        //TODO: вытащить в конструктор и создать глобальную константу TaskCount. 
-        //Также TODO: Инициализировать списки каким-нибудь Capacity. 
         private InternalActivityMasksArgs internalActivityMasksArgs = new InternalActivityMasksArgs()
         {
             interResults = new List<List<float>>()
@@ -90,11 +88,8 @@ namespace MNIST
             secondContractionInterResults = new List<List<int>>()
             { new List<int>(1000), new List<int>(1000), new List<int>(1000), new List<int>(1000) }
         };
-        //TODO: длинновато, декомпозировать. Done. 
         public Counter Assessment(int dispenser, List<float> inputData, float semblance, int indexData = -1)
         {
-            //TODO: функция вызывается внутри тройного цикла, возможно, нужно убрать создание списков наружу и переиспользовать заранее созданные. Done. 
-            //также TODO: привести нейминг списков к единообразному виду. Done. 
             interResult.Clear();
             contractionInputData.Clear();
             firstContractionInterResult.Clear();
@@ -112,17 +107,17 @@ namespace MNIST
             if (assessmentCounter % MemoryDuration == 0)
             {
 
-                _ = new Clearing(Mattes, ReverseMattes, Satiety, Matteselect); //TODO: заменить на символ удаления. Done.                
+                _ = new Clearing(Mattes, ReverseMattes, Satiety, Matteselect);
             }
 
             float[] interData = inputData.ToArray();
             int inputDataCount = interData.Length;
 
-            //Коррекция сигнала от сенсоров 
+            //Коррекция входящего сигнала 
             if (inputDataCount > 0 && ReverseMattes.Count > 0 && firstAssessment.Count > 0)
             {
 
-                _ = new Correction(inputDataCount, ReverseMattes, firstAssessment, secondAssessment, interData, semblance, indexData_); //TODO: заменить на символ удаления. Done. 
+                _ = new Correction(inputDataCount, ReverseMattes, firstAssessment, secondAssessment, interData, semblance, indexData_);
                 indexData = indexData_[0];
             }
             // Порог минимального значения после коррекции
@@ -132,8 +127,7 @@ namespace MNIST
 
             for (int i = inputDataCount - dispenser; i < inputDataCount; i++)
             {
-                //TODO: заменить на тетрарный оператор. Done. 
-                counter.inter_Data_.Add(interData[i] > 1.0f ? (byte)1 : (byte)0); //TODO: уточнить, почему сравнивается с единицей. 
+                counter.inter_Data_.Add(interData[i] > 1.0f ? (byte)1 : (byte)0);
             }
 
             counter.summ = 0;
@@ -141,23 +135,22 @@ namespace MNIST
             int l = 0;
             for (int i = inputDataCount - dispenser + 1; i < inputDataCount; i++)
             {
-                if (interData[i] > 1.0f)
+                if (interData[i] > 1.0f) // сведения о наличии активности зрительных и моторных нейронов по отдельности
                 {
                     if (l < dispenser)
                     {
-                        counter.summ++; //TODO: здесь должно быть что-то вроде counter.summ = 2 * Dispencer - InputDataCount - 1, но с учётом inter_Data[i] > 1.0f.
+                        counter.summ++;
                     }
                     else
                     {
-                        counter.summ2++; //TODO: а здесь - что-то вроде counter.summ2 = 2 * (InputDataCount - Dispencer) + 1 с учётом того же условия. 
+                        counter.summ2++;
                     }
                 }
                 l++;
             }
             counter.inter_Data_Full.Clear();
-            for (int i = 0; i < inputDataCount; i++)
+            for (int i = 0; i < inputDataCount; i++)// сведения о активности зрительных и моторных нейронов по отдельности
             {
-                //TODO: заменить на тетрарный оператор. Done. 
                 counter.inter_Data_Full.Add(interData[i] > 1 ? (byte)1 : (byte)0);
             }
 
@@ -179,18 +172,15 @@ namespace MNIST
             };
             ActivityMasks activityMasks = new ActivityMasks(activityMasksArgs, internalActivityMasksArgs, inputDataCount, dispenser);
             float Activ_ = activityMasks.Activ_;
-            //int n;
+
             int Index = activityMasks.Index;
 
-            //Обучение масок
-            TeachMatte(inputData, Activ_, Index, Mattes);
-            //Конец обучения масок
+            TeachMatte(inputData, Activ_, Index, Mattes);//Обучение масок            
 
             //Расчёт активности результирующих масок отвечающих за зрение
             ActivityReverseMasks activityReverseMasks = CalculateReverseMasksActivity(interResult, firstContractionInterResult,
                                                                                       secondContractionInterResult, counter,
                                                                                       firstAssessment, secondAssessment);
-            //Конец расчёт активности результирующих масок  
 
             //Подсчет ошибки
             counter.str2 = false; //TODO: уточнить, что за str2. 
@@ -205,25 +195,20 @@ namespace MNIST
                 counter.Index = ReverseMattes[maxActivityIndex].room;
             }
 
-            //TODO: заменить на nn % 2000 == 0? 0_o
             if (assessmentCounter % 4000 == 0)//Вывод ошибки
             {
                 Message += "нейр:" + Mattes.Count.ToString() + "/" + Matteselect.ToString() + " гр:" + ReverseMattes.Count.ToString() + "/" + reverseMatteselect.ToString() + "\r\n";
-                //Message += "R/A " + Reverse_appeal_max_.ToString() + " R/C/V " + Reverse_Control_value_max_.ToString() + "\r\n";
-                //Message += "M/A " + Mattes_appeal_max_.ToString() + " M/C/V " + Mattes_Control_value_max_.ToString() + " Activ " + Mattes_Activ_max_ + "\r\n";
                 if (Reverse_appeal_max_ > 0 && Mattes_appeal_max_ > 0)
                 {
                     if (Reverse_appeal_max__ == Reverse_appeal_max_ && Reverse_Control_value_max__ == Reverse_Control_value_max_)
                     {
                         Reverse_appeal_max = Reverse_appeal_max_ - 0.001f;
-                        //Reverse_Control_value_max = Reverse_Control_value_max_;
                     }
                     if (Mattes_Activ_max__ == Mattes_Activ_max_ && Mattes_appeal_max__ == Mattes_appeal_max_ &&
                         Mattes_Control_value_max__ == Mattes_Control_value_max_ && reverseMatteselect > 10)
                     {
-                        Mattes_Activ_max = Mattes_Activ_max_ ;
-                        Mattes_appeal_max = Mattes_appeal_max_;
-                        //Mattes_Control_value_max = Mattes_Control_value_max_;
+                        Mattes_Activ_max = Mattes_Activ_max_;
+                        Mattes_appeal_max = Mattes_appeal_max_ - 0.01f;
                     }
                     Reverse_appeal_max__ = Reverse_appeal_max_;
                     Reverse_Control_value_max__ = Reverse_Control_value_max_;
@@ -243,7 +228,6 @@ namespace MNIST
             }
             else
             {
-                //TODO: свернуть условия if'ов в саму булеву переменную. Done. 
                 bool IndVarMin = (maxActivityIndex == -1) ||
                     (ReverseMattes[maxActivityIndex].appeal_ < 0.2f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f && Activ_ < 0.9f);
                 bool IndVarMax = (maxActivityIndex == -1) ||
@@ -269,12 +253,11 @@ namespace MNIST
 
                 }
 
-
-                if (firstAssessment.Count > 0 && (IndVarMin || IndVarMax || IndVarActiv))//(Activ_ < 0.7f || Ind == -1)
+                if (firstAssessment.Count > 0 && (IndVarMin || IndVarMax || IndVarActiv))
                 {
                     for (int i = 0; i < firstAssessment.Count; i++)
                     {
-                        firstAssessment[i] = 0;//.001f
+                        firstAssessment[i] = 0;
                     }
                     CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter, IndVarActiv);
                     maxActivityIndex = ReverseMattes.Count - 1;
@@ -298,10 +281,9 @@ namespace MNIST
                     TeachReverseMatte(inputData, indexData, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex);
                 }
             }
-
             //Конец обучения результирующей маски
 
-            //Начало фиксации обучения
+            //Фиксация обучения
             if (assessmentCounter % 10 == 0)
             {
                 FixLesson(pass, SleepStep, Mattes, ReverseMattes);
@@ -309,7 +291,7 @@ namespace MNIST
             return counter;
         }
 
-        private void TeachReverseMatte(List<float> inputData, //Эта функция извлечена чисто механически и, возможно, сама по себе требует рефакторинга. 
+        private void TeachReverseMatte(List<float> inputData,
                                        int dataIndex,
                                        List<float> interResult,
                                        ref bool correctTrigger,
@@ -324,13 +306,13 @@ namespace MNIST
             int roomIndex = -1;
             float roomAppeal = 0.9f;
             int roomLive = 0;
-            if (index > -1 && LessonTrigger && pass)// Принудительное исправление активнова индекса
+            if (index > -1 && LessonTrigger && pass)// Принудительное исправление активного индекса
             {
                 if (ReverseMattes[index].room != dataIndex && firstAssessment[index] > 0)
                 {
                     for (int i = 0; i < firstAssessment.Count; i++)
                     {
-                        if (i != index && firstAssessment[i] >= roomValue && ReverseMattes[i].appeal_ <= roomAppeal && ReverseMattes[i].Live > roomLive && ReverseMattes[i].room == dataIndex)//
+                        if (i != index && firstAssessment[i] >= roomValue && ReverseMattes[i].appeal_ <= roomAppeal && ReverseMattes[i].Live > roomLive && ReverseMattes[i].room == dataIndex)
                         {
                             roomValue = firstAssessment[i];
                             roomIndex = i;
@@ -352,7 +334,7 @@ namespace MNIST
             {
                 for (int i = 0; i < ReverseMattes.Count; i++)
                 {
-                    firstAssessment[i] = (float)firstAssessment[i] / activ;
+                    firstAssessment[i] = (float)firstAssessment[i] / activ;// Приведение значения активности результирующих масок к еденице
                 }
             }
 
@@ -363,7 +345,7 @@ namespace MNIST
                 if (ReverseMattes[index].room == dataIndex || !LessonTrigger)//Основной цикл обучения 
                 {
                     appeal = ReverseMattes[index].appeal_;
-                    if (activ > appeal || LessonTrigger)//
+                    if ((activ > appeal || LessonTrigger) && !ReverseMattes[index].elect)
                     {
                         if (appeal < 0.8f)
                         {
@@ -379,9 +361,9 @@ namespace MNIST
                         }
                     }
                 }//Конец основного цикла обучения
-                if (dataIndex == ReverseMattes[index].room || dataIndex == -1)
+                if (dataIndex == ReverseMattes[index].room || dataIndex == -1)//Формирование обстракций
                 {
-                    for (int i = 0; i < ReverseMattes.Count; i++)//Формирование обстракций
+                    for (int i = 0; i < ReverseMattes.Count; i++)
                     {
                         appeal = ReverseMattes[i].appeal_;
                         if (appeal > 0.3f && appeal < V2)
@@ -425,7 +407,7 @@ namespace MNIST
                 {
                     if (reverseMattes[i].Contraction_ && pass && reverseMattes[i].appeal_ <= 0.2f && !reverseMattes[i].elect)
                     {
-                        reverseMattes[i].Control_value -= 0.01f; //TODO: заменить на -=. Done. 
+                        reverseMattes[i].Control_value -= 0.01f;  
                     }
                 }
             }
@@ -433,19 +415,8 @@ namespace MNIST
 
         private void CreateReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, float reverseSatiety, int reverseMatteCounter, bool IndVarActiv)
         {
-            try
-            {
-
                 ReverseMatte reverseMatte = new ReverseMatte(inputData, dataIndex, interResult, reverseMatteCounter, reverseSatiety, IndVarActiv);
                 ReverseMattes.Add(reverseMatte);
-
-            }
-            //Все знают, что ловить базовый класс Exception нехорошо, но все так делают. TODO: если будет время, переделать.
-            catch (Exception ex)
-            {
-                //Выводим ошибку
-                MessageBox.Show(ex.ToString());
-            }
         }
 
         private ActivityReverseMasks CalculateReverseMasksActivity(List<float> interResult,
@@ -469,16 +440,16 @@ namespace MNIST
             return activityReverseMasks;
         }
 
-        private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes)
+        private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes) 
         {
             try
             {
-                if (Activ_ > mattes[index].appeal)
+                if (Activ_ > mattes[index].appeal)// Отслежывается активность масок
                 {
                     mattes[index].Lesson(inputData);
-                    if (mattes[index].appeal < 0.7f) //TODO: часть условия повторяется с внешним if, можно упростить. Done. 
+                    if (mattes[index].appeal < 0.7f)  
                     {
-                        mattes[index].appeal += 0.001f; //TODO: заменить на +=. Done. 
+                        mattes[index].appeal += 0.001f;  
                     }
                 }
             }
@@ -488,22 +459,16 @@ namespace MNIST
                 MessageBox.Show(ex.ToString());
             }
 
+            //Формирование масок
             if (Activ_ <= Satiety + 0.2f)
             {
                 Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety);
                 mattes.Add(matte);
             }
 
-            if (Mattes_appeal_max < mattes[index].appeal && Mattes_Activ_max_ < Activ_)
-            {
-                Mattes_Activ_max_ = Activ_;
-                Mattes_appeal_max_ = mattes[index].appeal;
-                Mattes_Control_value_max_ = mattes[index].Control_value;
-            }
-
             if (Activ_ > Mattes_Activ_max && mattes[index].appeal > Mattes_appeal_max && !mattes[index].elect && mattes[index].Control_value > Mattes_Control_value_max)
             {
-                if (Matteselect * 0.1f < reverseMatteselect)
+                if (Matteselect * 0.01f < reverseMatteselect)
                 {
                     Mattes_Activ_max = Activ_;
                     Mattes_appeal_max = mattes[index].appeal;
@@ -511,6 +476,14 @@ namespace MNIST
                     mattes.Add(matte);
                     Matteselect++;
                 }
+            }
+
+            if (Mattes_appeal_max < mattes[index].appeal && Mattes_Activ_max_ < Activ_ && Matteselect * 0.01f < reverseMatteselect)
+            {
+
+                Mattes_Activ_max_ = Mattes_Activ_max;
+                Mattes_appeal_max_ = Mattes_appeal_max;
+                Mattes_Control_value_max_ = mattes[index].Control_value;
             }
         }
 
@@ -545,7 +518,7 @@ namespace MNIST
             }
             Message += "Объект экспортирован";
         }
-        public void LoadMatte(string path)//TODO: исправить название. Done.
+        public void LoadMatte(string path)
         {
             BinaryFormatter serial = new BinaryFormatter();
 

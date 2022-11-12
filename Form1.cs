@@ -24,9 +24,6 @@ namespace MNIST
         public float BlackCount = 0;
         public float GreenCount = 0;
         double greenToBlackRatio = 0;
-        // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
-        // нет ли ошибки в выставлении этого флага. 
-        //private WorkMode mode = WorkMode.Default;
 
         public Form1()
         {
@@ -69,7 +66,6 @@ namespace MNIST
             return BitConverter.ToInt32(intAsBytes, 0);
         }
 
-        //string[] setting = new string[2];
         bool sessionFlag = false;
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -80,8 +76,8 @@ namespace MNIST
         BackgroundWorker worker;
         byte minWoll = 0;
         int WollError = 0;
+        int bb = 0;
 
-        //TODO: очень длинно, рефакторить. А не хочу ли я вынести это в отдельный класс? Явно же здесь логика. Done, вынес в класс-помощник. 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
@@ -105,7 +101,7 @@ namespace MNIST
             int Xb = 0;
             int Yb = 0;
 
-            int bb = 0;
+
             Stopwatch sw = new Stopwatch();
             bool col;
             float semblance = 20;
@@ -117,7 +113,6 @@ namespace MNIST
             // проход по файлам данных
             for (int l = 0; l < 100; l++)
             {
-
                 Random rnd = new Random();
                 Bitmap bitMap;
                 Bitmap bitMap_;
@@ -142,16 +137,7 @@ namespace MNIST
                     {
                         if (button1.Enabled == false)
                         {
-                            try //TODO: Возможно, заменить на TryParse и вынести в инициализацию, едва ли это часто меняется. 
-                            {
-                                InitializeHarmoshka();
-                            }
-                            catch (Exception ex)
-                            {
-                                e.Cancel = true;
-                                MessageBox.Show(ex.Message);
-                                return;
-                            }
+                            InitializeHarmoshka();
                         }
                         button1.Enabled = true;
                     });
@@ -289,15 +275,7 @@ namespace MNIST
                             InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
                         }
 
-                        try
-                        {
-                            counter = Harmoshka.Assessment(784, InputData, semblance);//, game.bollСoordinate
-                        }
-                        catch (Exception ex)
-                        {
-                            //Выводим ошибку
-                            MessageBox.Show(ex.ToString());
-                        }
+                        counter = Harmoshka.Assessment(784, InputData, semblance); // вход в нейронную сеть
 
                         if (counter.str2 && Eror_Bool)
                         {
@@ -315,7 +293,7 @@ namespace MNIST
                         IndexList[p]++;
                         ll++;
                     }
-                    while (ll < 50);//(ll < 25 || Eror_Bool) && (ll < 50)
+                    while (ll < 40);
 
 
                     if (TabPagesBool)
@@ -349,7 +327,7 @@ namespace MNIST
                         }
                         IndexList[i] = 0;
                     }
-                    if ((!indexBool || sunset < 2) & indexVar != 0)//
+                    if ((!indexBool || sunset < 2) & indexVar != 0)
                     {
                         allError--;
                         all[all.Count - 1] = 0;
@@ -373,17 +351,13 @@ namespace MNIST
                         WollError++;
                     }
                 }
-                //if (Harmoshka.SleepStep < 200)
-                //{
-                //    Harmoshka.SleepStep += 5;
-                //}
 
                 InputData.Clear();
                 InputData.TrimExcess();
             }
         }
 
-        private void DrawActivityHistogram(int Index, Counter counter) //TODO: уточнить, что именно здесь рисуется. Done. 
+        private void DrawActivityHistogram(int Index, Counter counter) 
         {
             pictureBox8.Invoke((MethodInvoker)delegate
             {
@@ -478,6 +452,7 @@ namespace MNIST
             {
                 double y1 = (double)(WollError);
                 label18.Text = y1.ToString();
+                y1 -= Math.Truncate(bb / 6000f);
                 minWoll = 0;
 
 
@@ -507,8 +482,8 @@ namespace MNIST
                 {
                     if (greenToBlackRatio > 0)
                     {
-                        chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio);
-                        chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);
+                        chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio); //график участия нейронной сети в управлении фокусом
+                        chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);//график прироста побед
                     }
                 }
                 return;
@@ -701,11 +676,7 @@ namespace MNIST
         private void button4_Click(object sender, EventArgs e)
         {
             string path = Directory.GetCurrentDirectory() + "\\settings.ini";
-            // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
-            // нет ли ошибки в выставлении этого флага. 
-            //mode = WorkMode.Recording; 
             reproduction = true;
-
 
             if (backgroundWorker1.IsBusy != true)
             {
@@ -752,9 +723,7 @@ namespace MNIST
         private void button2_Click(object sender, EventArgs e)
         {
             string path = Directory.GetCurrentDirectory() + "\\settings.ini";
-            // Это используется в качестве замены флагу reproduction, но юбудет оставаться закомментированным до выяснения,
-            // нет ли ошибки в выставлении этого флага. 
-            //mode = WorkMode.Reproducing; 
+
             reproduction = false;
 
             if (backgroundWorker1.IsBusy != true)

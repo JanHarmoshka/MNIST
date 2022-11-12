@@ -19,31 +19,29 @@ namespace MNIST
             }
         }
 
-        public bool IsColoured { get; private set; } //TODO: Переименовать. Done. // если управляет зрачком нейронная сеть - true
-        //int prevX1; //TODO: Закомментировать. Done. 
-        //int prevY1;
+        public bool IsColoured { get; private set; } 
         private int prevX2 = 0;
         private int prevY2 = 0;
         private int waiting = 0;
 
-        private int bufX = 14; //TODO: нет внешних ссылок. Заменить уровень доступа? Done.
+        private int bufX = 14; 
         private int bufY = 14;
         private readonly int[] XYBuf = { 14, 14 };
 
         public float BlackCount;
         public float GreenCount;
-        public Bitmap bitMap; //TODO: уточнить, где именно используются эти три битмапа, и соответствующим образом переименовать.  
+        public Bitmap bitMap; 
         public Bitmap bitMap_Draw;
         public Bitmap way_Draw;
 
         public int X { get; private set; }
         public int Y { get; private set; }
-        private int wayMax = 256; //TODO: подумать ещё над именем. Здесь должно быть что-то вроде maxFocusWayTrace, но, быть может, покороче. 
+        private int wayMax = 256; 
         private int wayMin = 255;
 
-        public List<byte> InputData = new List<byte>(); //TODO: Возможно, удалить лишние вызовы Clear. 
+        public List<byte> InputData = new List<byte>(); 
         private const int focusFieldSize = 28; //Размер поля. 
-        private readonly int[,] way = new int[focusFieldSize, focusFieldSize]; //TODO: Здесь и всюду дальше заменить 28 на именованную константу. Done, но см. замечание выше. 
+        private readonly int[,] way = new int[focusFieldSize, focusFieldSize];  
         private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
         private readonly int lowerLimit = 0;
@@ -52,10 +50,10 @@ namespace MNIST
 
         private Random rnd = new Random();
         public float Semblance { get; private set; }
-        private int meter = 100; //TODO: одна внешняя ссылка, в которой поле используется в условии. Изменить поле на приватное и сделать публичное булево свойство. Done. => Это счётчик вывода картинки ка форму с графиками.
-        public bool DrawFocusField { get { return meter == 100; } } //TODO: Уточнить название. 
+        private int meter = 100; 
+        public bool DrawFocusField { get { return meter == 100; } } 
         private PreparationInput() { }
-        //TODO: Переименовать в соответствии с выполняемыми действиями. Done.
+        
         /// <summary>
         /// Этот метод инициализирует поля класса. 
         /// </summary>
@@ -76,24 +74,21 @@ namespace MNIST
 
             InputData.Clear();
 
-            //TODO: Здесь и ниже декомпозировать. 
+            
             var XY = CalculateXY(counter, X, Y);
             X = XY.Item1;
-            Y = XY.Item2;
-
-            // semblance = CalculateSemblance(Xb, Yb, semblance);
+            Y = XY.Item2;  
 
             prevX2 = X;
             prevY2 = Y;
 
-            //TODO: Выделить в булеву переменную? На Ваше усмотрение
             if ((counter.summ < 1 && counter.summ2 < 1) ||
                 counter.inter_Data_.Count < 1 ||
                 X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения
             {
 
                 InputData.Clear();
-                IsColoured = false;//Если фокусом управляет гератор движения. Цвет рамки чёрный
+                IsColoured = false;//Если фокусом управляет генератор движения. Цвет рамки чёрный
                 BlackCount++;
                 GreenCount--;
 
@@ -102,8 +97,8 @@ namespace MNIST
                 X = XYBuf[0];
                 Y = XYBuf[1];
 
-                //TODO: Отсюда и ниже выделить в метод UpdateCoordinate или как-то так. Done, но ещё нужно будет подумать над названием. 
-                byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize]; //TODO: Переименовать переменную на CoordinateFlags. Возможно, изменить тип на булевый массив. Done тоже. Вернул, как было, потому что ниже по коду требуется именно byte. 
+                 
+                byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];  
 
                 InitializeCoordinates(rnd, Coordinates, X, Y); //На сгенерированных координатах фокуса                
 
@@ -128,12 +123,10 @@ namespace MNIST
             X = XY.Item1;
             Y = XY.Item2;
 
-            //BackXYBufInLimits(rnd, XYBuf);
-
             UpdateXY();
 
 
-            {// Прорисовка того, как зрачёк движится по полю (в каких точках он бывает чаще). Чем меньше пятно в центре и чем сельнее контраст между центром и перефериеей, тем лучше обучена нейронная сеть. Идеально - красный квадрат в центре белого поля.
+            {// Прорисовка того, как зрачёк движится по полю (в каких точках он бывает чаще).
                 way[X + 2, Y + 2] += 1;
                 if (wayMax < way[X + 2, Y + 2])
                 {
@@ -181,8 +174,7 @@ namespace MNIST
                 if (IsColoured)
                 {
                     InitializeCoordinates(rnd, Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти
-                    //XYBuf[0] = X;
-                    //XYBuf[1] = Y;
+
                 }
                 else
                 {
@@ -205,7 +197,7 @@ namespace MNIST
         /// <summary>
         /// Этот метод располагает координаты X и Y "по соседству" с их предыдущими значениями, если текущие и предыдущие значения не совпадают. 
         /// </summary>
-        private void UpdateXY() //Не уверен в выделении этого метода, но пусть пока так. 
+        private void UpdateXY()  
         {
             if (bufX != X)
             {
@@ -390,7 +382,6 @@ namespace MNIST
             byte Color_grey;
             Bitmap result = new Bitmap(width, height);
             Graphics gr = Graphics.FromImage(result);
-            //gr.Clear(Color.FromArgb(255, 255, 255));
             SolidBrush sb = new SolidBrush(Color.FromArgb(0, 0, 0));
             for (int i = 0; i < 28; ++i)
             {

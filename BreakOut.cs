@@ -30,16 +30,7 @@ namespace MNIST
                 boll[1] = 1;
                 ballСhange[0] = 0;
                 ballСhange[1] = 1;
-                //for (int i = 0; i < 11; i++) // Ряд блоков
-                //{
-                //    Word[i, 6] = 1;
-                //    Word[i, 9] = 1;
-                //}
-                //for (int i = 0; i < 3; i++) // Ряд блоков
-                //{
-                //    Word[i * 3 + 2, 6] = 1;
-                //    Word[i * 3 + 2, 8] = 1;
-                //}
+
                 Word[2, 6] = 1; Word[5, 6] = 1; Word[8, 6] = 1;
                 Word[2, 8] = 1; Word[6, 8] = 1; Word[8, 8] = 1;
             }
@@ -136,7 +127,6 @@ namespace MNIST
                 bollСoordinate = bollСoordinateBuf;
             }
             bollСoordinateBuf = bollСoordinate;
-            ////boll[0] = bollСoordinate + 1;
 
 
             byte a = (byte)rnd.Next(2);

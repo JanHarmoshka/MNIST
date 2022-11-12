@@ -12,7 +12,7 @@ public static class BackgroundWorkerHelper
         {
             for (int j = 0; j < focusSize; ++j)
             {
-                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения                                                                    
+                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения  
             }
         }
 
@@ -31,7 +31,7 @@ public static class BackgroundWorkerHelper
                     if (peripheralArray[j, i] < 200 && peripheralArray[j, i] > 150)
                     {
                         InputData.Add(1);
-                    }
+                                           }
                     else
                     {
                         InputData.Add(0);
@@ -55,9 +55,6 @@ public static class BackgroundWorkerHelper
         return pixels_;
     }
 
-    //TODO: отразить в нейминге различия с методом ниже (сейчас здесь и там используется слово Image). Done, изменил 
-    //LimitImageByThreshold на FormArrayByThreshold ниже, но, возможно, нужно будет переделать ещё раз. Done дважды,
-    //изменил всюду Array на Pixels как более описательный термин. 
     public static void PixelsFromImage(Bitmap b2, byte[,] pixels)
     {
         for (int i = 0; i < 12; ++i)
@@ -69,8 +66,6 @@ public static class BackgroundWorkerHelper
         }
     }
 
-    //TODO: механически выделил, изменить аргументы после. Done. 
-    //TODO: возможно, заменить BinaryReader в аргументе на массив байтов с исходным изображением через ReadBytes() снаружи. Done. 
     public static void FormPixelsByThreshold(List<byte> InputDataBuf, byte[,] pixels, byte[] sourceImage, int threshold)
     {
         InputDataBuf.Clear();
@@ -79,9 +74,8 @@ public static class BackgroundWorkerHelper
             for (int j = 0; j < 28; ++j)
             {
                 byte b = sourceImage[28 * i + j];
-                //byte b = sourceImage.ReadByte();
                 pixels[i, j] = b > threshold ? (byte)1 : (byte)0;
-                InputDataBuf.Add(b > threshold ? (byte)1 : (byte)0); //TODO: уточнить, зачем нужен InputDataBuf. Done. 
+                InputDataBuf.Add(b > threshold ? (byte)1 : (byte)0);
             }
         }
     }

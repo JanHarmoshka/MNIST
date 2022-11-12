@@ -51,7 +51,7 @@ namespace MNIST
             }
             max_0 = max;
 
-            max /= 1.8f;//2
+            max /= 1.8f;
             Single summ = 0;
             for (int j = 0; j < mask.Count; j++)
             {
@@ -73,9 +73,9 @@ namespace MNIST
                 }
                 summ_0 += matte[j];
             }
-            if (max_0 < 10)// 25
+            if (max_0 < 10)
             {
-                if (summ_0 < 0.3f)//0.6
+                if (summ_0 < 0.3f)
                 {
                     if (Control_value > 0 && !elect)
                     {
@@ -89,11 +89,6 @@ namespace MNIST
                 }
 
             }
-            //if (SleepStep < 300)
-            //{
-            //    SleepStep++;
-            //}
-
         }
 
         /// Обучение маски.
@@ -153,8 +148,6 @@ namespace MNIST
             room = IndexData;
             elect = elect_;
             participation = 0;
-            //mask = InputData.GetRange(0, InputData.Count);
-            //Refined = inter_result.GetRange(0, inter_result.Count);
             Live = nn;
             for (int i = 0; i < InputData.Count; i++)
             {
@@ -283,7 +276,7 @@ namespace MNIST
 
             if (Math.Abs(summ_0) < 1.1f)
             {
-                if (Control_value > 0 && appeal_ < 0.99f && !elect)//0,8
+                if (Control_value > 0 && appeal_ < 0.99f && !elect)
                 {
                     Control_value--;
                     Contraction_ = true;
