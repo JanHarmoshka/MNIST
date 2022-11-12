@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,6 +85,7 @@
             this.Consol = new System.Windows.Forms.RichTextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.label6 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -212,6 +213,7 @@
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.Gray;
+            this.tabPage1.Controls.Add(this.label6);
             this.tabPage1.Controls.Add(this.chart1);
             this.tabPage1.Controls.Add(this.pictureBox9);
             this.tabPage1.Controls.Add(this.label18);
@@ -231,8 +233,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart1.BackColor = System.Drawing.Color.Gray;
             this.chart1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            chartArea9.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea9);
             this.chart1.Location = new System.Drawing.Point(-4, 24);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(1599, 544);
@@ -267,11 +269,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart2.BackColor = System.Drawing.Color.Gray;
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea2.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea2);
+            chartArea10.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea10);
             this.chart2.Location = new System.Drawing.Point(6, 558);
             this.chart2.Name = "chart2";
-            this.chart2.Size = new System.Drawing.Size(1256, 296);
+            this.chart2.Size = new System.Drawing.Size(1283, 296);
             this.chart2.TabIndex = 40;
             this.chart2.Text = "chart2";
             this.chart2.TextAntiAliasingQuality = System.Windows.Forms.DataVisualization.Charting.TextAntiAliasingQuality.Normal;
@@ -304,7 +306,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1570, 850);
+            this.tabPage2.Size = new System.Drawing.Size(1551, 850);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Визуализация";
             // 
@@ -448,7 +450,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1570, 850);
+            this.tabPage3.Size = new System.Drawing.Size(1551, 850);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Настройки";
             // 
@@ -660,6 +662,18 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.Gainsboro;
+            this.label6.Font = new System.Drawing.Font("Consolas", 10F);
+            this.label6.Location = new System.Drawing.Point(359, 5);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(944, 17);
+            this.label6.TabIndex = 47;
+            this.label6.Text = "Прирост побед на каждые 10%. 1% состовляет 600 кадров, каждый из которых демонстр" +
+    "ируется нейронной сети 30 раз подряд";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -757,6 +771,7 @@
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox9;
+        private System.Windows.Forms.Label label6;
     }
 }
 
