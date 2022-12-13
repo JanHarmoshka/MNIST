@@ -38,13 +38,13 @@ namespace MNIST
 
         public float Satiety { get; set; } = 0.15f; //Порог жизни маски
 
-        public float CorrectionThreshold { get; set; } = 0.5f; 
+        public float CorrectionThreshold { get; set; } = 0.5f;
 
         public float V2 { get; set; } = 0.7f;//Мах возраст участия
 
         public float V5 { get; set; } = 0.2f;//Мах активность группы
 
-        public int MemoryDuration { get; set; } = 5000;//Длительность памяти
+        public int MemoryDuration { get; set; } = 1000;//Длительность памяти
 
         public int SleepStep = 22;
         private int Matteselect = 0;
@@ -56,10 +56,10 @@ namespace MNIST
         private int assessmentCounter = 0;
         private int reverseMatteCounter;
 
-        private List<float> interResult = new List<float>();
-        private List<int> contractionInputData = new List<int>();
-        private List<int> firstContractionInterResult = new List<int>();
-        private List<int> secondContractionInterResult = new List<int>();
+        private readonly List<float> interResult = new List<float>();
+        private readonly List<int> contractionInputData = new List<int>();
+        private readonly List<int> firstContractionInterResult = new List<int>();
+        private readonly List<int> secondContractionInterResult = new List<int>();
 
         private float Reverse_appeal_max = 0.65f;
         private float Reverse_Control_value_max = 43.0f;
@@ -67,17 +67,17 @@ namespace MNIST
         private float Mattes_appeal_max = 0.7009f;
         private int Mattes_Control_value_max = 243;
 
-        private float Reverse_appeal_max_ = 0;
-        private float Reverse_Control_value_max_ = 0;
-        private float Mattes_Activ_max_ = 0;
-        private float Mattes_appeal_max_ = 0;
-        private int Mattes_Control_value_max_ = 0;
+        //private float Reverse_appeal_max_ = 0;
+        //private float Reverse_Control_value_max_ = 0;
+        //private float Mattes_Activ_max_ = 0;
+        //private float Mattes_appeal_max_ = 0;
+        //private int Mattes_Control_value_max_ = 0;
 
-        private float Reverse_appeal_max__ = 0;
-        private float Reverse_Control_value_max__ = 0;
-        private float Mattes_Activ_max__ = 0;
-        private float Mattes_appeal_max__ = 0;
-        private int Mattes_Control_value_max__ = 0;
+        //private float Reverse_appeal_max__ = 0;
+        //private float Reverse_Control_value_max__ = 0;
+        //private float Mattes_Activ_max__ = 0;
+        //private float Mattes_appeal_max__ = 0;
+        //private int Mattes_Control_value_max__ = 0;
 
         private InternalActivityMasksArgs internalActivityMasksArgs = new InternalActivityMasksArgs()
         {
@@ -197,25 +197,28 @@ namespace MNIST
 
             if (assessmentCounter % 4000 == 0)//Вывод ошибки
             {
-                Message += "нейр:" + Mattes.Count.ToString() + "/" + Matteselect.ToString() + " гр:" + ReverseMattes.Count.ToString() + "/" + reverseMatteselect.ToString() + "\r\n";
-                if (Reverse_appeal_max_ > 0 && Mattes_appeal_max_ > 0)
-                {
-                    if (Reverse_appeal_max__ == Reverse_appeal_max_ && Reverse_Control_value_max__ == Reverse_Control_value_max_)
-                    {
-                        Reverse_appeal_max = Reverse_appeal_max_ - 0.001f;
-                    }
-                    if (Mattes_Activ_max__ == Mattes_Activ_max_ && Mattes_appeal_max__ == Mattes_appeal_max_ &&
-                        Mattes_Control_value_max__ == Mattes_Control_value_max_ && reverseMatteselect > 10)
-                    {
-                        Mattes_Activ_max = Mattes_Activ_max_;
-                        Mattes_appeal_max = Mattes_appeal_max_ - 0.01f;
-                    }
-                    Reverse_appeal_max__ = Reverse_appeal_max_;
-                    Reverse_Control_value_max__ = Reverse_Control_value_max_;
-                    Mattes_Activ_max__ = Mattes_Activ_max_;
-                    Mattes_appeal_max__ = Mattes_appeal_max_;
-                    Mattes_Control_value_max__ = Mattes_Control_value_max_;
-                }
+                Message += "нейр:" + Mattes.Count.ToString() + "/" + Matteselect.ToString() + " гр:" + ReverseMattes.Count.ToString() + "/" + reverseMatteselect.ToString() + "\r\n";//
+                //if (Reverse_appeal_max_ > 0 && Mattes_appeal_max_ > 0)
+                //{
+                //if (Reverse_appeal_max__ == Reverse_appeal_max_ && Reverse_Control_value_max__ == Reverse_Control_value_max_)
+                //{
+                //    Reverse_appeal_max = Reverse_appeal_max - 0.001f;
+                //    Reverse_appeal_max_ = Reverse_appeal_max;
+                //}
+                //if (Mattes_Activ_max__ == Mattes_Activ_max_ && Mattes_appeal_max__ == Mattes_appeal_max_ &&
+                //    Mattes_Control_value_max__ == Mattes_Control_value_max_ && reverseMatteselect > 10)
+                //{
+                //    Mattes_Activ_max = Mattes_Activ_max - 0.001f;
+                //    Mattes_Activ_max_ = Mattes_Activ_max;
+                //    Mattes_appeal_max = Mattes_appeal_max - 0.001f;
+                //    Mattes_appeal_max_ = Mattes_appeal_max;
+                //}
+                //Reverse_appeal_max__ = Reverse_appeal_max_;
+                //Reverse_Control_value_max__ = Reverse_Control_value_max_;
+                //Mattes_Activ_max__ = Mattes_Activ_max_;
+                //Mattes_appeal_max__ = Mattes_appeal_max_;
+                //Mattes_Control_value_max__ = Mattes_Control_value_max_;
+                //}
 
             }
             //Конец подсчёта ошибок	
@@ -228,38 +231,32 @@ namespace MNIST
             }
             else
             {
-                bool IndVarMin = (maxActivityIndex == -1) ||
-                    (ReverseMattes[maxActivityIndex].appeal_ < 0.2f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f && Activ_ < 0.9f);
+                //bool IndVarMin = (maxActivityIndex == -1) ||
+                //    (Activ_ < 0.9f && ReverseMattes[maxActivityIndex].appeal_ < 0.2f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f);
                 bool IndVarMax = (maxActivityIndex == -1) ||
-                    (ReverseMattes[maxActivityIndex].appeal_ < 0.95f && ReverseMattes[maxActivityIndex].appeal_ > 0.1f && Activ_ < 0.9f);
+                    (Activ_ < 0.9f && ReverseMattes[maxActivityIndex].appeal_ < 0.95f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f );//&& !ReverseMattes[maxActivityIndex].elect
                 bool IndVarActiv = false;
-                if (ReverseMattes.Count > maxActivityIndex && maxActivityIndex > -1)
+                if (maxActivityIndex > -1 && ReverseMattes.Count > maxActivityIndex)
                 {
-                    if (ReverseMattes[maxActivityIndex].appeal_ >= Reverse_appeal_max_)
-                    {
-                        if (ReverseMattes[maxActivityIndex].Control_value < 100)
-                        {
-                            Reverse_Control_value_max_ = ReverseMattes[maxActivityIndex].Control_value;
-                        }
-                        Reverse_appeal_max_ = ReverseMattes[maxActivityIndex].appeal_;
-
-                    }
-
-                    IndVarActiv = (ReverseMattes[maxActivityIndex].appeal_ >= Reverse_appeal_max && ReverseMattes[maxActivityIndex].Control_value >= Reverse_Control_value_max && !ReverseMattes[maxActivityIndex].elect);
+                    IndVarActiv = (ReverseMattes[maxActivityIndex].appeal_ > Reverse_appeal_max && ReverseMattes[maxActivityIndex].Control_value > Reverse_Control_value_max && !ReverseMattes[maxActivityIndex].elect);
                     if (IndVarActiv)
                     {
                         reverseMatteselect++;
+                        ReverseMattes[maxActivityIndex].elect = true;
+                        //Reverse_Control_value_max = ReverseMattes[maxActivityIndex].Control_value;
+                        //Reverse_Control_value_max_ = Reverse_Control_value_max;
+                        //Reverse_appeal_max = ReverseMattes[maxActivityIndex].appeal_;
+                        //Reverse_appeal_max_ = Reverse_appeal_max;
                     }
-
                 }
 
-                if (firstAssessment.Count > 0 && (IndVarMin || IndVarMax || IndVarActiv))
+                if (firstAssessment.Count > 0 && (IndVarMax))//IndVarMin || || IndVarActiv
                 {
                     for (int i = 0; i < firstAssessment.Count; i++)
                     {
                         firstAssessment[i] = 0;
                     }
-                    CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter, IndVarActiv);
+                    CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter, false);
                     maxActivityIndex = ReverseMattes.Count - 1;
                     firstAssessment.Add(1);
                     pass = false;
@@ -291,14 +288,8 @@ namespace MNIST
             return counter;
         }
 
-        private void TeachReverseMatte(List<float> inputData,
-                                       int dataIndex,
-                                       List<float> interResult,
-                                       ref bool correctTrigger,
-                                       bool pass,
-                                       Counter counter,
-                                       ActivityReverseMasks activityReverseMasks,
-                                       ref int index)
+        private void TeachReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, ref bool correctTrigger, bool pass,
+                                       Counter counter, ActivityReverseMasks activityReverseMasks, ref int index)
         {
             float activ = activityReverseMasks.Activ;
             counter.str1 = activ;
@@ -345,15 +336,15 @@ namespace MNIST
                 if (ReverseMattes[index].room == dataIndex || !LessonTrigger)//Основной цикл обучения 
                 {
                     appeal = ReverseMattes[index].appeal_;
-                    if ((activ > appeal || LessonTrigger) && !ReverseMattes[index].elect)
+                    if ((activ > appeal || LessonTrigger) && !ReverseMattes[index].elect)//
                     {
                         if (appeal < 0.8f)
                         {
-                            ReverseMattes[index].Lesson(inputData, interResult, 1, correctTrigger);
+                            ReverseMattes[index].Lesson(inputData, interResult, correctTrigger);
                         }
                         else
                         {
-                            ReverseMattes[index].Lesson(inputData, inter_result_, 1, correctTrigger);
+                            ReverseMattes[index].Lesson(inputData, correctTrigger);
                         }
                         if (activ > appeal && appeal < 0.97f)
                         {
@@ -370,7 +361,7 @@ namespace MNIST
                         {
                             if (index != i && firstAssessment[i] > V5 && firstAssessment[i] < V2)
                             {
-                                ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] - (V5 + 0.01f), false);
+                                ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] - (V5 + 0.01f));
                                 ReverseMattes[i].Control_value++;
                                 ReverseMattes[i].appeal_ += 0.001f;
                             }
@@ -407,7 +398,7 @@ namespace MNIST
                 {
                     if (reverseMattes[i].Contraction_ && pass && reverseMattes[i].appeal_ <= 0.2f && !reverseMattes[i].elect)
                     {
-                        reverseMattes[i].Control_value -= 0.01f;  
+                        reverseMattes[i].Control_value -= 0.01f;
                     }
                 }
             }
@@ -415,16 +406,12 @@ namespace MNIST
 
         private void CreateReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, float reverseSatiety, int reverseMatteCounter, bool IndVarActiv)
         {
-                ReverseMatte reverseMatte = new ReverseMatte(inputData, dataIndex, interResult, reverseMatteCounter, reverseSatiety, IndVarActiv);
-                ReverseMattes.Add(reverseMatte);
+            ReverseMatte reverseMatte = new ReverseMatte(inputData, dataIndex, interResult, reverseMatteCounter, reverseSatiety, IndVarActiv);
+            ReverseMattes.Add(reverseMatte);
         }
 
-        private ActivityReverseMasks CalculateReverseMasksActivity(List<float> interResult,
-                                                                   List<int> firstContractionInterResult,
-                                                                   List<int> secondContractionInterResult,
-                                                                   Counter counter,
-                                                                   List<float> firstAssessment,
-                                                                   List<float> secondAssessment)
+        private ActivityReverseMasks CalculateReverseMasksActivity(List<float> interResult, List<int> firstContractionInterResult, List<int> secondContractionInterResult,
+                                                                   Counter counter, List<float> firstAssessment, List<float> secondAssessment)
         {
             firstAssessment.Clear();
             secondAssessment.Clear();
@@ -440,16 +427,16 @@ namespace MNIST
             return activityReverseMasks;
         }
 
-        private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes) 
+        private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes)
         {
             try
             {
                 if (Activ_ > mattes[index].appeal)// Отслежывается активность масок
                 {
                     mattes[index].Lesson(inputData);
-                    if (mattes[index].appeal < 0.7f)  
+                    if (mattes[index].appeal < 0.7f)
                     {
-                        mattes[index].appeal += 0.001f;  
+                        mattes[index].appeal += 0.001f;
                     }
                 }
             }
@@ -468,23 +455,21 @@ namespace MNIST
 
             if (Activ_ > Mattes_Activ_max && mattes[index].appeal > Mattes_appeal_max && !mattes[index].elect && mattes[index].Control_value > Mattes_Control_value_max)
             {
-                if (Matteselect * 0.01f < reverseMatteselect)
-                {
-                    Mattes_Activ_max = Activ_;
-                    Mattes_appeal_max = mattes[index].appeal;
-                    Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety, true);
-                    mattes.Add(matte);
-                    Matteselect++;
-                }
+                mattes[index].elect = true;
+                //    if (Matteselect * 0.01f < reverseMatteselect)
+                //    {
+                //Mattes_Activ_max = Activ_;
+                //Mattes_appeal_max = mattes[index].appeal;
+                //Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety, true);
+                //mattes.Add(matte);
+                Matteselect++;
+                //Mattes_Activ_max_ = Mattes_Activ_max;
+                //Mattes_appeal_max_ = Mattes_appeal_max;
+                //Mattes_Control_value_max_ = mattes[index].Control_value;
+                //    }
             }
 
-            if (Mattes_appeal_max < mattes[index].appeal && Mattes_Activ_max_ < Activ_ && Matteselect * 0.01f < reverseMatteselect)
-            {
 
-                Mattes_Activ_max_ = Mattes_Activ_max;
-                Mattes_appeal_max_ = Mattes_appeal_max;
-                Mattes_Control_value_max_ = mattes[index].Control_value;
-            }
         }
 
         private void ResetByThreshold(List<int> contractionInputData, float[] array, float threshold)

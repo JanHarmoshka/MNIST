@@ -75,7 +75,7 @@ namespace MNIST
         private Harmoshka Harmoshka;
         BackgroundWorker worker;
         byte minWoll = 0;
-        int WollError = 0;
+        int WollWin = 0;
         int bb = 0;
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -110,13 +110,17 @@ namespace MNIST
             int baseСoordinateBuf = -1;
 
             sw.Start();
-            // проход по файлам данных
+
+            Bitmap bitMap;
+            Bitmap bitMap_;
+            Bitmap b2 = new Bitmap(10, 10);
+            PreparationInput preparation_input = PreparationInput.Instance;
+            BreakOut game = new BreakOut();
+
+            // Счётчик запусков основного алгоритмс
             for (int l = 0; l < 100; l++)
             {
                 Random rnd = new Random();
-                Bitmap bitMap;
-                Bitmap bitMap_;
-                Bitmap b2 = new Bitmap(10, 10);
 
                 byte[,] pixelsBuf = new byte[28, 28];
                 byte[,] arrayb2 = new byte[12, 12];
@@ -124,12 +128,9 @@ namespace MNIST
 
                 int focusSize = 6;// Размер зрачка
 
-                PreparationInput preparation_input = PreparationInput.Instance;
-                BreakOut game = new BreakOut();
-
                 Harmoshka.LessonTrigger = sessionFlag;
 
-                //поиск файла индекса
+                //основной алгоритм программы
 
                 for (int di = 0; di < Harmoshka.ErrorCount; di++)
                 {
@@ -160,10 +161,11 @@ namespace MNIST
 
                     {//Подготовка изображения для загрузки в нейронную сеть
 
-                        if (minWoll == 0)
+                        if (game.gameOver || game.gameWin)
                         {
-                            game.minWoll = 6;//22 количество блоков
                             NumberGames++;
+                            game.gameOver = false;
+                            game.gameWin = false;
                         }
                         pixels = game.MoveGame(baseСoordinate);
 
@@ -207,15 +209,8 @@ namespace MNIST
                         col = true;
                         GreenCount++;
 
-                        try
-                        {
-                            preparation_input.PrepareInput(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
-                        }
-                        catch (Exception ex)
-                        {
-                            //Выводим ошибку
-                            MessageBox.Show(ex.ToString());
-                        }
+                        preparation_input.PrepareInput(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
+
 
                         col = preparation_input.IsColoured;
                         BlackCount += preparation_input.BlackCount;
@@ -224,10 +219,11 @@ namespace MNIST
                         Y = preparation_input.Y;
                         semblance = preparation_input.Semblance;
 
-                        DrawImage(pictureBox3, preparation_input.bitMap);
+
 
                         if (TabPagesBool)
                         {
+                            DrawImage(pictureBox3, preparation_input.bitMap);
                             bitMap = BitmapMaker.MakeBitmap(pixels, X + 3, Y + 3, col);
                             DrawImage(pictureBox1, bitMap);
                         }
@@ -346,9 +342,9 @@ namespace MNIST
                         all.RemoveAt(0);
                     }
 
-                    if (minWoll == 0 & game.woll == 0)
+                    if (!game.gameOver && game.gameWin)
                     {
-                        WollError++;
+                        WollWin++;
                     }
                 }
 
@@ -357,7 +353,7 @@ namespace MNIST
             }
         }
 
-        private void DrawActivityHistogram(int Index, Counter counter) 
+        private void DrawActivityHistogram(int Index, Counter counter)
         {
             pictureBox8.Invoke((MethodInvoker)delegate
             {
@@ -450,7 +446,7 @@ namespace MNIST
         {
             if (e.ProgressPercentage == 0)
             {
-                double y1 = (double)(WollError);
+                double y1 = (double)(WollWin);
                 label18.Text = y1.ToString();
                 y1 -= Math.Truncate(bb / 6000f);
                 minWoll = 0;

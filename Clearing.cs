@@ -134,20 +134,20 @@ namespace MNIST
     class Activity
     {
         public float Activ { get; private set; }
-        private float maxAxtiv = -1; 
+        private float maxAxtiv = -1;
         private float ActivSecond;
         public int Ind { get; private set; }
-        private int InputDataCount;
-        private int Dispenser;
-        private List<Matte> mattes;
-        private List<int> contractionInputData;
-        private float[] interData;
+        private readonly int InputDataCount;
+        private readonly int Dispenser;
+        private readonly List<Matte> mattes;
+        private readonly List<int> contractionInputData;
+        private readonly float[] interData;
 
         private readonly List<float> interResult;
         public IEnumerable<float> InterResult { get => interResult; }
-        private List<int> firstContractionInterResult;
+        private readonly List<int> firstContractionInterResult;
         public IEnumerable<int> FirstContractionInterResult { get => firstContractionInterResult; }
-        private List<int> secondContractionInterResult;
+        private readonly List<int> secondContractionInterResult;
         public IEnumerable<int> SecondContractionInterResult { get => secondContractionInterResult; }
         public Task Task { get; private set; }
 
@@ -360,11 +360,11 @@ namespace MNIST
             }
             SecondAssessment.AddRange(FirstAssessment);
 
+            firstContractionInterResult = new List<int>(vFirstContractionInterResult);
+            secondContractionInterResult = new List<int>(vSecondContractionInterResult);
+
             if (reverseMattes.Count < 200)
             {
-                firstContractionInterResult = new List<int>(vFirstContractionInterResult);
-                secondContractionInterResult = new List<int>(vSecondContractionInterResult);
-
                 interResult = new List<float>(vInterResult);
 
                 ActivityFor();
@@ -381,9 +381,9 @@ namespace MNIST
                         InterResult = vInterResult,
                         ReverseMattes = vReverseMattes
                     };
-                    var activity = new ReverseActivity(listArgs,
-                                                i,
-                                                defenseLearning);
+
+                    var activity = new ReverseActivity(listArgs, i, defenseLearning);
+
                     activity.SecondAssessment.AddRange(FirstAssessment);
                     activity.FirstAssessment.AddRange(FirstAssessment);
                     activities.Add(activity);
@@ -401,16 +401,30 @@ namespace MNIST
                     }
                     if (secondActiv < activities[i].SecondActiv) secondActiv = activities[i].SecondActiv;
                 }
-
-                Parallel.For(0, FirstAssessment.Count, i =>
+                for (int i = 0; i < FirstAssessment.Count; i++)
                 {
                     FirstAssessment[i] = 0;
                     SecondAssessment[i] = 0;
-                    foreach (var activity in activities)
+                }
+
+                for (int j = 0; j < activities.Count; j++)
+                {
+                    for (int i = 0; i < activities[j].CounterFirstAssessment.Count; i++)
                     {
-                        FirstAssessment[i] += activity.FirstAssessment[i];
-                        SecondAssessment[i] += activity.SecondAssessment[i];
+                        int n = activities[j].CounterFirstAssessment[i];
+                        FirstAssessment[n] += activities[j].FirstAssessment[n];
+                    }                    
+
+                    for (int i = 0; i < activities[j].CounterSecondAssessment.Count; i++)
+                    {
+                        int n = activities[j].CounterSecondAssessment[i];
+                        SecondAssessment[n] += activities[j].SecondAssessment[n];
                     }
+
+                }
+
+                for (int i = 0; i < FirstAssessment.Count; i++)
+                {
                     if (FirstAssessment[i] > 0)
                     {
                         reverseMattes[i].ActivityFrequency++;
@@ -419,13 +433,14 @@ namespace MNIST
                     {
                         reverseMattes[i].ActivityFrequency = 0;
                     }
-                });
+                }
+
             }
             if (Activ > 1)
             {
                 Parallel.For(0, reverseMattes.Count, i =>
                 {
-                    FirstAssessment[i] = FirstAssessment[i] / Activ; 
+                    FirstAssessment[i] = FirstAssessment[i] / Activ;
                 });
             }
 
@@ -433,7 +448,7 @@ namespace MNIST
             {
                 Parallel.For(0, reverseMattes.Count, i =>
                 {
-                    SecondAssessment[i] = (float)SecondAssessment[i] / secondActiv; 
+                    SecondAssessment[i] = (float)SecondAssessment[i] / secondActiv;
                 });
             }
         }
@@ -501,27 +516,25 @@ namespace MNIST
             public List<int> SecondContractionInterResult;
             public List<float> InterResult;
         }
-       
+
         private class ReverseActivity
         {
             public List<float> FirstAssessment = new List<float>();
-            public List<float> SecondAssessment = new List<float>();
+            public List<int> CounterFirstAssessment = new List<int>();
 
-            public int Ind { get; private set; } 
+            public List<float> SecondAssessment = new List<float>();
+            public List<int> CounterSecondAssessment = new List<int>();
+
+            public int Ind { get; private set; }
             public float Activ { get; private set; }
             public float SecondActiv { get; private set; }
-            public Task Task { get; private set; } 
+            public Task Task { get; private set; }
             readonly List<ReverseMatte> reverseMattes;
             readonly List<int> firstContractionInterResult;
             readonly List<int> secondContractionInterResult;
             readonly List<float> interResult;
 
-            public ReverseActivity(ReverseActivityArgs listArgs,
-                            int num,
-                            int defenseLearning,
-                            int ind = -1,
-                            float activ = 0,
-                            float secondActiv = 0) 
+            public ReverseActivity(ReverseActivityArgs listArgs, int num, int defenseLearning, int ind = -1, float activ = 0, float secondActiv = 0)
             {
                 Activ = activ;
                 SecondActiv = secondActiv;
@@ -535,7 +548,7 @@ namespace MNIST
 
             public Action GenerateActivityFunction(int DefenseLearning, int num)
             {
-                void ActivityFor() 
+                void ActivityFor()
                 {
                     int n1;
                     int n2;
@@ -546,58 +559,78 @@ namespace MNIST
                     int firstContractionInterResultCount = firstContractionInterResult.Count;
                     int secondContractionInterResultCount = secondContractionInterResult.Count;
 
-                    for (int i = reverseMattes.Count / TaskCount * num; i < reverseMattes.Count / TaskCount * (num + 1); i++)
+                    if (firstContractionInterResultCount > 0 || secondContractionInterResultCount > 0)
                     {
-                        int arrayCorrectLength = reverseMattes[i].Correct.Count;
-                        if (reverseMattes[i].Control_value > 0f && arrayCorrectLength > 0)
+                        for (int i = reverseMattes.Count / TaskCount * num; i < reverseMattes.Count / TaskCount * (num + 1); i++)
                         {
-                            for (int j = 0; j < firstContractionInterResultCount; j++)
-                            {
-                                n1 = firstContractionInterResult[j];
-                                if (arrayCorrectLength > n1)
-                                {
-                                    if (reverseMattes[i].Correct[n1] != 0)// Исключаю операции с 0
-                                    {
-                                        FirstAssessment[i] += reverseMattes[i].Correct[n1] * interResult[n1];
-                                    }
+                            bool CounterFirst = false;
+                            bool CounterSecond = false;
 
-                                }
-                                else
+                            int arrayCorrectLength = reverseMattes[i].Correct.Count;
+                            if (arrayCorrectLength > 0 && reverseMattes[i].Control_value > 0f)
+                            {
+                                float[] BuffCorrekt = reverseMattes[i].Correct.ToArray();
+
+                                for (int j = 0; j < firstContractionInterResultCount; j++)
                                 {
-                                    break;
+                                    n1 = firstContractionInterResult[j];
+                                    if (arrayCorrectLength > n1)
+                                    {
+                                        if (BuffCorrekt[n1] != 0)// Исключаю операции с 0
+                                        {
+                                            FirstAssessment[i] += BuffCorrekt[n1] * interResult[n1];
+                                            CounterFirst = true;
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                for (int j = 0; j < secondContractionInterResultCount; j++)
+                                {
+                                    n2 = secondContractionInterResult[j];
+                                    if (arrayCorrectLength > n2)
+                                    {
+                                        if (BuffCorrekt[n2] != 0)// Исключаю операции с 0
+                                        {
+                                            SecondAssessment[i] += BuffCorrekt[n2] * interResult[n2];
+                                            CounterSecond = true;
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
                                 }
                             }
-                            for (int j = 0; j < secondContractionInterResultCount; j++)
+                            if (CounterFirst && FirstAssessment[i] > 0)
                             {
-                                n2 = secondContractionInterResult[j];
-                                if (arrayCorrectLength > n2)
-                                {
-                                    if (reverseMattes[i].Correct[n2] != 0)// Исключаю операции с 0
-                                    {
-                                        SecondAssessment[i] += reverseMattes[i].Correct[n2] * interResult[n2];
-                                    }
+                                CounterFirstAssessment.Add(i);
+                            }
+                            if (CounterSecond && SecondAssessment[i] > 0)
+                            {
+                                CounterSecondAssessment.Add(i);
+                            }
 
-                                }
-                                else
-                                {
-                                    break;
-                                }
+                        }
+
+                        for (int i = 0; i < reverseMattes.Count; i++)
+                        {
+                            if (SecondAssessment[i] >= SecondActiv)
+                            {
+                                SecondActiv = SecondAssessment[i];
+                            }
+                            if (Activ < FirstAssessment[i] && FirstAssessment[i] > 0 && i < reverseMattes.Count - DefenseLearning)
+                            {
+                                Activ = FirstAssessment[i];
+                                Ind = i;
                             }
                         }
                     }
 
-                    for (int i = 0; i < reverseMattes.Count; i++)
-                    {
-                        if (SecondAssessment[i] >= SecondActiv)
-                        {
-                            SecondActiv = SecondAssessment[i];
-                        }
-                        if (Activ < FirstAssessment[i] && FirstAssessment[i] > 0 && i < reverseMattes.Count - DefenseLearning)
-                        {
-                            Activ = FirstAssessment[i];
-                            Ind = i;
-                        }
-                    }
                 }
                 return ActivityFor;
             }

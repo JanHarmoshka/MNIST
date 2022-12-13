@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MNIST
 {
@@ -29,6 +30,10 @@ namespace MNIST
                 matte.Add(0);
             }
             appeal = satiety;
+            if (elect)
+            {
+                appeal = 0.6f;
+            }
             Control_value = 250;
             this.Sleep();
             Contraction = true;
@@ -44,6 +49,8 @@ namespace MNIST
             Contraction_ = false;
             Single max = 0;
             Single max_0;
+            float matteVar;
+
             for (int j = 0; j < mask.Count; j++)
             {
                 if (max < mask[j])
@@ -63,15 +70,16 @@ namespace MNIST
             Single summ_0 = 0;
             for (int j = 0; j < mask.Count; j++)
             {
-                if (Math.Abs(matte[j] / summ) >= 0.01f)
+                matteVar = matte[j] / summ;
+                if (matteVar <= -0.01f || matteVar >= 0.01f)
                 {
-                    matte[j] = (float)(matte[j] / summ);
+                    matte[j] = matteVar;
+                    summ_0 += matte[j];
                 }
                 else
                 {
                     matte[j] = 0;
                 }
-                summ_0 += matte[j];
             }
             if (max_0 < 10)
             {
@@ -132,7 +140,7 @@ namespace MNIST
         public bool Contraction;
         public bool Contraction_;
         readonly float appeal;
-        public float appeal_;
+        public float appeal_ = 0;
         public float participation;
         public bool elect;
         readonly List<float> mask = new List<float>();
@@ -140,19 +148,25 @@ namespace MNIST
         public List<float> Refined = new List<float>();
         public List<float> Correct = new List<float>();
         public List<float> Appeal = new List<float>();
+        Single max;
 
         public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, int nn, float satiety = 0.3f, bool elect_ = false)
         {
             appeal = satiety;
-            appeal_ = 0.0f;
             room = IndexData;
             elect = elect_;
+            if (elect)
+            {
+                appeal_ = 0.6f;
+            }
             participation = 0;
             Live = nn;
             for (int i = 0; i < InputData.Count; i++)
             {
                 mask.Add(InputData[i] * 0.1f);
                 matte.Add(-0f);
+                if (max < mask.Last())
+                    max = mask.Last();
             }
             for (int i = 0; i < inter_result.Count; i++)
             {
@@ -168,7 +182,88 @@ namespace MNIST
         /// Обучение результирующей маски.
         /// Это ситуация дообучения результирующей маски, на текущем
         /// представлении о событии которое ассоциировано с группой.
-        public void Lesson(List<Single> InputData, List<float> inter_result, Single res, bool leader)
+        public void Lesson(List<Single> InputData, List<float> inter_result, bool leader)
+        {
+            Contraction = true;
+
+            if (matte.Count != InputData.Count)
+                for (int i = matte.Count; i < InputData.Count; i++)
+                {
+                    matte.Add(0);
+                }
+            if (Correct.Count < inter_result.Count)
+            {
+                for (int i = Correct.Count; i < inter_result.Count; i++)
+                {
+                    Correct.Add(0);
+                    Refined.Add(0);
+                }
+            }
+            if (Appeal.Count < Correct.Count)
+            {
+                for (int i = Appeal.Count; i < Correct.Count; i++)
+                {
+                    Appeal.Add(appeal);
+                }
+            }
+            if (inter_result.Count > 0)
+            {
+                for (int j = 1; j < inter_result.Count; j++)
+                {
+                    if (inter_result[j] > 0.0f)
+                    {
+                        if (Correct[j] * 10f >= Appeal[j] || Correct[j] < 0.00001f)
+                        {
+                            Refined[j] = (float)(Refined[j] + inter_result[j]);
+                            if (Appeal[j] < 0.3f)
+                            {
+                                Appeal[j] = Appeal[j] + 0.0001f;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if (leader)
+            {
+                for (int j = 1; j < InputData.Count; j++)
+                {
+                    if (InputData[j] == 1)
+                    {
+                        mask[j]++;
+                        if (max < mask[j])
+                            max = mask[j];
+                    }
+                }
+            }
+            this.Sleep();
+        }
+        public void Lesson(List<Single> InputData, bool leader)
+        {
+            Contraction = true;
+
+            if (matte.Count != InputData.Count)
+                for (int i = matte.Count; i < InputData.Count; i++)
+                {
+                    matte.Add(0);
+                }
+
+            if (leader)
+            {
+                for (int j = 1; j < InputData.Count; j++)
+                {
+                    if (InputData[j] == 1)
+                    {
+                        mask[j]++;
+                        if (max < mask[j])
+                            max = mask[j];
+                    }
+                }
+            }
+            this.Sleep();
+        }
+        public void Lesson(List<Single> InputData, List<float> inter_result, Single res)
         {
             Contraction = true;
 
@@ -209,21 +304,8 @@ namespace MNIST
                     }
                 }
             }
-
-
-            if (leader)
-            {
-                for (int j = 1; j < InputData.Count; j++)
-                {
-                    if (InputData[j] == 1)
-                    {
-                        mask[j]++;
-                    }
-                }
-            }
             this.Sleep();
         }
-
         /// Сон результирующей маски.
         /// Это ситуация повторного обучения результирующей маски, после обновления
         /// представления об ассоциированном с группой событии.
@@ -231,27 +313,26 @@ namespace MNIST
         {
             Contraction = false;
             Contraction_ = false;
-            Single max = 0;
-            for (int j = 0; j < mask.Count; j++)
-            {
-                if (max < mask[j])
-                    max = mask[j];
-            }
-
-            max /= 3f;
+            float matteVar;
+            Single calculatedMax = 0;
             Single summ = 0;
+            Single summ_0 = 0;
+
+            calculatedMax = max / 3f;
+
             for (int j = 0; j < mask.Count; j++)
             {
-                matte[j] = mask[j] - max;
+                matte[j] = mask[j] - calculatedMax;
                 if (matte[j] > 0)
-                    summ += matte[j] * 1f;
+                    summ += matte[j];
             }
 
             for (int j = 0; j < mask.Count; j++)
             {
-                if (Math.Abs(matte[j] / summ) >= 0.01)
+                matteVar = matte[j] / summ;
+                if (matteVar <= -0.01f || matteVar >= 0.01f)
                 {
-                    matte[j] = (float)(matte[j] / summ);
+                    matte[j] = matteVar;
                 }
                 else
                 {
@@ -259,17 +340,17 @@ namespace MNIST
                 }
             }
 
-            max = 0.01f;
+            calculatedMax = 0.01f;
             for (int j = 1; j < Refined.Count; j++)
             {
-                if (Refined[j] > max)
-                    max = Refined[j];
+                if (Refined[j] > calculatedMax)
+                    calculatedMax = Refined[j];
             }
 
-            Single summ_0 = 0;
+
             for (int j = 1; j < Refined.Count; j++)
             {
-                Correct[j] = Refined[j] / max;
+                Correct[j] = Refined[j] / calculatedMax;
                 summ_0 += Correct[j];
             }
             summ_0 /= Correct.Count;

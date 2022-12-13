@@ -15,6 +15,8 @@ namespace MNIST
         private byte basBuf = 5;
         public byte woll = 0;
         public byte minWoll = 0;
+        public bool gameOver = false;
+        public bool gameWin = false;
 
         private System.Random rnd = new Random();
 
@@ -36,14 +38,19 @@ namespace MNIST
             }
             else
             {
-                if (Math.Abs(X - bas) > 2)
+                if (Math.Abs(X - bas) > 3)
                 {
                     X = Math.Abs(X - bas) / (X - bas) + basBuf;
                 }
                 bas = (byte)X;
                 if (bas < 2 || bas > 8)
                 {
-                    bas = basBuf;
+                    bas = 2;
+                    if (bas > 8)
+                    {
+                        bas = 8;
+                    }
+
                 }
                 basBuf = bas;
 
@@ -62,19 +69,7 @@ namespace MNIST
                     woll--;
                     if (woll == 0)
                     {
-                        ;
-                    }
-                    if (woll < 3)
-                    {
-                        ;
-                    }
-                    if (woll < 4)
-                    {
-                        ;
-                    }
-                    if (woll < minWoll)
-                    {
-                        minWoll = woll;
+                        gameWin = true;
                     }
                 }
 
@@ -89,6 +84,7 @@ namespace MNIST
                 if (boll[1] == 0)//промах
                 {
                     woll = 0;
+                    gameOver = true;
                 }
                 if (boll[1] == 1)// контакт с батутом
                 {

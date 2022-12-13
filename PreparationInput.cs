@@ -19,41 +19,41 @@ namespace MNIST
             }
         }
 
-        public bool IsColoured { get; private set; } 
+        public bool IsColoured { get; private set; }
         private int prevX2 = 0;
         private int prevY2 = 0;
         private int waiting = 0;
 
-        private int bufX = 14; 
+        private int bufX = 14;
         private int bufY = 14;
         private readonly int[] XYBuf = { 14, 14 };
 
         public float BlackCount;
         public float GreenCount;
-        public Bitmap bitMap; 
+        public Bitmap bitMap;
         public Bitmap bitMap_Draw;
         public Bitmap way_Draw;
 
         public int X { get; private set; }
         public int Y { get; private set; }
-        private int wayMax = 256; 
+        private int wayMax = 256;
         private int wayMin = 255;
 
-        public List<byte> InputData = new List<byte>(); 
+        public List<byte> InputData = new List<byte>();
         private const int focusFieldSize = 28; //Размер поля. 
-        private readonly int[,] way = new int[focusFieldSize, focusFieldSize];  
+        private readonly int[,] way = new int[focusFieldSize, focusFieldSize];
         private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
         private readonly int lowerLimit = 0;
         private readonly int upperLimit = 28;
         private readonly int proportions = 7;
 
-        private Random rnd = new Random();
+        private readonly Random rnd = new Random();
         public float Semblance { get; private set; }
-        private int meter = 100; 
-        public bool DrawFocusField { get { return meter == 100; } } 
+        private int meter = 100;
+        public bool DrawFocusField { get { return meter == 100; } }
         private PreparationInput() { }
-        
+
         /// <summary>
         /// Этот метод инициализирует поля класса. 
         /// </summary>
@@ -74,10 +74,10 @@ namespace MNIST
 
             InputData.Clear();
 
-            
+
             var XY = CalculateXY(counter, X, Y);
             X = XY.Item1;
-            Y = XY.Item2;  
+            Y = XY.Item2;
 
             prevX2 = X;
             prevY2 = Y;
@@ -97,8 +97,8 @@ namespace MNIST
                 X = XYBuf[0];
                 Y = XYBuf[1];
 
-                 
-                byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];  
+
+                byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
 
                 InitializeCoordinates(rnd, Coordinates, X, Y); //На сгенерированных координатах фокуса                
 
@@ -155,11 +155,11 @@ namespace MNIST
                     }
                     if (meter == 0)
                     {
-                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, wayMin + 10, false);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, false);// wayMin + 10,
                     }
                     else
                     {
-                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, wayMin + 10, true);
+                        way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, true);//wayMin + 10,
                     }
                     wayMax = 256;
                     wayMin = 256;
@@ -180,8 +180,10 @@ namespace MNIST
                 {
                     InitializeCoordinates(rnd, Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
                 }
-
-                bitMap_Draw = BitmapMaker.MakeBitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
+                if (isVisualSelected)
+                {
+                    bitMap_Draw = BitmapMaker.MakeBitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
+                }
 
                 for (int i = 0; i < focusFieldSize; i++)
                 {
@@ -197,7 +199,7 @@ namespace MNIST
         /// <summary>
         /// Этот метод располагает координаты X и Y "по соседству" с их предыдущими значениями, если текущие и предыдущие значения не совпадают. 
         /// </summary>
-        private void UpdateXY()  
+        private void UpdateXY()
         {
             if (bufX != X)
             {
@@ -230,19 +232,19 @@ namespace MNIST
         /// <summary>
         /// Эта функция возвращает зрачёк если он оказывается за границами поля. 
         /// </summary>
-        private void BackXYBufInLimits(Random rnd, int[] XYBuf)
-        {
-            if (X < lowerLimit || X > upperLimit)
-            {
-                X = rnd.Next(lowerLimit, upperLimit);
-                XYBuf[0] = (byte)X;
-            }
-            if (Y < lowerLimit || Y > upperLimit)
-            {
-                Y = rnd.Next(lowerLimit, upperLimit);
-                XYBuf[1] = (byte)Y;
-            }
-        }
+        //private void BackXYBufInLimits(Random rnd, int[] XYBuf)
+        //{
+        //    if (X < lowerLimit || X > upperLimit)
+        //    {
+        //        X = rnd.Next(lowerLimit, upperLimit);
+        //        XYBuf[0] = (byte)X;
+        //    }
+        //    if (Y < lowerLimit || Y > upperLimit)
+        //    {
+        //        Y = rnd.Next(lowerLimit, upperLimit);
+        //        XYBuf[1] = (byte)Y;
+        //    }
+        //}
 
         /// <summary>
         /// Эта функция выводит рисунок пятна фокуса на поле. 
@@ -284,28 +286,28 @@ namespace MNIST
         /// <summary>
         /// Эта функция препятствует "зависанию" зрачка на одном и томже месте, влияя на нейронную сеть. 
         /// </summary>
-        private float CalculateSemblance(int Xb, int Yb, float semblance)
-        {
-            if (prevX2 > 0 && prevY2 > 0)
-            {
-                if ((prevX2 == X && prevY2 == Y) || (prevX2 == Xb && prevY2 == Yb))
-                {
-                    if (semblance > 1)
-                    {
-                        semblance -= 7f;
-                    }
-                }
-                else
-                {
-                    semblance = 22;
-                }
-            }
-            else
-            {
-                semblance = 22;
-            }
-            return semblance;
-        }
+        //private float CalculateSemblance(int Xb, int Yb, float semblance)
+        //{
+        //    if (prevX2 > 0 && prevY2 > 0)
+        //    {
+        //        if ((prevX2 == X && prevY2 == Y) || (prevX2 == Xb && prevY2 == Yb))
+        //        {
+        //            if (semblance > 1)
+        //            {
+        //                semblance -= 7f;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            semblance = 22;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        semblance = 22;
+        //    }
+        //    return semblance;
+        //}
 
         /// <summary>
         /// Эта функция создаёт пятно фокуса на поле. 
@@ -374,7 +376,7 @@ namespace MNIST
     /// </summary>
     class BitmapMaker
     {
-        public static Bitmap MakeGreyBitmap(byte[,] pixels, int X, int Y, int wayMin, bool isRectDrawn = true)
+        public static Bitmap MakeGreyBitmap(byte[,] pixels, int X, int Y, bool isRectDrawn = true)//int wayMin,
         {
             int mag = 10;
             int width = 28 * mag;
