@@ -168,11 +168,13 @@ namespace MNIST
                             game.gameWin = false;
                         }
                         pixels = game.MoveGame(baseСoordinate);
+ 
 
                         b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
                         b2 = new Bitmap(b2, new Size(12, 12));
                         BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
                     }// Конец подготовки изображения
+
 
                     Index = game.bollСoordinate;
                     if (game.woll == 0)
@@ -289,7 +291,7 @@ namespace MNIST
                         IndexList[p]++;
                         ll++;
                     }
-                    while (ll < 40);
+                    while (ll < 25);
 
 
                     if (TabPagesBool)
@@ -351,6 +353,15 @@ namespace MNIST
                 InputData.Clear();
                 InputData.TrimExcess();
             }
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                //Выводим ошибку
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void DrawActivityHistogram(int Index, Counter counter)
@@ -387,7 +398,7 @@ namespace MNIST
                     {
                         sbIndex.Color = Color.Red;
                     }
-                    g.FillRectangle(sbIndex, 21 * i, 370 - (7 * IndexList[i] + 5), 20, (7 * IndexList[i] + 5));
+                    g.FillRectangle(sbIndex, 21 * i, 210 - (7 * IndexList[i] + 5), 20, (7 * IndexList[i] + 5));
                 }
 
             });
@@ -476,11 +487,11 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    if (greenToBlackRatio > 0)
-                    {
-                        chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio); //график участия нейронной сети в управлении фокусом
-                        chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);//график прироста побед
-                    }
+                    //if (greenToBlackRatio > 0)
+                    //{
+                    chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio); //график участия нейронной сети в управлении фокусом
+                    chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);//график прироста побед
+                    //}
                 }
                 return;
             }

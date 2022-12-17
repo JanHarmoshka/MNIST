@@ -92,7 +92,7 @@ namespace MNIST
                 BlackCount++;
                 GreenCount--;
 
-                ShakeXYBuf(rnd, XYBuf);
+                ShakeXYBuf(XYBuf);//rnd,
 
                 X = XYBuf[0];
                 Y = XYBuf[1];
@@ -100,7 +100,7 @@ namespace MNIST
 
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
 
-                InitializeCoordinates(rnd, Coordinates, X, Y); //На сгенерированных координатах фокуса                
+                InitializeCoordinates( Coordinates, X, Y); //На сгенерированных координатах фокуса    //  rnd,          
 
                 counter.inter_Data_.Clear();
                 for (int i = 0; i < focusFieldSize; i++)
@@ -173,12 +173,12 @@ namespace MNIST
 
                 if (IsColoured)
                 {
-                    InitializeCoordinates(rnd, Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти
+                    InitializeCoordinates( Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти//rnd,
 
                 }
                 else
                 {
-                    InitializeCoordinates(rnd, Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций
+                    InitializeCoordinates( Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций//rnd,
                 }
                 if (isVisualSelected)
                 {
@@ -272,8 +272,9 @@ namespace MNIST
         /// Эта функция задаёт случайное значение координат фокуса с некоторой вероятностью. 
         /// </summary>
         /// <param name="rnd"></param>
-        private void ShakeXYBuf(Random rnd, int[] XYBuf)
+        private void ShakeXYBuf(int[] XYBuf)//Random rnd,
         {
+            Random rnd = new Random();
             if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 20)
             {
                 waiting = 0;
@@ -312,8 +313,9 @@ namespace MNIST
         /// <summary>
         /// Эта функция создаёт пятно фокуса на поле. 
         /// </summary>
-        private void InitializeCoordinates(Random rnd, byte[,] Coordinates, int X, int Y)
+        private void InitializeCoordinates( byte[,] Coordinates, int X, int Y)//Random rnd,
         {
+            Random rnd = new Random();
             for (int i = 0; i < focusFieldSize; i++)
             {
                 for (int j = 0; j < focusFieldSize; j++)

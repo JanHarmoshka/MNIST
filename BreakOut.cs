@@ -10,7 +10,7 @@ namespace MNIST
         private byte bollСoordinateBuf = 5;
         private readonly List<int[]> trail = new List<int[]>();
         private readonly int[] ballСhange = { 0, 1 };
-        private readonly int[,] Word = new int[11, 11];
+        private readonly int[,] Word = new int[12, 12];
         public byte bas = 5;
         private byte basBuf = 5;
         public byte woll = 0;
@@ -38,7 +38,7 @@ namespace MNIST
             }
             else
             {
-                if (Math.Abs(X - bas) > 3)
+                if (Math.Abs(X - bas) > 2)
                 {
                     X = Math.Abs(X - bas) / (X - bas) + basBuf;
                 }
@@ -54,6 +54,19 @@ namespace MNIST
                 }
                 basBuf = bas;
 
+                if (Word[boll[0], boll[1]] == 1) // контакт с блокоми
+                {
+                    Word[boll[0], boll[1]] = 0;
+                    woll--;
+
+                    ballСhange[1] *= -1;
+                    ballСhange[0] *= -1;
+                    if (woll == 0)
+                    {
+                        gameWin = true;
+                    }
+                }
+
                 if (boll[0] + ballСhange[0] > 10 || boll[0] + ballСhange[0] < 0)//касание стенок 
                 {
                     ballСhange[0] *= -1;
@@ -63,18 +76,11 @@ namespace MNIST
                     ballСhange[1] *= -1;
                 }
 
-                if (Word[boll[0], boll[1]] == 1) // контакт с блокоми
-                {
-                    Word[boll[0], boll[1]] = 0;
-                    woll--;
-                    if (woll == 0)
-                    {
-                        gameWin = true;
-                    }
-                }
-
-                boll[0] = ballСhange[0] + boll[0];//смена траектории от касания
+                //смена траектории от касания
+                boll[0] = ballСhange[0] + boll[0];
                 boll[1] = ballСhange[1] + boll[1];
+
+
                 trail.Add((int[])boll.Clone());
                 if (trail.Count > 7)
                 {

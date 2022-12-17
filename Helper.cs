@@ -12,7 +12,15 @@ public static class BackgroundWorkerHelper
         {
             for (int j = 0; j < focusSize; ++j)
             {
-                InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения  
+                if (i + Y > 0 && i + Y < 28 && j + X > 0 && j + X < 28)
+                {
+                    InputData.Add(pixels[i + Y, j + X]); // Запись во входящий вектор фокуса зрения  
+                }
+                else
+                {
+                    InputData.Add(0);
+                }
+
             }
         }
 
@@ -31,7 +39,7 @@ public static class BackgroundWorkerHelper
                     if (peripheralArray[j, i] < 200 && peripheralArray[j, i] > 150)
                     {
                         InputData.Add(1);
-                                           }
+                    }
                     else
                     {
                         InputData.Add(0);
