@@ -11,7 +11,7 @@ namespace MNIST
         private readonly List<int[]> trail = new List<int[]>();
         private readonly int[] ballСhange = { 0, 1 };
         private readonly int[,] Word = new int[12, 12];
-        public byte bas = 5;
+        private byte bas = 5;
         private byte basBuf = 5;
         public byte woll = 0;
         public byte minWoll = 0;
@@ -22,23 +22,25 @@ namespace MNIST
 
         public byte[,] MoveGame(int X)
         {
+            //X = 5;
             byte[,] pixels = new byte[28, 28];
             if (woll == 0)//Начало новой игры
             {
-                bas = 5;
-                woll = 6;//22
+                //bas = 1;
+
                 trail.Clear(); //стираю след мяча
-                boll[0] = 5;
+                boll[0] = 4;
                 boll[1] = 1;
-                ballСhange[0] = 0;
+                ballСhange[0] = 1;
                 ballСhange[1] = 1;
 
-                Word[2, 6] = 1; Word[5, 6] = 1; Word[8, 6] = 1;
-                Word[2, 8] = 1; Word[6, 8] = 1; Word[8, 8] = 1;
+                woll = 6;//Количество блоков
+                Word[2, 9] = 1; Word[4, 9] = 1; Word[6, 9] = 1; Word[8, 9] = 1;//
+                Word[2, 7] = 1; Word[8, 7] = 1;//Word[4, 7] = 1;Word[6, 7] = 1;
             }
             else
             {
-                if (Math.Abs(X - bas) > 2)
+                if (Math.Abs(X - bas) > 3)//Скорость платформы
                 {
                     X = Math.Abs(X - bas) / (X - bas) + basBuf;
                 }
@@ -59,8 +61,17 @@ namespace MNIST
                     Word[boll[0], boll[1]] = 0;
                     woll--;
 
-                    ballСhange[1] *= -1;
-                    ballСhange[0] *= -1;
+
+                    if (ballСhange[0] == ballСhange[1])
+                    {
+                        ballСhange[1] *= -1;
+                    }
+                    else
+                    {
+                        ballСhange[0] *= -1;
+                    }
+
+
                     if (woll == 0)
                     {
                         gameWin = true;
@@ -92,6 +103,7 @@ namespace MNIST
                     woll = 0;
                     gameOver = true;
                 }
+
                 if (boll[1] == 1)// контакт с батутом
                 {
                     int Сhange = boll[0] - bas;
@@ -108,7 +120,8 @@ namespace MNIST
 
                         ballСhange[1] = 1;
                     }
-                    else if (Сhange == 0)
+                    else
+                    if (Сhange == 0)
                     {
                         if (ballСhange[0] > 0)
                         {
@@ -117,7 +130,7 @@ namespace MNIST
                         else
                         {
                             ballСhange[0] = -1;
-                        };
+                        }
                         ballСhange[1] = 1;
                     }
                 }
@@ -137,7 +150,7 @@ namespace MNIST
             // Вывод ситуации в игре
             for (int i = 0; i < 11; i++)
             {
-                for (int j = 6; j < 11; j++)
+                for (int j = 5; j < 11; j++)
                 {
                     if (Word[i, j] == 1)
                     {

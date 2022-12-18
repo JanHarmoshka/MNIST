@@ -45,9 +45,9 @@ namespace MNIST
             {
                 if (!reverseMattes[j].elect || reverseMattes[j].Correct.Count < 1)
                 {
-                    if (reverseMattes[j].participation < 3)
+                    if (reverseMattes[j].participation < 1)
                     {
-                        if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.10f && reverseMattes[j].Control_value <= 97.0f)
+                        if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ <= 0.1f && reverseMattes[j].Control_value <= 97.0f)
                                || reverseMattes[j].Correct.Count < mattes.Count * 0.1f || reverseMattes[j].ActivityFrequency > 1000)
                         {
                             if (reverseMattes[j].elect)
@@ -81,7 +81,7 @@ namespace MNIST
         public float participation;
         public Correction(int inputDataCount, List<ReverseMatte> reverseMattes, List<float> firstAssessment, List<float> secondAssessment, float[] interData, float semblance, List<int> indexData_)
         {
-            participation = 4;
+            participation = 20;
             if (secondAssessment.Count < firstAssessment.Count)
             {
                 for (int i = secondAssessment.Count; i < firstAssessment.Count; i++)
@@ -99,6 +99,11 @@ namespace MNIST
                         for (int i = 0; i < inputDataCount; i++)
                         {
                             interData[i] += reverseMattes[j].matte[i] * VFirst_;
+                        }
+                        if (reverseMattes[j].participation > 5 )
+                        {
+                            //reverseMattes[j].Control_value++;
+                            reverseMattes[j].appeal_ += 0.0001f;
                         }
                     }
                     if (VFirst_ > 0)
@@ -413,7 +418,7 @@ namespace MNIST
                     {
                         int n = activities[j].CounterFirstAssessment[i];
                         FirstAssessment[n] += activities[j].FirstAssessment[n];
-                    }                    
+                    }
 
                     for (int i = 0; i < activities[j].CounterSecondAssessment.Count; i++)
                     {

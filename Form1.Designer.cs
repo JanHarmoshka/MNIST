@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +44,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.label6 = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.label18 = new System.Windows.Forms.Label();
@@ -213,7 +212,6 @@
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.Gray;
-            this.tabPage1.Controls.Add(this.label6);
             this.tabPage1.Controls.Add(this.chart1);
             this.tabPage1.Controls.Add(this.pictureBox9);
             this.tabPage1.Controls.Add(this.label18);
@@ -226,18 +224,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Сводка";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.BackColor = System.Drawing.Color.Gainsboro;
-            this.label6.Font = new System.Drawing.Font("Consolas", 10F);
-            this.label6.Location = new System.Drawing.Point(359, 5);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(944, 17);
-            this.label6.TabIndex = 47;
-            this.label6.Text = "Прирост побед на каждые 10%. 1% состовляет 600 кадров, каждый из которых демонстр" +
-    "ируется нейронной сети 25 раз подряд";
-            // 
             // chart1
             // 
             this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -245,8 +231,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart1.BackColor = System.Drawing.Color.Gray;
             this.chart1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea5.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea5);
+            chartArea7.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea7);
             this.chart1.Location = new System.Drawing.Point(-4, 24);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(1599, 544);
@@ -281,8 +267,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chart2.BackColor = System.Drawing.Color.Gray;
             this.chart2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            chartArea6.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea6);
+            chartArea8.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea8);
             this.chart2.Location = new System.Drawing.Point(6, 558);
             this.chart2.Name = "chart2";
             this.chart2.Size = new System.Drawing.Size(1283, 296);
@@ -771,7 +757,6 @@
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox9;
-        private System.Windows.Forms.Label label6;
     }
 }
 

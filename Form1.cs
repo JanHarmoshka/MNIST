@@ -291,7 +291,7 @@ namespace MNIST
                         IndexList[p]++;
                         ll++;
                     }
-                    while (ll < 25);
+                    while (ll < 5);
 
 
                     if (TabPagesBool)
@@ -459,7 +459,7 @@ namespace MNIST
             {
                 double y1 = (double)(WollWin);
                 label18.Text = y1.ToString();
-                y1 -= Math.Truncate(bb / 6000f);
+               // y1 -= Math.Truncate(bb / 6000f);
                 minWoll = 0;
 
 

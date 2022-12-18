@@ -29,7 +29,7 @@ namespace MNIST
         public string Message = null;
         public List<Matte> Mattes = new List<Matte>();
         public List<ReverseMatte> ReverseMattes = new List<ReverseMatte>();
-        readonly List<float> inter_result_ = new List<float>(); //TODO: уточнить, что это именно, и переименовать соответствующе. 
+        readonly List<float> inter_result_ = new List<float>();
 
 
         public int ErrorCount { get; set; } = 60000;//Количество элементов. 
@@ -66,18 +66,6 @@ namespace MNIST
         private float Mattes_Activ_max = 1.01f;
         private float Mattes_appeal_max = 0.7009f;
         private int Mattes_Control_value_max = 243;
-
-        //private float Reverse_appeal_max_ = 0;
-        //private float Reverse_Control_value_max_ = 0;
-        //private float Mattes_Activ_max_ = 0;
-        //private float Mattes_appeal_max_ = 0;
-        //private int Mattes_Control_value_max_ = 0;
-
-        //private float Reverse_appeal_max__ = 0;
-        //private float Reverse_Control_value_max__ = 0;
-        //private float Mattes_Activ_max__ = 0;
-        //private float Mattes_appeal_max__ = 0;
-        //private int Mattes_Control_value_max__ = 0;
 
         private InternalActivityMasksArgs internalActivityMasksArgs = new InternalActivityMasksArgs()
         {
@@ -198,28 +186,6 @@ namespace MNIST
             if (assessmentCounter % 4000 == 0)//Вывод ошибки
             {
                 Message += "нейр:" + Mattes.Count.ToString() + "/" + Matteselect.ToString() + " гр:" + ReverseMattes.Count.ToString() + "/" + reverseMatteselect.ToString() + "\r\n";//
-                //if (Reverse_appeal_max_ > 0 && Mattes_appeal_max_ > 0)
-                //{
-                //if (Reverse_appeal_max__ == Reverse_appeal_max_ && Reverse_Control_value_max__ == Reverse_Control_value_max_)
-                //{
-                //    Reverse_appeal_max = Reverse_appeal_max - 0.001f;
-                //    Reverse_appeal_max_ = Reverse_appeal_max;
-                //}
-                //if (Mattes_Activ_max__ == Mattes_Activ_max_ && Mattes_appeal_max__ == Mattes_appeal_max_ &&
-                //    Mattes_Control_value_max__ == Mattes_Control_value_max_ && reverseMatteselect > 10)
-                //{
-                //    Mattes_Activ_max = Mattes_Activ_max - 0.001f;
-                //    Mattes_Activ_max_ = Mattes_Activ_max;
-                //    Mattes_appeal_max = Mattes_appeal_max - 0.001f;
-                //    Mattes_appeal_max_ = Mattes_appeal_max;
-                //}
-                //Reverse_appeal_max__ = Reverse_appeal_max_;
-                //Reverse_Control_value_max__ = Reverse_Control_value_max_;
-                //Mattes_Activ_max__ = Mattes_Activ_max_;
-                //Mattes_appeal_max__ = Mattes_appeal_max_;
-                //Mattes_Control_value_max__ = Mattes_Control_value_max_;
-                //}
-
             }
             //Конец подсчёта ошибок	
 
@@ -231,26 +197,20 @@ namespace MNIST
             }
             else
             {
-                //bool IndVarMin = (maxActivityIndex == -1) ||
-                //    (Activ_ < 0.9f && ReverseMattes[maxActivityIndex].appeal_ < 0.2f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f);
                 bool IndVarMax = (maxActivityIndex == -1) ||
-                    (Activ_ < 0.9f && ReverseMattes[maxActivityIndex].appeal_ < 0.95f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f );//&& !ReverseMattes[maxActivityIndex].elect
+                    (Activ_ < 0.90f && ReverseMattes[maxActivityIndex].appeal_ < 0.95f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f );
                 bool IndVarActiv = false;
                 if (maxActivityIndex > -1 && ReverseMattes.Count > maxActivityIndex)
                 {
-                    IndVarActiv = (ReverseMattes[maxActivityIndex].appeal_ > Reverse_appeal_max && ReverseMattes[maxActivityIndex].Control_value > Reverse_Control_value_max && !ReverseMattes[maxActivityIndex].elect);
+                    IndVarActiv = (ReverseMattes[maxActivityIndex].appeal_ > Reverse_appeal_max && ReverseMattes[maxActivityIndex].Control_value > Reverse_Control_value_max && !ReverseMattes[maxActivityIndex].elect && ReverseMattes[maxActivityIndex].participation > 1);
                     if (IndVarActiv)
                     {
                         reverseMatteselect++;
                         ReverseMattes[maxActivityIndex].elect = true;
-                        //Reverse_Control_value_max = ReverseMattes[maxActivityIndex].Control_value;
-                        //Reverse_Control_value_max_ = Reverse_Control_value_max;
-                        //Reverse_appeal_max = ReverseMattes[maxActivityIndex].appeal_;
-                        //Reverse_appeal_max_ = Reverse_appeal_max;
                     }
                 }
 
-                if (firstAssessment.Count > 0 && (IndVarMax))//IndVarMin || || IndVarActiv
+                if (firstAssessment.Count > 0 && (IndVarMax))
                 {
                     for (int i = 0; i < firstAssessment.Count; i++)
                     {
@@ -447,7 +407,7 @@ namespace MNIST
             }
 
             //Формирование масок
-            if (Activ_ <= Satiety + 0.2f)
+            if (Activ_ <= Satiety + 0.3f)
             {
                 Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety);
                 mattes.Add(matte);
@@ -456,17 +416,7 @@ namespace MNIST
             if (Activ_ > Mattes_Activ_max && mattes[index].appeal > Mattes_appeal_max && !mattes[index].elect && mattes[index].Control_value > Mattes_Control_value_max)
             {
                 mattes[index].elect = true;
-                //    if (Matteselect * 0.01f < reverseMatteselect)
-                //    {
-                //Mattes_Activ_max = Activ_;
-                //Mattes_appeal_max = mattes[index].appeal;
-                //Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety, true);
-                //mattes.Add(matte);
                 Matteselect++;
-                //Mattes_Activ_max_ = Mattes_Activ_max;
-                //Mattes_appeal_max_ = Mattes_appeal_max;
-                //Mattes_Control_value_max_ = mattes[index].Control_value;
-                //    }
             }
 
 
