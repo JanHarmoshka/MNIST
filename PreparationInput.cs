@@ -31,7 +31,7 @@ namespace MNIST
         public float BlackCount;
         public float GreenCount;
         public Bitmap bitMap;
-        public Bitmap bitMap_Draw;
+        //public Bitmap bitMap_Draw;
         public Bitmap way_Draw;
 
         public int X { get; private set; }
@@ -45,7 +45,7 @@ namespace MNIST
         private readonly byte[,] wayByte = new byte[focusFieldSize, focusFieldSize];
 
         private readonly int lowerLimit = 0;
-        private readonly int upperLimit = 28;
+        private readonly int upperLimit = 26;
         private readonly int proportions = 7;
 
         private readonly Random rnd = new Random();
@@ -82,9 +82,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if ((counter.summ < 1 && counter.summ2 < 1) ||
-                counter.inter_Data_.Count < 1 ||
-                X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения
+            if ((counter.summ2 < 30 || counter.summ2 > 55) || X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения counter.summ < 1 && counter.inter_Data_.Count < 1 || 
             {
 
                 InputData.Clear();
@@ -100,7 +98,7 @@ namespace MNIST
 
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
 
-                InitializeCoordinates( Coordinates, X, Y); //На сгенерированных координатах фокуса    //  rnd,          
+                InitializeCoordinates(Coordinates, X, Y); //На сгенерированных координатах фокуса    //  rnd,          
 
                 counter.inter_Data_.Clear();
                 for (int i = 0; i < focusFieldSize; i++)
@@ -128,7 +126,7 @@ namespace MNIST
 
             {// Прорисовка того, как зрачёк движится по полю (в каких точках он бывает чаще).
                 way[X + 2, Y + 2] += 1;
-                if (wayMax < way[X + 2, Y + 2])
+                if (wayMax < way[X + 2, Y + 2])//&& IsColoured
                 {
                     wayMax = way[X + 2, Y + 2] + 1;
                 }
@@ -150,6 +148,10 @@ namespace MNIST
                                     wayMin = wayByte[i, j];
                                 }
                             }
+                            //if (meter == 10 && way[i, j] > 10)
+                            //{
+                            //    way[i, j] -= 10;
+                            //}
 
                         }
                     }
@@ -173,17 +175,17 @@ namespace MNIST
 
                 if (IsColoured)
                 {
-                    InitializeCoordinates( Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти//rnd,
+                    InitializeCoordinates(Coordinates, prevX2, prevY2); //Повторяется положение вспомненного фокуса для укрепления памяти//rnd,
 
                 }
                 else
                 {
-                    InitializeCoordinates( Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций//rnd,
+                    InitializeCoordinates(Coordinates, X, Y); //На окончательных координатах фокуса, после всех коррекций//rnd,
                 }
-                if (isVisualSelected)
-                {
-                    bitMap_Draw = BitmapMaker.MakeBitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
-                }
+                //if (isVisualSelected)
+                //{
+                //    bitMap_Draw = BitmapMaker.MakeBitmap(Coordinates, X + 3, Y + 3, IsColoured, 10, false); //Выводит рисунок фокуса на поле, в том виде, в котором эта информация будет передана в нейронную сеть 
+                //}
 
                 for (int i = 0; i < focusFieldSize; i++)
                 {
@@ -201,6 +203,7 @@ namespace MNIST
         /// </summary>
         private void UpdateXY()
         {
+            //if (Math.Abs(bufX - X) > 1)
             if (bufX != X)
             {
                 if (bufX > X)
@@ -211,9 +214,10 @@ namespace MNIST
                 {
                     X = bufX + 1;
                 }
-                bufX = X;
             }
+            bufX = X;
 
+            //  if (Math.Abs(bufY - Y) > 1)
             if (bufY != Y)
             {
 
@@ -225,8 +229,8 @@ namespace MNIST
                 {
                     Y = bufY + 1;
                 }
-                bufY = Y;
             }
+            bufY = Y;
         }
 
         /// <summary>
@@ -313,19 +317,19 @@ namespace MNIST
         /// <summary>
         /// Эта функция создаёт пятно фокуса на поле. 
         /// </summary>
-        private void InitializeCoordinates( byte[,] Coordinates, int X, int Y)//Random rnd,
+        private void InitializeCoordinates(byte[,] Coordinates, int X, int Y)//Random rnd,
         {
-            Random rnd = new Random();
-            for (int i = 0; i < focusFieldSize; i++)
-            {
-                for (int j = 0; j < focusFieldSize; j++)
-                {
-                    if (rnd.Next(100) <= 1)
-                    {
-                        Coordinates[i, j] = 1;
-                    }
-                }
-            }
+            //Random rnd = new Random();
+            //for (int i = 0; i < focusFieldSize; i++)
+            //{
+            //    for (int j = 0; j < focusFieldSize; j++)
+            //    {
+            //        if (rnd.Next(100) <= 1)
+            //        {
+            //            Coordinates[i, j] = 1;
+            //        }
+            //    }
+            //}
             for (int i = 0; i < proportions; i++)
             {
                 for (int j = 0; j < proportions; j++)

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Forms;
 
 namespace MNIST
 {
 
     /// Анализ активности и обучение масок.
     [Serializable]
-    public class Harmoshka //TODO: сделать синглтоном тоже? Done. 
+    public class Harmoshka
     {
         private static Harmoshka instance = null;
         public static Harmoshka Instance
@@ -29,26 +28,25 @@ namespace MNIST
         public string Message = null;
         public List<Matte> Mattes = new List<Matte>();
         public List<ReverseMatte> ReverseMattes = new List<ReverseMatte>();
-        readonly List<float> inter_result_ = new List<float>();
+        private List<bool> ReverseMattes_List = new List<bool>();
+        //readonly List<float> inter_result_ = new List<float>();
 
 
         public int ErrorCount { get; set; } = 60000;//Количество элементов. 
 
-        public bool LessonTrigger { get; set; } = false;
+        //public bool LessonTrigger { get; set; } = false;
 
         public float Satiety { get; set; } = 0.15f; //Порог жизни маски
 
-        public float CorrectionThreshold { get; set; } = 0.5f;
+        public float CorrectionThreshold { get; set; } = 0.8f;
 
-        public float V2 { get; set; } = 0.7f;//Мах возраст участия
+        //public float V2 { get; set; } = 0.7f;//Мах возраст участия
 
         public float V5 { get; set; } = 0.2f;//Мах активность группы
 
         public int MemoryDuration { get; set; } = 1000;//Длительность памяти
 
         public int SleepStep = 22;
-        private int Matteselect = 0;
-        private int reverseMatteselect = 0;
 
         private readonly List<float> firstAssessment = new List<float>();
         private readonly List<float> secondAssessment = new List<float>();
@@ -61,12 +59,6 @@ namespace MNIST
         private readonly List<int> firstContractionInterResult = new List<int>();
         private readonly List<int> secondContractionInterResult = new List<int>();
 
-        private float Reverse_appeal_max = 0.65f;
-        private float Reverse_Control_value_max = 43.0f;
-        private float Mattes_Activ_max = 1.01f;
-        private float Mattes_appeal_max = 0.7009f;
-        private int Mattes_Control_value_max = 243;
-
         private InternalActivityMasksArgs internalActivityMasksArgs = new InternalActivityMasksArgs()
         {
             interResults = new List<List<float>>()
@@ -76,6 +68,7 @@ namespace MNIST
             secondContractionInterResults = new List<List<int>>()
             { new List<int>(1000), new List<int>(1000), new List<int>(1000), new List<int>(1000) }
         };
+
         public Counter Assessment(int dispenser, List<float> inputData, float semblance, int indexData = -1)
         {
             interResult.Clear();
@@ -88,14 +81,11 @@ namespace MNIST
             Counter counter = new Counter();
             List<int> indexData_ = new List<int>();
 
-
             assessmentCounter++;
-
 
             if (assessmentCounter % MemoryDuration == 0)
             {
-
-                _ = new Clearing(Mattes, ReverseMattes, Satiety, Matteselect);
+                _ = new Clearing(Mattes, ReverseMattes, Satiety, ReverseMattes_List);// Matteselect,
             }
 
             float[] interData = inputData.ToArray();
@@ -104,46 +94,35 @@ namespace MNIST
             //Коррекция входящего сигнала 
             if (inputDataCount > 0 && ReverseMattes.Count > 0 && firstAssessment.Count > 0)
             {
-
                 _ = new Correction(inputDataCount, ReverseMattes, firstAssessment, secondAssessment, interData, semblance, indexData_);
-                indexData = indexData_[0];
+                indexData = indexData_[0];// Индекс узнанного нейросетью события (вспомогательная величина не соотносящаяся с реальным событием)
             }
-            // Порог минимального значения после коррекции
-            ResetByThreshold(contractionInputData, interData, CorrectionThreshold);
+
+            for (int i = 0; i < inputDataCount; i++)// Порог минимального значения входящих данных после коррекции     
+            {
+                if (interData[i] <= CorrectionThreshold)
+                {
+                    interData[i] = 0;
+                }
+                else
+                {
+                    contractionInputData.Add(i);//Для ускорения расчётов
+                }
+            }
 
             counter.inter_Data_.Clear();
-
+            counter.summ2 = 0;
             for (int i = inputDataCount - dispenser; i < inputDataCount; i++)
             {
-                counter.inter_Data_.Add(interData[i] > 1.0f ? (byte)1 : (byte)0);
+                counter.inter_Data_.Add(interData[i] > 1 ? (byte)1 : (byte)0); //Список активных моторных нейронов
+                if (interData[i] > 1) counter.summ2++;// сведения о наличии активности моторных нейронов 
             }
 
-            counter.summ = 0;
-            counter.summ2 = 0;
-            int l = 0;
-            for (int i = inputDataCount - dispenser + 1; i < inputDataCount; i++)
-            {
-                if (interData[i] > 1.0f) // сведения о наличии активности зрительных и моторных нейронов по отдельности
-                {
-                    if (l < dispenser)
-                    {
-                        counter.summ++;
-                    }
-                    else
-                    {
-                        counter.summ2++;
-                    }
-                }
-                l++;
-            }
             counter.inter_Data_Full.Clear();
-            for (int i = 0; i < inputDataCount; i++)// сведения о активности зрительных и моторных нейронов по отдельности
-            {
-                counter.inter_Data_Full.Add(interData[i] > 1 ? (byte)1 : (byte)0);
-            }
+            for (int i = 0; i < inputDataCount; i++) counter.inter_Data_Full.Add(interData[i] > 1 ? (byte)1 : (byte)0);// Список активных зрительных и моторных нейронов. Передаётся в обработчик движения Preparationinput 
 
-            //Инициализация масок
-            if (Mattes.Count == 0)
+
+            if (Mattes.Count == 0) //Инициализация нейронов первого слоя
             {
                 Matte matte = new Matte(inputData, 0, Satiety);
                 Mattes.Add(matte);
@@ -158,176 +137,96 @@ namespace MNIST
                 mattes = Mattes,
                 secondContractionInterResult = secondContractionInterResult
             };
-            ActivityMasks activityMasks = new ActivityMasks(activityMasksArgs, internalActivityMasksArgs, inputDataCount, dispenser);
-            float Activ_ = activityMasks.Activ_;
+            ActivityMasks activityMasks = new ActivityMasks(activityMasksArgs, internalActivityMasksArgs, inputDataCount, dispenser); //Расчёт активности первого слоя
+            float Activ_ = activityMasks.Activ_; //Значение активнсти самого возбуждённого нейрона первого слоя
+            int Index = activityMasks.Index; //Самый возбуждённый нейрон первого слоя
 
-            int Index = activityMasks.Index;
+            for (int i = 0; i < interResult.Count; i++) counter.room2.Add((int)Math.Truncate(interResult[i] * 100));// Выыод данных для графтка активности первого слоя
 
-            TeachMatte(inputData, Activ_, Index, Mattes);//Обучение масок            
+            TeachMatte(inputData, Activ_, Index, Mattes);//формирование и обучение первого слоя            
 
-            //Расчёт активности результирующих масок отвечающих за зрение
-            ActivityReverseMasks activityReverseMasks = CalculateReverseMasksActivity(interResult, firstContractionInterResult,
-                                                                                      secondContractionInterResult, counter,
-                                                                                      firstAssessment, secondAssessment);
+            ActivityReverseMasks activityReverseMasks = CalculateReverseMasksActivity(interResult, firstContractionInterResult, secondContractionInterResult, counter, firstAssessment, secondAssessment); //Расчёт активности второго слоя
+            int maxActivityIndex = activityReverseMasks.Ind; //Самый возбуждённый нейрон второго слоя
+            float firstActiv = activityReverseMasks.Activ; // Значение максимального возбуждения среди зрительных нейронов
+            float secondActiv = activityReverseMasks.secondActiv;//Значение максимального возбуждения среди моторных нейронов
 
-            //Подсчет ошибки
-            counter.str2 = false; //TODO: уточнить, что за str2. 
+            if (assessmentCounter % 4000 == 0)//Вывод в консоль кратких сведеней о нейросети            
+                Message += "нейр:" + Mattes.Count.ToString() + " гр:" + ReverseMattes.Count.ToString() + "\r\n";
 
-            int maxActivityIndex = activityReverseMasks.Ind;
-            if (ReverseMattes.Count >= maxActivityIndex && maxActivityIndex != -1)
+            if (ReverseMattes.Count == 0)// Формирование второго слоя
             {
-                if (ReverseMattes[maxActivityIndex].room == indexData && indexData != -1)
-                {
-                    counter.str2 = true;
-                }
-                counter.Index = ReverseMattes[maxActivityIndex].room;
-            }
-
-            if (assessmentCounter % 4000 == 0)//Вывод ошибки
-            {
-                Message += "нейр:" + Mattes.Count.ToString() + "/" + Matteselect.ToString() + " гр:" + ReverseMattes.Count.ToString() + "/" + reverseMatteselect.ToString() + "\r\n";//
-            }
-            //Конец подсчёта ошибок	
-
-            // Формирование результирующей маски
-            if (ReverseMattes.Count == 0)
-            {
-                reverseMatteCounter++;
-                CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter, false);
+                reverseMatteCounter++; //Здесь и ниже, счётчик фактического порядкого номера нейрона второго слоя
+                CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter);
             }
             else
             {
-                bool IndVarMax = (maxActivityIndex == -1) ||
-                    (Activ_ < 0.90f && ReverseMattes[maxActivityIndex].appeal_ < 0.95f && ReverseMattes[maxActivityIndex].appeal_ > 0.001f );
-                bool IndVarActiv = false;
-                if (maxActivityIndex > -1 && ReverseMattes.Count > maxActivityIndex)
-                {
-                    IndVarActiv = (ReverseMattes[maxActivityIndex].appeal_ > Reverse_appeal_max && ReverseMattes[maxActivityIndex].Control_value > Reverse_Control_value_max && !ReverseMattes[maxActivityIndex].elect && ReverseMattes[maxActivityIndex].participation > 1);
-                    if (IndVarActiv)
-                    {
-                        reverseMatteselect++;
-                        ReverseMattes[maxActivityIndex].elect = true;
-                    }
-                }
+                bool IndVarMax = maxActivityIndex == -1 || (firstActiv < 0.2f && secondActiv < 0.2f && firstActiv > 0.0f && secondActiv > 0.0f); // Если нет активных нейронов во втором слое или если возбуждение нейрона второго слоя не значительно.
 
                 if (firstAssessment.Count > 0 && (IndVarMax))
                 {
-                    for (int i = 0; i < firstAssessment.Count; i++)
+                    if ((maxActivityIndex == -1)) // Если во втором слое нет ни одного нейрона удовлетворяющего условиям возбуждённого состояния. Активность второго слоя обнуляется.
                     {
-                        firstAssessment[i] = 0;
+                        for (int i = 0; i < firstAssessment.Count; i++)
+                        {
+                            firstAssessment[i] = 0;
+                        }
+                        pass = false;
                     }
-                    CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter, false);
-                    maxActivityIndex = ReverseMattes.Count - 1;
+                    CreateReverseMatte(inputData, indexData, interResult, reverseSatiety, reverseMatteCounter); // формирование нейронов второго слоя
+                    maxActivityIndex = ReverseMattes.Count - 1; //Вновь сформированный нейрон назначается самым активным
                     firstAssessment.Add(1);
-                    pass = false;
+
                     reverseMatteCounter++;
                 }
-            }
-            //Конец формирования результирующей маски
+            }//Конец формирования второго слоя
 
-            //Начало обучения результирующей маски
-            if (indexData_.Count == 1)
-            {
-                TeachReverseMatte(inputData, indexData, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex);
-            }
-            else
-            {
-                for (int i = 0; i < indexData_.Count; i++)
-                {
-                    indexData = indexData_[i];
-                    TeachReverseMatte(inputData, indexData, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex);
-                }
-            }
-            //Конец обучения результирующей маски
+            TeachReverseMatte(inputData, indexData, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex); //Обучение второго слоя
 
-            //Фиксация обучения
-            if (assessmentCounter % 10 == 0)
-            {
-                FixLesson(pass, SleepStep, Mattes, ReverseMattes);
-            }
+
+            if (assessmentCounter % 10 == 0) FixLesson(pass, SleepStep, Mattes, ReverseMattes); //Фиксация обоих слоёв
+
             return counter;
         }
 
-        private void TeachReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, ref bool correctTrigger, bool pass,
-                                       Counter counter, ActivityReverseMasks activityReverseMasks, ref int index)
+
+
+        private void TeachReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, ref bool correctTrigger, bool pass, Counter counter, ActivityReverseMasks activityReverseMasks, ref int index)
         {
             float activ = activityReverseMasks.Activ;
             counter.str1 = activ;
-            float roomValue = -1000;
-            int roomIndex = -1;
-            float roomAppeal = 0.9f;
-            int roomLive = 0;
-            if (index > -1 && LessonTrigger && pass)// Принудительное исправление активного индекса
-            {
-                if (ReverseMattes[index].room != dataIndex && firstAssessment[index] > 0)
-                {
-                    for (int i = 0; i < firstAssessment.Count; i++)
-                    {
-                        if (i != index && firstAssessment[i] >= roomValue && ReverseMattes[i].appeal_ <= roomAppeal && ReverseMattes[i].Live > roomLive && ReverseMattes[i].room == dataIndex)
-                        {
-                            roomValue = firstAssessment[i];
-                            roomIndex = i;
-                            roomAppeal = ReverseMattes[i].appeal_;
-                            roomLive = ReverseMattes[i].Live;
-                        }
-                    }
-                    if (roomIndex > -1 && roomValue > -1000)
-                    {
-                        firstAssessment[index] = 0;
-                        correctTrigger = false;
-                        index = roomIndex;
-                        activ = firstAssessment[index];
-                    }
-                }
-            }// Конец принудительного исправления индекса
 
             if (activ > 1)
             {
                 for (int i = 0; i < ReverseMattes.Count; i++)
                 {
-                    firstAssessment[i] = (float)firstAssessment[i] / activ;// Приведение значения активности результирующих масок к еденице
+                    firstAssessment[i] = (float)firstAssessment[i] / activ;// Приведение значения активности результирующих масок к еденице. Так становится понятно где максимум.
                 }
             }
 
             if (index > -1 && pass)
             {
-                float appeal;
                 activ = firstAssessment[index];
-                if (ReverseMattes[index].room == dataIndex || !LessonTrigger)//Основной цикл обучения 
+                if (ReverseMattes[index].room) //Основной цикл обучения самого возбуждённого нейрона второго слоя начинается только для тех нейронов, которые имеют приемственность в передаче сигнала.
                 {
-                    appeal = ReverseMattes[index].appeal_;
-                    if ((activ > appeal || LessonTrigger) && !ReverseMattes[index].elect)//
+                    if (activ > 0.7f && ReverseMattes[index].participation > 2) // Если нейрон достаточно активен и участвует в цепочке возбуждения.
                     {
-                        if (appeal < 0.8f)
-                        {
-                            ReverseMattes[index].Lesson(inputData, interResult, correctTrigger);
-                        }
-                        else
-                        {
-                            ReverseMattes[index].Lesson(inputData, correctTrigger);
-                        }
-                        if (activ > appeal && appeal < 0.97f)
-                        {
-                            ReverseMattes[index].appeal_ += 0.01f;
-                        }
+                        ReverseMattes[index].Lesson(inputData, interResult, correctTrigger); // Нейрон обучается как на входящей в слой информации, так и на информации поступившей в нейронную сеть. Последнее необходимо для формирования исходящего сигнала передаваемого в обработчик движения Preparationinput.
                     }
+                    else
+                    {
+                        ReverseMattes[index].Lesson(inputData, interResult);
+                    }
+                    ReverseMattes[index].appeal_ += 0.01f;
                 }//Конец основного цикла обучения
-                if (dataIndex == ReverseMattes[index].room || dataIndex == -1)//Формирование обстракций
+
+                for (int i = 0; i < ReverseMattes.Count; i++)// Формирование обстракций
                 {
-                    for (int i = 0; i < ReverseMattes.Count; i++)
+                    if (index != i && firstAssessment[i] > 0 && !ReverseMattes[i].room)
                     {
-                        appeal = ReverseMattes[i].appeal_;
-                        if (appeal > 0.3f && appeal < V2)
-                        {
-                            if (index != i && firstAssessment[i] > V5 && firstAssessment[i] < V2)
-                            {
-                                ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] - (V5 + 0.01f));
-                                ReverseMattes[i].Control_value++;
-                                ReverseMattes[i].appeal_ += 0.001f;
-                            }
-                        }
+                        ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] * 0.00001f);
+                        ReverseMattes[i].appeal_ += firstAssessment[i] * 0.001f;
                     }
-                }//Конец формирования абстракций
+                }//Конец формирования абстракций                
             }
         }
 
@@ -342,7 +241,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (mattes[j].Contraction_ && !mattes[j].elect)
+                    if (mattes[j].Contraction_)//&& !mattes[j].elect
                     {
                         mattes[j].Control_value--;
                     }
@@ -356,7 +255,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (reverseMattes[i].Contraction_ && pass && reverseMattes[i].appeal_ <= 0.2f && !reverseMattes[i].elect)
+                    if (reverseMattes[i].Contraction_ && pass)//&& !reverseMattes[i].elect&& reverseMattes[i].appeal_ <= 0.2f
                     {
                         reverseMattes[i].Control_value -= 0.01f;
                     }
@@ -364,10 +263,11 @@ namespace MNIST
             }
         }
 
-        private void CreateReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, float reverseSatiety, int reverseMatteCounter, bool IndVarActiv)
+        private void CreateReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, float reverseSatiety, int reverseMatteCounter)
         {
-            ReverseMatte reverseMatte = new ReverseMatte(inputData, dataIndex, interResult, reverseMatteCounter, reverseSatiety, IndVarActiv);
+            ReverseMatte reverseMatte = new ReverseMatte(inputData, dataIndex, interResult, reverseMatteCounter, reverseSatiety);
             ReverseMattes.Add(reverseMatte);
+            ReverseMattes_List.Add(true);
         }
 
         private ActivityReverseMasks CalculateReverseMasksActivity(List<float> interResult, List<int> firstContractionInterResult, List<int> secondContractionInterResult,
@@ -381,7 +281,7 @@ namespace MNIST
             for (int i = 0; i < firstAssessment.Count; i++)
             {
                 counter.Assessment.Add(firstAssessment[i] + secondAssessment[i]);
-                counter.room.Add(ReverseMattes[i].room);
+                counter.room.Add((int)Math.Truncate(firstAssessment[i] * 100));
             }
 
             return activityReverseMasks;
@@ -389,53 +289,22 @@ namespace MNIST
 
         private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes)
         {
-            try
+            if (Activ_ > 0)// Если в первом слое есть активный нейрон mattes[index].appeal
             {
-                if (Activ_ > mattes[index].appeal)// Отслежывается активность масок
+                mattes[index].Lesson(inputData);
+                if (mattes[index].appeal < 0.7f)
                 {
-                    mattes[index].Lesson(inputData);
-                    if (mattes[index].appeal < 0.7f)
-                    {
-                        mattes[index].appeal += 0.001f;
-                    }
+                    mattes[index].appeal += 0.01f;
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(index.ToString());
-                MessageBox.Show(ex.ToString());
-            }
 
-            //Формирование масок
-            if (Activ_ <= Satiety + 0.3f)
+            if (Activ_ <= 0.7f) //Дублирование самого возбуждённого нейрона первого слоя, если его активность не превышает порог, или создание нового нейрона.
             {
-                Matte matte = new Matte(inputData, (ushort)(mattes.Count), Satiety);
+                Matte matte = new Matte(inputData, (ushort)(mattes[mattes.Count - 1].room + 1), Satiety);
                 mattes.Add(matte);
             }
-
-            if (Activ_ > Mattes_Activ_max && mattes[index].appeal > Mattes_appeal_max && !mattes[index].elect && mattes[index].Control_value > Mattes_Control_value_max)
-            {
-                mattes[index].elect = true;
-                Matteselect++;
-            }
-
-
         }
 
-        private void ResetByThreshold(List<int> contractionInputData, float[] array, float threshold)
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i] <= threshold)
-                {
-                    array[i] = 0;
-                }
-                else
-                {
-                    contractionInputData.Add(i);//Для ускорения расчётов
-                }
-            }
-        }
 
         // Сохранение масок
         //TODO: какой-то косяк с сохранением, не забыть посмотреть. Вроде бы здесь всё хорошо, нужно искать дальше. 

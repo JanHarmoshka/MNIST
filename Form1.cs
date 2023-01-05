@@ -66,7 +66,7 @@ namespace MNIST
             return BitConverter.ToInt32(intAsBytes, 0);
         }
 
-        bool sessionFlag = false;
+        //bool sessionFlag = false;
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -76,12 +76,17 @@ namespace MNIST
         BackgroundWorker worker;
         byte minWoll = 0;
         int WollWin = 0;
+        int gamesPlayed = 0;
         int bb = 0;
+        private object RichTextBox1;
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
             worker = sender as BackgroundWorker;
+
+            bool TabPages4BoolStop = false;
+            bool TabPages4Bool = false;
 
             List<float> inter_result = new List<float>();
             int Index = 0;
@@ -91,7 +96,7 @@ namespace MNIST
             List<float> InputData = new List<float>();
             List<byte> InputDataBuf = new List<byte>();
             byte[] IndexList = new byte[14];
-            bool Eror_Bool;
+            // bool Eror_Bool;
             int NumberGames = 0;
 
             int X = 7;
@@ -101,10 +106,12 @@ namespace MNIST
             int Xb = 0;
             int Yb = 0;
 
+            float summ = 0;
+            float summ_0 = 0;
 
             Stopwatch sw = new Stopwatch();
             bool col;
-            float semblance = 20;
+            float semblance = 50f;
 
             int baseСoordinate = 5;
             int baseСoordinateBuf = -1;
@@ -116,252 +123,297 @@ namespace MNIST
             Bitmap b2 = new Bitmap(10, 10);
             PreparationInput preparation_input = PreparationInput.Instance;
             BreakOut game = new BreakOut();
-
-            // Счётчик запусков основного алгоритмс
-            for (int l = 0; l < 100; l++)
-            {
-                Random rnd = new Random();
-
-                byte[,] pixelsBuf = new byte[28, 28];
-                byte[,] arrayb2 = new byte[12, 12];
-                byte[,] pixels = new byte[28, 28];
-
-                int focusSize = 6;// Размер зрачка
-
-                Harmoshka.LessonTrigger = sessionFlag;
-
-                //основной алгоритм программы
-
-                for (int di = 0; di < Harmoshka.ErrorCount; di++)
-                {
-                    button1.Invoke((MethodInvoker)delegate
-                    {
-                        if (button1.Enabled == false)
-                        {
-                            InitializeHarmoshka();
-                        }
-                        button1.Enabled = true;
-                    });
-                    nn++;
-                    if (scroll.Count < Harmoshka.ErrorCount)
-                    {
-                        scroll.Add(false);
-                    }
-
-                    if (worker.CancellationPending == true)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-
-                    if (di % 500 == 0) // Частота прорисовки графиков
-                    {
-                        worker.ReportProgress(0);
-                    }
-
-                    {//Подготовка изображения для загрузки в нейронную сеть
-
-                        if (game.gameOver || game.gameWin)
-                        {
-                            NumberGames++;
-                            game.gameOver = false;
-                            game.gameWin = false;
-                        }
-                        pixels = game.MoveGame(baseСoordinate);
- 
-
-                        b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
-                        b2 = new Bitmap(b2, new Size(12, 12));
-                        BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
-                    }// Конец подготовки изображения
-
-
-                    Index = game.bollСoordinate;
-                    if (game.woll == 0)
-                    {
-                        minWoll = game.minWoll;
-                    }
-
-                    if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
-                    {
-                        Harmoshka.Message += String.Format(">>{0:000}% ", (bb / 600.001f)) + "Сыграно:" + NumberGames;
-                        Harmoshka.Message += String.Format(" {00:00.0}", sw.ElapsedMilliseconds / 1000.0f) + "c" + "\r\n" + "\r\n";
-                        sw.Restart();
-                        NumberGames = 0;
-                    }
-
-                    bb++;
-
-                    allError++;
-                    all.Add(1);
-                    Eror_Bool = true;
-
-
-                    bool TabPagesBool = false;
-                    tabControl1.Invoke((MethodInvoker)delegate
-                    {
-                        TabPagesBool = tabControl1.SelectedIndex == 1;
-                    });
-
-                    int ll = 0;
-                    counter.Assessment.Clear();
-                    counter.room.Clear();
-                    do //обработка одного изображения в цикле узнавания
-                    {
-                        col = true;
-                        GreenCount++;
-
-                        preparation_input.PrepareInput(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
-
-
-                        col = preparation_input.IsColoured;
-                        BlackCount += preparation_input.BlackCount;
-                        GreenCount += preparation_input.GreenCount;
-                        X = preparation_input.X;
-                        Y = preparation_input.Y;
-                        semblance = preparation_input.Semblance;
-
-
-
-                        if (TabPagesBool)
-                        {
-                            DrawImage(pictureBox3, preparation_input.bitMap);
-                            bitMap = BitmapMaker.MakeBitmap(pixels, X + 3, Y + 3, col);
-                            DrawImage(pictureBox1, bitMap);
-                        }
-
-                        BackgroundWorkerHelper.FillInputData(InputData, arrayb2, pixels, focusSize, X, Y);
-
-                        if (TabPagesBool)
-                        {
-                            byte[,] pixels_ = BackgroundWorkerHelper.CreateFocusArray(X, Y, pixels, focusSize);
-                            bitMap_ = BitmapMaker.MakeBitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
-                            DrawImage(pictureBox2, bitMap_);
-
-                            b2 = new Bitmap(b2, new Size(280, 280)); //прорисовка переферийного зрения
-                            DrawImage(pictureBox5, b2);
-                            DrawImage(pictureBox6, preparation_input.bitMap_Draw);
-                            DrawImage(pictureBox4, preparation_input.way_Draw);
-
-                            label16.Invoke((MethodInvoker)delegate
-                            {
-                                label16.Text = "Повторение символа: " + ll.ToString();
-                                label17.Text = "Множетель корекции входящего сигнала: " + semblance.ToString();
-                            });
-                        }
-                        if (preparation_input.DrawFocusField)
-                        {
-                            DrawImage(pictureBox9, preparation_input.way_Draw);
-                        }
-
-                        Xb = X;
-                        Yb = Y;
-
-                        for (int i = 0; i < InputData.Count; i++)
-                        {
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 0;
-                            }
-                            if (rnd.Next(0, 9) > 8)
-                            {
-                                InputData[i] = 1;
-                            }
-                        }
-                        for (int i = 0; i < preparation_input.InputData.Count; i++)
-                        {
-                            InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
-                        }
-
-                        counter = Harmoshka.Assessment(784, InputData, semblance); // вход в нейронную сеть
-
-                        if (counter.str2 && Eror_Bool)
-                        {
-                            Eror_Bool = false;
-                        }
-                        int p = (int)(Math.Round(Y / 1.7f) - 3);
-                        if (p < 0)
-                        {
-                            p = 0;
-                        }
-                        if (p > 9)
-                        {
-                            p = 9;
-                        }
-                        IndexList[p]++;
-                        ll++;
-                    }
-                    while (ll < 5);
-
-
-                    if (TabPagesBool)
-                    {
-                        DrawNumberHistogram(Index, IndexList);
-                        DrawActivityHistogram(Index, counter);
-                    }
-
-                    int IndexLisBuf = 0;//поиск самой активной группы, для определения координаты платформы
-                    for (int i = 0; i < 9; i++)
-                    {
-                        if (IndexList[i] > IndexLisBuf)
-                        {
-                            IndexLisBuf = IndexList[i];
-                            baseСoordinate = i;//результат поиска
-                        }
-
-                    }
-
-                    baseСoordinateBuf = baseСoordinate;
-
-                    int indexVar = IndexList[Index];
-                    int sunset = 0;
-                    bool indexBool = false;
-                    for (int i = 0; i < 10; i++)
-                    {
-                        if (IndexList[i] > indexVar)
-                        {
-                            indexBool = true;
-                            sunset++;
-                        }
-                        IndexList[i] = 0;
-                    }
-                    if ((!indexBool || sunset < 2) & indexVar != 0)
-                    {
-                        allError--;
-                        all[all.Count - 1] = 0;
-                    }
-
-
-                    if (Harmoshka.Message != null)
-                    {
-                        worker.ReportProgress(di, Harmoshka.Message);
-                        Harmoshka.Message = null;
-                    }
-
-                    if (l > 0)
-                    {
-                        allError -= all[0];
-                        all.RemoveAt(0);
-                    }
-
-                    if (!game.gameOver && game.gameWin)
-                    {
-                        WollWin++;
-                    }
-                }
-
-                InputData.Clear();
-                InputData.TrimExcess();
-            }
             try
             {
+                // Счётчик запусков основного алгоритмс
+                for (int l = 0; l < 100; l++)
+                {
+                    Random rnd = new Random();
 
+                    byte[,] pixelsBuf = new byte[28, 28];
+                    byte[,] arrayb2 = new byte[12, 12];
+                    byte[,] pixels = new byte[28, 28];
+
+                    int focusSize = 6;// Размер зрачка
+
+                    //Harmoshka.LessonTrigger = sessionFlag;
+
+                    //основной алгоритм программы
+
+                    for (int di = 0; di < Harmoshka.ErrorCount; di++)
+                    {
+                        button1.Invoke((MethodInvoker)delegate
+                        {
+                            if (button1.Enabled == false)
+                            {
+                                InitializeHarmoshka();
+                            }
+                            button1.Enabled = true;
+                        });
+                        nn++;
+                        if (scroll.Count < Harmoshka.ErrorCount)
+                        {
+                            scroll.Add(false);
+                        }
+
+                        if (worker.CancellationPending == true)
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        if (di % 500 == 0) // Частота прорисовки графиков
+                        {
+                            worker.ReportProgress(0);
+                        }
+
+                        {//Подготовка изображения для загрузки в нейронную сеть
+
+                            if (game.gameOver || game.gameWin)
+                            {
+                                NumberGames++;
+                                gamesPlayed++;
+                                game.gameOver = false;
+                                game.gameWin = false;
+                            }
+                            pixels = game.MoveGame(baseСoordinate);
+
+
+                            b2 = BitmapMaker.MakeBitmap(pixels, X_, Y_, false, 1, false); //Уменьшение исходного изображения для переферийного зрения
+                            b2 = new Bitmap(b2, new Size(12, 12));
+                            BackgroundWorkerHelper.PixelsFromImage(b2, arrayb2);
+                        }// Конец подготовки изображения
+
+
+                        Index = game.bollСoordinate;
+                        if (game.woll == 0)
+                        {
+                            minWoll = game.minWoll;
+                        }
+
+                        //if (summ == 0)
+                        //{
+                        //    summ = counter.summ2;
+                        //}
+                        //else if (counter.summ2 > 0)
+                        //{
+                        //    summ = ((counter.summ2 + summ) / 2f);
+                        //}
+
+                        //if (counter.summ2 == 0)
+                        //{
+                        //    summ_0++;
+                        //}
+
+
+                        if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
+                        {
+                            Harmoshka.Message += String.Format(">>{0:000}% ", (bb / 600.001f)) + "Сыграно:" + NumberGames;//+ " " + String.Format("{0:000} ", summ) + " " + summ_0
+                            Harmoshka.Message += String.Format(" {00:00.0}", sw.ElapsedMilliseconds / 1000.0f) + "c" + "\r\n";
+                            sw.Restart();
+                            NumberGames = 0;
+                            summ_0 = 0;
+                        }
+
+                        bb++;
+
+                        allError++;
+                        all.Add(1);
+                        //Eror_Bool = true;
+
+
+                        bool TabPagesBool = false;
+                        tabControl1.Invoke((MethodInvoker)delegate
+                        {
+                            TabPagesBool = tabControl1.SelectedIndex == 1;
+                        });
+
+                        tabControl1.Invoke((MethodInvoker)delegate
+                        {
+                            TabPages4Bool = tabControl1.SelectedIndex == 3;
+                        });
+                        if (!TabPages4Bool)
+                        {
+                            TabPages4BoolStop = false;
+                        }
+
+                        int ll = 0;
+                        counter.Assessment.Clear();
+                        counter.room.Clear();
+                        do //обработка одного изображения в цикле узнавания
+                        {
+                            col = true;
+                            GreenCount++;
+                            preparation_input.PrepareInput(counter, semblance, Xb, Yb, reproduction, TabPagesBool);
+
+                            col = preparation_input.IsColoured;
+                            BlackCount += preparation_input.BlackCount;
+                            GreenCount += preparation_input.GreenCount;
+                            X = preparation_input.X;
+                            Y = preparation_input.Y;
+                            //semblance = preparation_input.Semblance;
+
+
+
+                            if (TabPagesBool)
+                            {
+                                DrawImage(pictureBox3, preparation_input.bitMap);
+                                bitMap = BitmapMaker.MakeBitmap(pixels, X + 3, Y + 3, col);
+                                DrawImage(pictureBox1, bitMap);
+                            }
+
+                            BackgroundWorkerHelper.FillInputData(InputData, arrayb2, pixels, focusSize, X, Y);
+
+                            if (TabPagesBool)
+                            {
+                                byte[,] pixels_ = BackgroundWorkerHelper.CreateFocusArray(X, Y, pixels, focusSize);
+                                bitMap_ = BitmapMaker.MakeBitmap(pixels_, 9, 9, col, 15, true);//прорисовка фокуса зрения
+                                DrawImage(pictureBox2, bitMap_);
+
+                                b2 = new Bitmap(b2, new Size(280, 280)); //прорисовка переферийного зрения
+                                DrawImage(pictureBox5, b2);
+                                // DrawImage(pictureBox6, preparation_input.bitMap_Draw);
+                                DrawImage(pictureBox4, preparation_input.way_Draw);
+
+                                label16.Invoke((MethodInvoker)delegate
+                                {
+                                    label16.Text = "Повторение символа: " + ll.ToString();
+                                });
+                            }
+                            if (preparation_input.DrawFocusField)
+                            {
+                                DrawImage(pictureBox9, preparation_input.way_Draw);
+                            }
+
+                            Xb = X;
+                            Yb = Y;
+
+                            //for (int i = 0; i < InputData.Count; i++)
+                            //{
+                            //    if (rnd.Next(0, 9) > 8)
+                            //    {
+                            //        InputData[i] = 0;
+                            //    }
+                            //    if (rnd.Next(0, 9) > 8)
+                            //    {
+                            //        InputData[i] = 1;
+                            //    }
+                            //}
+                            for (int i = 0; i < preparation_input.InputData.Count; i++) // К входящиму в нейросеть сигналу добавляется информация о движении
+                            {
+                                InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
+                            }
+                            counter = Harmoshka.Assessment(784, InputData, semblance); // вход в нейронную сеть
+
+                            if (TabPages4Bool && !TabPages4BoolStop)
+                            {
+                                richTextBox1.Invoke((MethodInvoker)delegate
+                                {
+                                    string Text = "";
+                                    foreach (Matte item in Harmoshka.Mattes)
+                                    {
+                                        //richTextBox1.Text += item.room + " | " + item.appeal + " | " + item.Control_value + " | " + item.mattepPositive + " | " + item.Control_value + "\r\n";
+                                        Text += String.Format("{00:00000} ", (item.room)) + String.Format("|{00:00.0000} ", (item.appeal)) + String.Format("|{00:000} ", (item.Control_value)) +
+                                             String.Format("|{00:000} ", (item.mattepPositive)) + String.Format("|{00:000} ", (item.matteNegative)) + String.Format("|{00:0000} ", (item.summ)) + "\r\n";
+                                    }
+                                    Text += "____________________________" + "\r\n";
+                                    foreach (ReverseMatte item in Harmoshka.ReverseMattes)
+                                    {
+                                        //richTextBox1.Text += item.room + " | " + item.appeal + " | " + item.Control_value + " | " + item.mattepPositive + " | " + item.Control_value + "\r\n";
+                                        Text += String.Format("{00:00000} ", (item.Live)) + String.Format("|{00:00.0000} ", (item.appeal_)) + String.Format("|{00:000.000} ", (item.Control_value)) +
+                                            String.Format("|{00:000} ", (item.mattepPositive)) + String.Format("|{00:000} ", (item.matteNegative)) + String.Format("|{00:0000} ", (item.summ)) +
+                                            String.Format("|{00:0000} ", (item.room)) + String.Format("|{00:0000} ", (item.participation)) + String.Format("|{00:0.000} ", (item.summCorrect)) + "\r\n";
+                                    }
+                                    richTextBox1.Text += Text + "____________________________" + "\r\n";
+                                });
+                                TabPages4BoolStop = true;
+                            }
+
+                            //if (counter.str2 && Eror_Bool)
+                            //{
+                            //    Eror_Bool = false;
+                            //}
+                            int p = (int)(Math.Round(Y / 2.4f) - 1);
+                            if (p < 0)
+                            {
+                                p = 0;
+                            }
+                            if (p > 10)
+                            {
+                                p = 10;
+                            }
+                            IndexList[p]++;
+                            ll++;
+                        }
+                        while (ll < 3);
+
+
+                        if (TabPagesBool)
+                        {
+                            DrawNumberHistogram(Index, IndexList);
+                            DrawActivityHistogram(Index, counter);
+                        }
+
+                        int IndexLisBuf = 0;//поиск самой активной группы, для определения координаты платформы
+                        for (int i = 0; i < 9; i++)
+                        {
+                            if (IndexList[i] > IndexLisBuf)
+                            {
+                                IndexLisBuf = IndexList[i];
+                                baseСoordinate = i;//результат поиска
+                            }
+
+                        }
+
+                        baseСoordinateBuf = baseСoordinate;
+
+                        int indexVar = IndexList[Index];
+                        int sunset = 0;
+                        bool indexBool = false;
+                        for (int i = 0; i < 10; i++)
+                        {
+                            if (IndexList[i] > indexVar)
+                            {
+                                indexBool = true;
+                                sunset++;
+                            }
+                            IndexList[i] = 0;
+                        }
+                        if ((!indexBool || sunset < 2) & indexVar != 0)
+                        {
+                            allError--;
+                            all[all.Count - 1] = 0;
+                        }
+
+
+                        if (Harmoshka.Message != null)
+                        {
+                            worker.ReportProgress(di, Harmoshka.Message);
+                            Harmoshka.Message = null;
+                        }
+
+                        if (l > 0)
+                        {
+                            allError -= all[0];
+                            all.RemoveAt(0);
+                        }
+
+                        if (!game.gameOver && game.gameWin)
+                        {
+                            WollWin++;
+                        }
+                    }
+
+                    InputData.Clear();
+                    InputData.TrimExcess();
+                }
             }
             catch (Exception ex)
             {
                 //Выводим ошибку
                 MessageBox.Show(ex.ToString());
             }
+
         }
 
         private void DrawActivityHistogram(int Index, Counter counter)
@@ -370,16 +422,23 @@ namespace MNIST
             {
                 Graphics g = pictureBox8.CreateGraphics();
                 g.Clear(Color.White);
-                Pen blackPen = new Pen(Color.Red, 1);
-                for (int i = 0; i < counter.Assessment.Count; i++)
+                Pen blackPen = new Pen(Color.Sienna, 1);
+                for (int i = 0; i < counter.room.Count; i++)
                 {
-                    blackPen.Color = Color.Black;
-                    if (counter.room[i] == Index)
-                    {
-                        blackPen.Color = Color.Red;
-                    }
-                    g.DrawLine(blackPen, i, 200, i, 200 - counter.Assessment[i] * 100);
+                    g.DrawLine(blackPen, i, 200, i, 200 - counter.room[i]);
                 }
+                g.DrawString("Активность нейронов второго слоя", new Font("Arial", 14), Brushes.Green, 2, 2);
+            });
+            pictureBox10.Invoke((MethodInvoker)delegate
+            {
+                Graphics g = pictureBox10.CreateGraphics();
+                g.Clear(Color.White);
+                Pen blackPen = new Pen(Color.Sienna, 1);
+                for (int i = 0; i < counter.room2.Count; i++)
+                {
+                    g.DrawLine(blackPen, i, 200, i, 200 - counter.room2[i]);
+                }
+                g.DrawString("Активность нейронов первого слоя", new Font("Arial", 14), Brushes.Green, 2, 2);
 
             });
         }
@@ -420,7 +479,7 @@ namespace MNIST
 
             Harmoshka.CorrectionThreshold = float.Parse(textBox8.Text);
 
-            Harmoshka.V2 = float.Parse(textBox7.Text);
+            //Harmoshka.V2 = float.Parse(textBox7.Text);
 
             Harmoshka.V5 = float.Parse(textBox12.Text);
 
@@ -458,10 +517,12 @@ namespace MNIST
             if (e.ProgressPercentage == 0)
             {
                 double y1 = (double)(WollWin);
-                label18.Text = y1.ToString();
-               // y1 -= Math.Truncate(bb / 6000f);
+                label18.Text = y1.ToString() + "/" + gamesPlayed;
+                if (gamesPlayed > 0)
+                {
+                    y1 = (double)WollWin / (gamesPlayed);
+                }
                 minWoll = 0;
-
 
                 if (BlackCount > 0)
                 {
@@ -477,8 +538,6 @@ namespace MNIST
                 }
                 BlackCount = 0;
                 GreenCount = 0;
-
-
 
                 if (series == null)
                 {
@@ -597,7 +656,6 @@ namespace MNIST
                     string[] text = File.ReadAllLines(openFileDialog1.FileName);
                     images = text[0];
                     labels = text[1];
-                    //session_flag = true;
 
                     textBox1.Text = text[2];
                     textBox3.Text = text[3];
@@ -702,7 +760,6 @@ namespace MNIST
                 chart2.Series[0].Points.Clear();
                 backgroundWorker1.RunWorkerAsync();
                 button4.Text = "Стоп";
-                sessionFlag = true;
             }
             else
             {
@@ -722,7 +779,6 @@ namespace MNIST
                         if (obj is TextBox) obj.Enabled = true;
                     }
                     button4.Text = "Запись";
-                    sessionFlag = false;
                 }
             }
         }
@@ -750,7 +806,6 @@ namespace MNIST
                 chart2.Series[0].Points.Clear();
                 backgroundWorker1.RunWorkerAsync(); //запуск потока
                 button4.Enabled = false;
-                sessionFlag = false;
             }
             else if (backgroundWorker1.WorkerSupportsCancellation == true)
             {
@@ -768,7 +823,6 @@ namespace MNIST
                     if (obj is TextBox) obj.Enabled = true;
                 }
                 button4.Enabled = true;
-                sessionFlag = true;
             }
         }
 

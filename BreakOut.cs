@@ -26,7 +26,7 @@ namespace MNIST
             byte[,] pixels = new byte[28, 28];
             if (woll == 0)//Начало новой игры
             {
-                //bas = 1;
+                bas = 5;
 
                 trail.Clear(); //стираю след мяча
                 boll[0] = 4;
@@ -36,7 +36,7 @@ namespace MNIST
 
                 woll = 6;//Количество блоков
                 Word[2, 9] = 1; Word[4, 9] = 1; Word[6, 9] = 1; Word[8, 9] = 1;//
-                Word[2, 7] = 1; Word[8, 7] = 1;//Word[4, 7] = 1;Word[6, 7] = 1;
+                Word[2, 7] = 1; Word[4, 7] = 1; Word[6, 7] = 1; Word[8, 7] = 1;// 
             }
             else
             {

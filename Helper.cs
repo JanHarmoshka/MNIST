@@ -57,7 +57,10 @@ public static class BackgroundWorkerHelper
         {
             for (int j = 0; j <= focusSize; j++)
             {
-                pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
+                if (i + Y < 28 && j + X < 28 && i + Y > 0 && j + X > 0)
+                {
+                    pixels_[i + 6, j + 6] = pixels[i + Y, j + X];
+                }
             }
         }
         return pixels_;
