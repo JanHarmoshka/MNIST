@@ -28,7 +28,7 @@ namespace MNIST
             {
                 matte.Add(0);
             }
-            appeal = satiety;
+            appeal = 0.1f;
 
             Control_value = 250;
             this.Sleep();
@@ -88,7 +88,7 @@ namespace MNIST
             {
                 if (summ_0 < 0.3f)
                 {
-                    if (Control_value > 0)//&& !elect
+                    if (Control_value > 0)
                     {
                         Control_value--;
                         Contraction_ = true;
@@ -123,7 +123,7 @@ namespace MNIST
             Contraction = true;
             for (int j = 1; j < mask.Count; j++)
             {
-                if (InputData[j] >= 1)
+                if (InputData[j] >= 1 )
                 {
                     mask[j]++;
                 }
@@ -152,6 +152,7 @@ namespace MNIST
         public int matteNegative;
         public Single summ;
         public Single summCorrect;
+
 
         public ReverseMatte(List<float> InputData, int IndexData, List<float> inter_result, int nn, float satiety = 0.3f)
         {
@@ -202,7 +203,7 @@ namespace MNIST
             {
                 for (int j = 1; j < inter_result.Count; j++)
                 {
-                    if (inter_result[j] > 0.0f)
+                    if (inter_result[j] > 0.0f && summCorrect < 10)
                     {
                         Refined[j] = Refined[j] + inter_result[j];
                     }
@@ -212,7 +213,8 @@ namespace MNIST
 
             if (leader)
             {
-                for (int j = 1; j < InputData.Count; j++)
+                int ICount = InputData.Count;
+                for (int j = 1; j < ICount; j++)
                 {
                     if (InputData[j] == 1)
                     {
@@ -245,7 +247,7 @@ namespace MNIST
             {
                 for (int j = 1; j < inter_result.Count; j++)
                 {
-                    if (inter_result[j] > 0.0f)
+                    if (inter_result[j] > 0.0f && summCorrect < 10)
                     {
                         Refined[j] = Refined[j] + inter_result[j];
                     }
@@ -281,13 +283,12 @@ namespace MNIST
                     }
                 }
             }
-
-
             this.Sleep();
         }
         /// Сон результирующей маски.
         /// Это ситуация повторного обучения результирующей маски, после обновления
         /// представления об ассоциированном с группой событии.
+        /// <param name="rnd"></param>
         public void Sleep()
         {
             Contraction = false;
@@ -299,12 +300,14 @@ namespace MNIST
             mattepPositive = 0;
             matteNegative = 0;
 
-            calculatedMax = max / 2.0f;
-  
+            calculatedMax = max / 2f;
+            Random rnd = new Random();
+
             for (int j = 0; j < mask.Count; j++)
             {
                 matteNegative++;
-                matte[j] = mask[j] - calculatedMax;
+                    matte[j] = mask[j] - calculatedMax;               
+
                 if (matte[j] > 0)
                 {
                     summ += matte[j];
@@ -316,7 +319,7 @@ namespace MNIST
             for (int j = 0; j < mask.Count; j++)
             {
                 matteVar = matte[j] / summ;
-                if (matteVar <= -0.01f || matteVar >= 0.01f)
+                if (matteVar <= -0.001f || matteVar >= 0.001f)
                 {
                     matte[j] = matteVar;
                 }

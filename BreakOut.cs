@@ -31,10 +31,10 @@ namespace MNIST
                 trail.Clear(); //стираю след мяча
                 boll[0] = 4;
                 boll[1] = 1;
-                ballСhange[0] = 1;
+                ballСhange[0] = -1;
                 ballСhange[1] = 1;
 
-                woll = 6;//Количество блоков
+                woll = 6;//Количество блоков (должно быть 8, но пока только 6)
                 Word[2, 9] = 1; Word[4, 9] = 1; Word[6, 9] = 1; Word[8, 9] = 1;//
                 Word[2, 7] = 1; Word[4, 7] = 1; Word[6, 7] = 1; Word[8, 7] = 1;// 
             }
@@ -132,7 +132,7 @@ namespace MNIST
                             ballСhange[0] = -1;
                         }
                         ballСhange[1] = 1;
-                    }
+                    }                   
                 }
             }
 

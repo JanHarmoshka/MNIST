@@ -29,18 +29,12 @@ namespace MNIST
         public List<Matte> Mattes = new List<Matte>();
         public List<ReverseMatte> ReverseMattes = new List<ReverseMatte>();
         private List<bool> ReverseMattes_List = new List<bool>();
-        //readonly List<float> inter_result_ = new List<float>();
-
 
         public int ErrorCount { get; set; } = 60000;//Количество элементов. 
-
-        //public bool LessonTrigger { get; set; } = false;
 
         public float Satiety { get; set; } = 0.15f; //Порог жизни маски
 
         public float CorrectionThreshold { get; set; } = 0.8f;
-
-        //public float V2 { get; set; } = 0.7f;//Мах возраст участия
 
         public float V5 { get; set; } = 0.2f;//Мах активность группы
 
@@ -95,7 +89,7 @@ namespace MNIST
             if (inputDataCount > 0 && ReverseMattes.Count > 0 && firstAssessment.Count > 0)
             {
                 _ = new Correction(inputDataCount, ReverseMattes, firstAssessment, secondAssessment, interData, semblance, indexData_);
-                indexData = indexData_[0];// Индекс узнанного нейросетью события (вспомогательная величина не соотносящаяся с реальным событием)
+                indexData = indexData_[0];// Индекс узнанного нейросетью события (вспомогательная величина соотносящаяся с реальным событием)
             }
 
             for (int i = 0; i < inputDataCount; i++)// Порог минимального значения входящих данных после коррекции     
@@ -115,11 +109,13 @@ namespace MNIST
             for (int i = inputDataCount - dispenser; i < inputDataCount; i++)
             {
                 counter.inter_Data_.Add(interData[i] > 1 ? (byte)1 : (byte)0); //Список активных моторных нейронов
-                if (interData[i] > 1) counter.summ2++;// сведения о наличии активности моторных нейронов 
+                if (interData[i] > 1)
+                    counter.summ2++;// сведения о наличии активности моторных нейронов 
             }
 
             counter.inter_Data_Full.Clear();
-            for (int i = 0; i < inputDataCount; i++) counter.inter_Data_Full.Add(interData[i] > 1 ? (byte)1 : (byte)0);// Список активных зрительных и моторных нейронов. Передаётся в обработчик движения Preparationinput 
+            for (int i = 0; i < inputDataCount; i++)
+                counter.inter_Data_Full.Add(interData[i] > 1 ? (byte)1 : (byte)0);// Список активных зрительных и моторных нейронов. Передаётся в обработчик движения Preparationinput 
 
 
             if (Mattes.Count == 0) //Инициализация нейронов первого слоя
@@ -140,6 +136,10 @@ namespace MNIST
             ActivityMasks activityMasks = new ActivityMasks(activityMasksArgs, internalActivityMasksArgs, inputDataCount, dispenser); //Расчёт активности первого слоя
             float Activ_ = activityMasks.Activ_; //Значение активнсти самого возбуждённого нейрона первого слоя
             int Index = activityMasks.Index; //Самый возбуждённый нейрон первого слоя
+            for (int i = 0; i < firstContractionInterResult.Count; i++) //Фиксируется обращение к нейроны первого слоя
+            {
+                Mattes[i].Contraction_ = false;
+            }
 
             for (int i = 0; i < interResult.Count; i++) counter.room2.Add((int)Math.Truncate(interResult[i] * 100));// Выыод данных для графтка активности первого слоя
 
@@ -149,6 +149,13 @@ namespace MNIST
             int maxActivityIndex = activityReverseMasks.Ind; //Самый возбуждённый нейрон второго слоя
             float firstActiv = activityReverseMasks.Activ; // Значение максимального возбуждения среди зрительных нейронов
             float secondActiv = activityReverseMasks.secondActiv;//Значение максимального возбуждения среди моторных нейронов
+            for (int i = 0; i < firstAssessment.Count; i++) //Фиксируется обращение к нейроны второго слоя
+            {
+                if (firstAssessment[i] > 0)
+                {
+                    ReverseMattes[i].Contraction_ = false;
+                }
+            }
 
             if (assessmentCounter % 4000 == 0)//Вывод в консоль кратких сведеней о нейросети            
                 Message += "нейр:" + Mattes.Count.ToString() + " гр:" + ReverseMattes.Count.ToString() + "\r\n";
@@ -160,7 +167,7 @@ namespace MNIST
             }
             else
             {
-                bool IndVarMax = maxActivityIndex == -1 || (firstActiv < 0.2f && secondActiv < 0.2f && firstActiv > 0.0f && secondActiv > 0.0f); // Если нет активных нейронов во втором слое или если возбуждение нейрона второго слоя не значительно.
+                bool IndVarMax = maxActivityIndex == -1; // Если нет активных нейронов во втором слое или если возбуждение нейрона второго слоя не значительно.|| (firstActiv < 0.05f && firstActiv > 0.0f)
 
                 if (firstAssessment.Count > 0 && (IndVarMax))
                 {
@@ -180,7 +187,7 @@ namespace MNIST
                 }
             }//Конец формирования второго слоя
 
-            TeachReverseMatte(inputData, indexData, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex); //Обучение второго слоя
+            TeachReverseMatte(inputData, Activ_, interResult, ref correctTrigger, pass, counter, activityReverseMasks, ref maxActivityIndex); //Обучение второго слоя
 
 
             if (assessmentCounter % 10 == 0) FixLesson(pass, SleepStep, Mattes, ReverseMattes); //Фиксация обоих слоёв
@@ -190,7 +197,7 @@ namespace MNIST
 
 
 
-        private void TeachReverseMatte(List<float> inputData, int dataIndex, List<float> interResult, ref bool correctTrigger, bool pass, Counter counter, ActivityReverseMasks activityReverseMasks, ref int index)
+        private void TeachReverseMatte(List<float> inputData, float Activ_, List<float> interResult, ref bool correctTrigger, bool pass, Counter counter, ActivityReverseMasks activityReverseMasks, ref int index)
         {
             float activ = activityReverseMasks.Activ;
             counter.str1 = activ;
@@ -203,12 +210,13 @@ namespace MNIST
                 }
             }
 
-            if (index > -1 && pass)
+
+            if (index > -1 && pass) //Если есть активный нейрон первого слоя, давно создан 
             {
                 activ = firstAssessment[index];
-                if (ReverseMattes[index].room) //Основной цикл обучения самого возбуждённого нейрона второго слоя начинается только для тех нейронов, которые имеют приемственность в передаче сигнала.
+                if (ReverseMattes[index].room && activ >= 0.3f) //Основной цикл обучения самого возбуждённого нейрона второго слоя начинается только для тех нейронов, которые имеют приемственность в передаче сигнала и высокую активность.
                 {
-                    if (activ > 0.7f && ReverseMattes[index].participation > 2) // Если нейрон достаточно активен и участвует в цепочке возбуждения.
+                    if (activ >= 0.7f) // Если нейрон достаточно активен и участвует в цепочке возбуждения.
                     {
                         ReverseMattes[index].Lesson(inputData, interResult, correctTrigger); // Нейрон обучается как на входящей в слой информации, так и на информации поступившей в нейронную сеть. Последнее необходимо для формирования исходящего сигнала передаваемого в обработчик движения Preparationinput.
                     }
@@ -216,15 +224,17 @@ namespace MNIST
                     {
                         ReverseMattes[index].Lesson(inputData, interResult);
                     }
-                    ReverseMattes[index].appeal_ += 0.01f;
+                    if (ReverseMattes[index].appeal_ < 2)
+                        ReverseMattes[index].appeal_ += 0.001f;
                 }//Конец основного цикла обучения
 
                 for (int i = 0; i < ReverseMattes.Count; i++)// Формирование обстракций
                 {
-                    if (index != i && firstAssessment[i] > 0 && !ReverseMattes[i].room)
+                    if (index != i && firstAssessment[i] > 0 && ReverseMattes[i].appeal_ < 0.5f)
                     {
-                        ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] * 0.00001f);
-                        ReverseMattes[i].appeal_ += firstAssessment[i] * 0.001f;
+                        ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] * 0.0001f);
+                        if (ReverseMattes[i].appeal_ < 2)
+                            ReverseMattes[i].appeal_ += firstAssessment[i] * 0.001f;
                     }
                 }//Конец формирования абстракций                
             }
@@ -241,7 +251,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (mattes[j].Contraction_)//&& !mattes[j].elect
+                    if (mattes[j].Contraction_)
                     {
                         mattes[j].Control_value--;
                     }
@@ -255,7 +265,7 @@ namespace MNIST
                 }
                 else
                 {
-                    if (reverseMattes[i].Contraction_ && pass)//&& !reverseMattes[i].elect&& reverseMattes[i].appeal_ <= 0.2f
+                    if (reverseMattes[i].Contraction_ && pass)
                     {
                         reverseMattes[i].Control_value -= 0.01f;
                     }
@@ -289,19 +299,21 @@ namespace MNIST
 
         private void TeachMatte(List<float> inputData, float Activ_, int index, List<Matte> mattes)
         {
-            if (Activ_ > 0)// Если в первом слое есть активный нейрон mattes[index].appeal
-            {
-                mattes[index].Lesson(inputData);
-                if (mattes[index].appeal < 0.7f)
-                {
-                    mattes[index].appeal += 0.01f;
-                }
-            }
-
-            if (Activ_ <= 0.7f) //Дублирование самого возбуждённого нейрона первого слоя, если его активность не превышает порог, или создание нового нейрона.
+            if (Activ_ <= 0.1f) //Дублирование самого возбуждённого нейрона первого слоя, если его активность не превышает порог, или создание нового нейрона.
             {
                 Matte matte = new Matte(inputData, (ushort)(mattes[mattes.Count - 1].room + 1), Satiety);
                 mattes.Add(matte);
+            }
+            else
+            {
+                if (Activ_ > 0.8f && mattes[index].appeal > 0.5f)// Если в первом слое есть активный нейрон mattes[index].appeal
+                {
+                    mattes[index].Lesson(inputData);
+                }
+                if (mattes[index].appeal < 1.0f)
+                {
+                    mattes[index].appeal += 0.01f;
+                }
             }
         }
 

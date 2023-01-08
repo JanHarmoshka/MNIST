@@ -66,7 +66,6 @@ namespace MNIST
             return BitConverter.ToInt32(intAsBytes, 0);
         }
 
-        //bool sessionFlag = false;
         private void стартToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -96,7 +95,6 @@ namespace MNIST
             List<float> InputData = new List<float>();
             List<byte> InputDataBuf = new List<byte>();
             byte[] IndexList = new byte[14];
-            // bool Eror_Bool;
             int NumberGames = 0;
 
             int X = 7;
@@ -135,8 +133,6 @@ namespace MNIST
                     byte[,] pixels = new byte[28, 28];
 
                     int focusSize = 6;// Размер зрачка
-
-                    //Harmoshka.LessonTrigger = sessionFlag;
 
                     //основной алгоритм программы
 
@@ -191,24 +187,11 @@ namespace MNIST
                             minWoll = game.minWoll;
                         }
 
-                        //if (summ == 0)
-                        //{
-                        //    summ = counter.summ2;
-                        //}
-                        //else if (counter.summ2 > 0)
-                        //{
-                        //    summ = ((counter.summ2 + summ) / 2f);
-                        //}
-
-                        //if (counter.summ2 == 0)
-                        //{
-                        //    summ_0++;
-                        //}
 
 
                         if (bb % 600f == 0)// Вывод статистики о времени работы и ошибке
                         {
-                            Harmoshka.Message += String.Format(">>{0:000}% ", (bb / 600.001f)) + "Сыграно:" + NumberGames;//+ " " + String.Format("{0:000} ", summ) + " " + summ_0
+                            Harmoshka.Message += String.Format(">>{0:000}% ", (bb / 600.001f)) + "Сыграно:" + NumberGames;//
                             Harmoshka.Message += String.Format(" {00:00.0}", sw.ElapsedMilliseconds / 1000.0f) + "c" + "\r\n";
                             sw.Restart();
                             NumberGames = 0;
@@ -219,7 +202,6 @@ namespace MNIST
 
                         allError++;
                         all.Add(1);
-                        //Eror_Bool = true;
 
 
                         bool TabPagesBool = false;
@@ -251,7 +233,6 @@ namespace MNIST
                             GreenCount += preparation_input.GreenCount;
                             X = preparation_input.X;
                             Y = preparation_input.Y;
-                            //semblance = preparation_input.Semblance;
 
 
 
@@ -272,7 +253,6 @@ namespace MNIST
 
                                 b2 = new Bitmap(b2, new Size(280, 280)); //прорисовка переферийного зрения
                                 DrawImage(pictureBox5, b2);
-                                // DrawImage(pictureBox6, preparation_input.bitMap_Draw);
                                 DrawImage(pictureBox4, preparation_input.way_Draw);
 
                                 label16.Invoke((MethodInvoker)delegate
@@ -288,21 +268,12 @@ namespace MNIST
                             Xb = X;
                             Yb = Y;
 
-                            //for (int i = 0; i < InputData.Count; i++)
-                            //{
-                            //    if (rnd.Next(0, 9) > 8)
-                            //    {
-                            //        InputData[i] = 0;
-                            //    }
-                            //    if (rnd.Next(0, 9) > 8)
-                            //    {
-                            //        InputData[i] = 1;
-                            //    }
-                            //}
+
                             for (int i = 0; i < preparation_input.InputData.Count; i++) // К входящиму в нейросеть сигналу добавляется информация о движении
                             {
                                 InputData.Add(preparation_input.InputData[i] > 0 ? 1 : 0);
                             }
+
                             counter = Harmoshka.Assessment(784, InputData, semblance); // вход в нейронную сеть
 
                             if (TabPages4Bool && !TabPages4BoolStop)
@@ -325,15 +296,39 @@ namespace MNIST
                                             String.Format("|{00:0000} ", (item.room)) + String.Format("|{00:0000} ", (item.participation)) + String.Format("|{00:0.000} ", (item.summCorrect)) + "\r\n";
                                     }
                                     richTextBox1.Text += Text + "____________________________" + "\r\n";
+                                    //Text = "";
+                                    //foreach (ReverseMatte item in Harmoshka.ReverseMattes)
+                                    //{
+                                    //    int ln = 0;
+                                    //    for (int i = 1000 - 784; i < 1000; i++)
+                                    //    {
+                                    //        if (item.matte[i] > 0)
+                                    //        {
+                                    //            Text += "|";
+                                    //        }
+                                    //        else if (item.matte[i] == 0)
+                                    //        {
+                                    //            Text += " ";
+                                    //        }
+                                    //        else
+                                    //        {
+                                    //            Text += ".";
+                                    //        }
+                                    //        ln++;
+                                    //        if (ln == 28)
+                                    //        {
+                                    //            Text += "\r\n";
+                                    //            ln = 0;
+                                    //        }
+                                    //    }
+                                    //    Text += "\r\n" + "\r\n";
+                                    //}
+                                    //richTextBox1.Text += Text + "____________________________" + "\r\n";
                                 });
                                 TabPages4BoolStop = true;
                             }
 
-                            //if (counter.str2 && Eror_Bool)
-                            //{
-                            //    Eror_Bool = false;
-                            //}
-                            int p = (int)(Math.Round(Y / 2.4f) - 1);
+                            int p = (int)(Math.Round(Y / 2.0f) - 1);
                             if (p < 0)
                             {
                                 p = 0;
@@ -479,8 +474,6 @@ namespace MNIST
 
             Harmoshka.CorrectionThreshold = float.Parse(textBox8.Text);
 
-            //Harmoshka.V2 = float.Parse(textBox7.Text);
-
             Harmoshka.V5 = float.Parse(textBox12.Text);
 
             Harmoshka.MemoryDuration = int.Parse(textBox9.Text);
@@ -546,11 +539,8 @@ namespace MNIST
                 series.Add((int)y1);
                 if ((sender as BackgroundWorker).CancellationPending != true)
                 {
-                    //if (greenToBlackRatio > 0)
-                    //{
                     chart2.Series["N"].Points.AddXY(series.Count - 2, greenToBlackRatio); //график участия нейронной сети в управлении фокусом
-                    chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);//график прироста побед
-                    //}
+                    chart1.Series["Y"].Points.AddXY(series.Count - 2, y1);//график прироста побед                  
                 }
                 return;
             }

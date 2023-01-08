@@ -37,7 +37,6 @@ namespace MNIST
         public int X { get; private set; }
         public int Y { get; private set; }
         private int wayMax = 256;
-        private int wayMin = 255;
 
         public List<byte> InputData = new List<byte>();
         private const int focusFieldSize = 28; //Размер поля. 
@@ -82,7 +81,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if ((counter.summ2 < 30 || counter.summ2 > 55) || X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения counter.summ < 1 && counter.inter_Data_.Count < 1 || 
+            if ((counter.summ2 < 15 || counter.summ2 > 55) || X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения counter.summ < 1 && counter.inter_Data_.Count < 1 || 
             {
 
                 InputData.Clear();
@@ -90,7 +89,7 @@ namespace MNIST
                 BlackCount++;
                 GreenCount--;
 
-                ShakeXYBuf(XYBuf);//rnd,
+                ShakeXYBuf(XYBuf);
 
                 X = XYBuf[0];
                 Y = XYBuf[1];
@@ -98,7 +97,7 @@ namespace MNIST
 
                 byte[,] Coordinates = new byte[focusFieldSize, focusFieldSize];
 
-                InitializeCoordinates(Coordinates, X, Y); //На сгенерированных координатах фокуса    //  rnd,          
+                InitializeCoordinates(Coordinates, X, Y); //На сгенерированных координатах фокуса    
 
                 counter.inter_Data_.Clear();
                 for (int i = 0; i < focusFieldSize; i++)
@@ -125,10 +124,10 @@ namespace MNIST
 
 
             {// Прорисовка того, как зрачёк движится по полю (в каких точках он бывает чаще).
-                way[X + 2, Y + 2] += 1;
-                if (wayMax < way[X + 2, Y + 2])//&& IsColoured
+                way[Y, X] += 1;
+                if (wayMax < way[Y, X])
                 {
-                    wayMax = way[X + 2, Y + 2] + 1;
+                    wayMax = way[Y, X] + 1;
                 }
 
 
@@ -143,16 +142,7 @@ namespace MNIST
                             if (way[i, j] > 0)
                             {
                                 way[i, j] = 256 - wayByte[i, j];
-                                if (wayByte[i, j] < wayMin && wayByte[i, j] > 10)
-                                {
-                                    wayMin = wayByte[i, j];
-                                }
                             }
-                            //if (meter == 10 && way[i, j] > 10)
-                            //{
-                            //    way[i, j] -= 10;
-                            //}
-
                         }
                     }
                     if (meter == 0)
@@ -164,7 +154,6 @@ namespace MNIST
                         way_Draw = BitmapMaker.MakeGreyBitmap(wayByte, X + 3, Y + 3, true);//wayMin + 10,
                     }
                     wayMax = 256;
-                    wayMin = 256;
                     meter = 100;
                 }
             }
@@ -234,23 +223,6 @@ namespace MNIST
         }
 
         /// <summary>
-        /// Эта функция возвращает зрачёк если он оказывается за границами поля. 
-        /// </summary>
-        //private void BackXYBufInLimits(Random rnd, int[] XYBuf)
-        //{
-        //    if (X < lowerLimit || X > upperLimit)
-        //    {
-        //        X = rnd.Next(lowerLimit, upperLimit);
-        //        XYBuf[0] = (byte)X;
-        //    }
-        //    if (Y < lowerLimit || Y > upperLimit)
-        //    {
-        //        Y = rnd.Next(lowerLimit, upperLimit);
-        //        XYBuf[1] = (byte)Y;
-        //    }
-        //}
-
-        /// <summary>
         /// Эта функция выводит рисунок пятна фокуса на поле. 
         /// </summary>
         private void DrawFocus(Counter counter, int X, int Y)
@@ -282,37 +254,11 @@ namespace MNIST
             if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 20)
             {
                 waiting = 0;
-                XYBuf[0] = upperLimit - rnd.Next(lowerLimit, upperLimit);
-                XYBuf[1] = upperLimit - rnd.Next(lowerLimit, upperLimit);
+                XYBuf[0] = rnd.Next(lowerLimit, upperLimit - 2);//upperLimit -
+                XYBuf[1] = rnd.Next(lowerLimit, upperLimit - 2);//upperLimit -
             }
             waiting++;
         }
-
-        /// <summary>
-        /// Эта функция препятствует "зависанию" зрачка на одном и томже месте, влияя на нейронную сеть. 
-        /// </summary>
-        //private float CalculateSemblance(int Xb, int Yb, float semblance)
-        //{
-        //    if (prevX2 > 0 && prevY2 > 0)
-        //    {
-        //        if ((prevX2 == X && prevY2 == Y) || (prevX2 == Xb && prevY2 == Yb))
-        //        {
-        //            if (semblance > 1)
-        //            {
-        //                semblance -= 7f;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            semblance = 22;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        semblance = 22;
-        //    }
-        //    return semblance;
-        //}
 
         /// <summary>
         /// Эта функция создаёт пятно фокуса на поле. 
@@ -324,7 +270,7 @@ namespace MNIST
             //{
             //    for (int j = 0; j < focusFieldSize; j++)
             //    {
-            //        if (rnd.Next(100) <= 1)
+            //        if (rnd.Next(100) == 1)
             //        {
             //            Coordinates[i, j] = 1;
             //        }
@@ -334,8 +280,7 @@ namespace MNIST
             {
                 for (int j = 0; j < proportions; j++)
                 {
-                    bool cond = i + Y + proportions / 2 > 0 && i + Y < focusFieldSize &&
-                        j + X + proportions / 2 > 0 && j + X < focusFieldSize;
+                    bool cond = i + Y + proportions / 2 > 0 && i + Y < focusFieldSize && j + X + proportions / 2 > 0 && j + X < focusFieldSize;
                     if (cond) Coordinates[i + Y, j + X] = 1;
 
                 }
@@ -369,8 +314,8 @@ namespace MNIST
                 }
                 if (num > 0)
                 {
-                    X = (int)Math.Ceiling(SumX / num) - 3;
-                    Y = (int)Math.Ceiling(SumY / num) - 3;
+                    X = (int)Math.Ceiling(SumX / num);//- 2
+                    Y = (int)Math.Ceiling(SumY / num);//- 2
                 }
             }
             return Tuple.Create(X, Y);
@@ -395,7 +340,7 @@ namespace MNIST
             {
                 for (int j = 0; j < 28; ++j)
                 {
-                    if (pixels[i, j] > 0 && pixels[i, j] < 230)
+                    if (pixels[i, j] > 0 && pixels[i, j] < 240)
                     {
                         Color_grey = pixels[i, j];
                         sb.Color = Color.FromArgb(255 - Color_grey, 100, Color_grey);//красное чаще, синие реже
