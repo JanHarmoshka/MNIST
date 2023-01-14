@@ -81,7 +81,7 @@ namespace MNIST
             prevX2 = X;
             prevY2 = Y;
 
-            if ((counter.summ2 < 15 || counter.summ2 > 55) || X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения counter.summ < 1 && counter.inter_Data_.Count < 1 || 
+            if ((counter.summ2 < 5 || counter.summ2 > 65) || X > upperLimit || Y > upperLimit || X < lowerLimit || Y < lowerLimit || (X == Xb && Y == Yb))//Условия для запуска генератора движения counter.summ < 1 && counter.inter_Data_.Count < 1 || 
             {
 
                 InputData.Clear();
@@ -107,6 +107,10 @@ namespace MNIST
                         counter.inter_Data_.Add(Coordinates[i, j]);// Имитирует данные о пятне фокуса (подменяет данные из нейронной сети, сгенерированными данными)
                     }
                 }
+            }
+            else
+            {
+                //
             }
 
             if ((counter.inter_Data_Full.Count > 0 && !reproduction) || (counter.inter_Data_Full.Count > 0) && isVisualSelected)//Рисовать фокус внимания 
@@ -254,7 +258,7 @@ namespace MNIST
             if ((bufX == XYBuf[0] && bufY == XYBuf[1]) || waiting == 20)
             {
                 waiting = 0;
-                XYBuf[0] = rnd.Next(lowerLimit, upperLimit - 2);//upperLimit -
+                XYBuf[0] = rnd.Next(lowerLimit, upperLimit - 5);//upperLimit -
                 XYBuf[1] = rnd.Next(lowerLimit, upperLimit - 2);//upperLimit -
             }
             waiting++;

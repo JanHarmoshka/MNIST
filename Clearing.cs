@@ -9,48 +9,55 @@ namespace MNIST
         public Clearing(List<Matte> mattes, List<ReverseMatte> reverseMattes, float satiety, List<bool> ReverseMattes_List)
         {
             List<int> empty = new List<int>();
-            for (int j = 0; j < mattes.Count; j++)
+            if (mattes.Count > 500)
             {
-                if ((mattes[j].Control_value <= 0) )
+                for (int j = 0; j < mattes.Count; j++)
                 {
-                    empty.Add(j);
-                }
-            }
-
-            if (empty.Count > 0)
-            {
-                int e;
-                for (int j = 0; j < empty.Count; j++)
-                {
-                    e = empty[j] - j;
-                    mattes.RemoveAt(e);
-                    for (int i = 0; i < reverseMattes.Count; i++)
+                    if ((mattes[j].Control_value <= 0))
                     {
-                        if (reverseMattes[i].Correct.Count > e)
+                        empty.Add(j);
+                    }
+                }
+
+                if (empty.Count > 0)
+                {
+                    int e;
+                    for (int j = 0; j < empty.Count; j++)
+                    {
+                        e = empty[j] - j;
+                        mattes.RemoveAt(e);
+                        for (int i = 0; i < reverseMattes.Count; i++)
                         {
-                            reverseMattes[i].Correct.RemoveAt(e);
-                            reverseMattes[i].Refined.RemoveAt(e);
+                            if (reverseMattes[i].Correct.Count > e)
+                            {
+                                reverseMattes[i].Correct.RemoveAt(e);
+                                reverseMattes[i].Refined.RemoveAt(e);
+                            }
                         }
                     }
                 }
             }
+
             empty.Clear();
 
-            for (int j = 0; j < reverseMattes.Count; j++)
+            if (reverseMattes.Count > 500)
             {
-                if (reverseMattes[j].Control_value <= 0 )
+                for (int j = 0; j < reverseMattes.Count; j++)
                 {
-                    empty.Add(j);
-                    ReverseMattes_List[reverseMattes[j].Live] = false;
+                    if (reverseMattes[j].Control_value <= 0 || (reverseMattes[j].appeal_ > 1 && reverseMattes[j].summ == 0))
+                    {
+                        empty.Add(j);
+                    }
+                }
+                if (empty.Count > 0)
+                {
+                    for (int j = empty.Count - 1; j >= 0; j--)
+                    {
+                        reverseMattes.RemoveAt(empty[j]);
+                    }
                 }
             }
-            if (empty.Count > 0)
-            {
-                for (int j = empty.Count - 1; j >= 0; j--)
-                {
-                    reverseMattes.RemoveAt(empty[j]);
-                }
-            }
+
 
             empty.Clear();
         }
@@ -64,6 +71,10 @@ namespace MNIST
         public float participation;
         public Correction(int inputDataCount, List<ReverseMatte> reverseMattes, List<float> firstAssessment, List<float> secondAssessment, float[] interData, float semblance, List<int> indexData_)
         {
+            if (indexData_.Count == 0)
+            {
+                indexData_.Add(-1);
+            }
             participation = 40;
             if (secondAssessment.Count < firstAssessment.Count)
             {
@@ -98,15 +109,10 @@ namespace MNIST
                         if (reverseMattes[j].participation < participation + 1)
                         {
                             reverseMattes[j].participation++;
-                            if (roomContr && reverseMattes[j].participation > 10)
+                            if (roomContr && reverseMattes[j].participation > 15)
                             {
                                 reverseMattes[j].room = true;
                             }
-                        }
-
-                        if (participation < reverseMattes[j].participation && reverseMattes[j].appeal_ > 0.5f && indexData_.Count < 3)
-                        {
-                            indexData_.Add(j);
                         }
                     }
                     else
@@ -116,10 +122,7 @@ namespace MNIST
                     }
                 }
             }
-            if (indexData_.Count == 0)
-            {
-                indexData_.Add(-1);
-            }
+
 
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MNIST
 {
@@ -19,6 +18,7 @@ namespace MNIST
         public int mattepPositive;
         public int matteNegative;
         public Single summ;
+
 
         public Matte(List<float> InputData, ushort Room, float satiety = 0.4f, bool elect_ = false)
         {
@@ -101,20 +101,6 @@ namespace MNIST
             }
         }
 
-        /// Обучение маски.
-        /// Это ситуация дообучения маски, на текущем представлении о событии.
-        public void Lesson(List<float> InputData, float res)
-        {
-            Contraction = true;
-            for (int j = 1; j < mask.Count; j++)
-            {
-                if (InputData[j] >= 1)
-                {
-                    mask[j] = (mask[j] + (InputData[j] * res * 10f));
-                }
-            }
-            this.Sleep();
-        }
 
         /// Обучение маски.
         /// Это ситуация обучения, на выборке относящейся к искомому событию.
@@ -123,7 +109,7 @@ namespace MNIST
             Contraction = true;
             for (int j = 1; j < mask.Count; j++)
             {
-                if (InputData[j] >= 1 )
+                if (InputData[j] >= 1)
                 {
                     mask[j]++;
                 }
@@ -147,7 +133,8 @@ namespace MNIST
         public List<float> matte = new List<float>();
         public List<float> Refined = new List<float>();
         public List<float> Correct = new List<float>();
-        private Single max;
+        private float maxFirst;
+        private float maxSecond;
         public int mattepPositive;
         public int matteNegative;
         public Single summ;
@@ -158,15 +145,14 @@ namespace MNIST
         {
 
             room = false;
-
+            maxFirst = 1f;
+            maxSecond = 1f;
             participation = 0;
             Live = nn;
             for (int i = 0; i < InputData.Count; i++)
             {
                 mask.Add(InputData[i] * 0.1f);
                 matte.Add(-0f);
-                if (max < mask.Last())
-                    max = mask.Last();
             }
             for (int i = 0; i < inter_result.Count; i++)
             {
@@ -210,18 +196,23 @@ namespace MNIST
                 }
             }
 
-
-            if (leader)
+            int ICount = InputData.Count;
+            for (int j = 1; j < ICount; j++)
             {
-                int ICount = InputData.Count;
-                for (int j = 1; j < ICount; j++)
+                if (InputData[j] >= 1)
                 {
-                    if (InputData[j] == 1)
+                    mask[j]++;
+                    if (j < 216)
                     {
-                        mask[j]++;
-                        if (max < mask[j])
-                            max = mask[j];
+                        if (maxFirst < mask[j])
+                            maxFirst = mask[j];
                     }
+                    else
+                    {
+                        if (maxSecond < mask[j])
+                            maxSecond = mask[j];
+                    }
+
                 }
             }
             this.Sleep();
@@ -299,35 +290,52 @@ namespace MNIST
             summCorrect = 0;
             mattepPositive = 0;
             matteNegative = 0;
-
-            calculatedMax = max / 2f;
-            Random rnd = new Random();
-
-            for (int j = 0; j < mask.Count; j++)
+            if (maxFirst > 1)
             {
-                matteNegative++;
-                    matte[j] = mask[j] - calculatedMax;               
-
-                if (matte[j] > 0)
+                calculatedMax = maxFirst / 2f;
+                for (int j = 0; j < 216; j++)
                 {
-                    summ += matte[j];
-                    matteNegative--;
-                    mattepPositive++;
+                    matteNegative++;
+                    matte[j] = mask[j] - calculatedMax;
+                    if (matte[j] > 0)
+                    {
+                        summ += matte[j];
+                        matteNegative--;
+                        mattepPositive++;
+                    }
+                }
+            }
+            if (maxSecond > 1)
+            {
+                calculatedMax = maxSecond / 2f;
+                for (int j = 0; j < 784; j++)
+                {
+                    matteNegative++;
+                    matte[j] = mask[j] - calculatedMax;
+                    if (matte[j] > 0)
+                    {
+                        summ += matte[j];
+                        matteNegative--;
+                        mattepPositive++;
+                    }
+                }
+            }
+            if (maxFirst > 1 && maxSecond > 1)
+            {
+                for (int j = 0; j < mask.Count; j++)
+                {
+                    matteVar = matte[j] / summ;
+                    if (matteVar <= -0.0001f || matteVar >= 0.0001f)
+                    {
+                        matte[j] = matteVar;
+                    }
+                    else
+                    {
+                        matte[j] = 0;
+                    }
                 }
             }
 
-            for (int j = 0; j < mask.Count; j++)
-            {
-                matteVar = matte[j] / summ;
-                if (matteVar <= -0.001f || matteVar >= 0.001f)
-                {
-                    matte[j] = matteVar;
-                }
-                else
-                {
-                    matte[j] = 0;
-                }
-            }
 
             calculatedMax = 0.01f;
             for (int j = 1; j < Refined.Count; j++)

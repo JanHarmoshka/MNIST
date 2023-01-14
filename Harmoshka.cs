@@ -167,7 +167,7 @@ namespace MNIST
             }
             else
             {
-                bool IndVarMax = maxActivityIndex == -1; // Если нет активных нейронов во втором слое или если возбуждение нейрона второго слоя не значительно.|| (firstActiv < 0.05f && firstActiv > 0.0f)
+                bool IndVarMax = maxActivityIndex == -1 && firstActiv < 0.1f; // Если нет активных нейронов во втором слое или если возбуждение нейрона второго слоя не значительно.|| ( && firstActiv > 0.0f)
 
                 if (firstAssessment.Count > 0 && (IndVarMax))
                 {
@@ -230,11 +230,11 @@ namespace MNIST
 
                 for (int i = 0; i < ReverseMattes.Count; i++)// Формирование обстракций
                 {
-                    if (index != i && firstAssessment[i] > 0 && ReverseMattes[i].appeal_ < 0.5f)
+                    if (index != i && firstAssessment[i] > 0 && ReverseMattes[i].appeal_ < 0.5f)//
                     {
                         ReverseMattes[i].Lesson(inputData, interResult, firstAssessment[i] * 0.0001f);
-                        if (ReverseMattes[i].appeal_ < 2)
-                            ReverseMattes[i].appeal_ += firstAssessment[i] * 0.001f;
+                        //if (ReverseMattes[i].appeal_ < 2)
+                        //    ReverseMattes[i].appeal_ += firstAssessment[i] * 0.001f;
                     }
                 }//Конец формирования абстракций                
             }

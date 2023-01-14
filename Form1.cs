@@ -158,7 +158,7 @@ namespace MNIST
                             return;
                         }
 
-                        if (di % 500 == 0) // Частота прорисовки графиков
+                        if (di % 1000 == 0) // Частота прорисовки графиков
                         {
                             worker.ReportProgress(0);
                         }
@@ -296,34 +296,34 @@ namespace MNIST
                                             String.Format("|{00:0000} ", (item.room)) + String.Format("|{00:0000} ", (item.participation)) + String.Format("|{00:0.000} ", (item.summCorrect)) + "\r\n";
                                     }
                                     richTextBox1.Text += Text + "____________________________" + "\r\n";
-                                    //Text = "";
-                                    //foreach (ReverseMatte item in Harmoshka.ReverseMattes)
-                                    //{
-                                    //    int ln = 0;
-                                    //    for (int i = 1000 - 784; i < 1000; i++)
-                                    //    {
-                                    //        if (item.matte[i] > 0)
-                                    //        {
-                                    //            Text += "|";
-                                    //        }
-                                    //        else if (item.matte[i] == 0)
-                                    //        {
-                                    //            Text += " ";
-                                    //        }
-                                    //        else
-                                    //        {
-                                    //            Text += ".";
-                                    //        }
-                                    //        ln++;
-                                    //        if (ln == 28)
-                                    //        {
-                                    //            Text += "\r\n";
-                                    //            ln = 0;
-                                    //        }
-                                    //    }
-                                    //    Text += "\r\n" + "\r\n";
-                                    //}
-                                    //richTextBox1.Text += Text + "____________________________" + "\r\n";
+                                    Text = "";
+                                    foreach (ReverseMatte item in Harmoshka.ReverseMattes)
+                                    {
+                                        int ln = 0;
+                                        for (int i = 1000 - 784; i < 1000; i++)
+                                        {
+                                            if (item.matte[i] > 0)
+                                            {
+                                                Text += "|";
+                                            }
+                                            else if (item.matte[i] == 0)
+                                            {
+                                                Text += " ";
+                                            }
+                                            else
+                                            {
+                                                Text += ".";
+                                            }
+                                            ln++;
+                                            if (ln == 28)
+                                            {
+                                                Text += "\r\n";
+                                                ln = 0;
+                                            }
+                                        }
+                                        Text += "\r\n" + "\r\n";
+                                    }
+                                    richTextBox1.Text += Text + "____________________________" + "\r\n";
                                 });
                                 TabPages4BoolStop = true;
                             }
@@ -529,6 +529,7 @@ namespace MNIST
                     }
 
                 }
+                label6.Text = greenToBlackRatio.ToString();
                 BlackCount = 0;
                 GreenCount = 0;
 
